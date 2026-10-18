@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Rutina core</string>
+    <string name="widget_desc">Tu rutina diaria de core: si la has hecho hoy, tu racha y un botón para empezar.</string>
+</resources>
