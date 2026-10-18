@@ -350,6 +350,7 @@ bskip.onclick=()=>{if(!done){advance();ui();}};
 breset.onclick=()=>{running=false;bplay.textContent="Empezar";build();lock(false);ui();};
 document.querySelectorAll(".seg button").forEach(b=>b.onclick=()=>{
   rounds=+b.dataset.r; try{localStorage.setItem("rondas",rounds)}catch(e){}
+  try{window.Android&&Android.setRounds(rounds)}catch(e){}
   running=false;bplay.textContent="Empezar";build();ui();});
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&running)lock(true)});
 
@@ -373,6 +374,7 @@ function frame(now){
 requestAnimationFrame(frame);
 
 /* ---------- Integración con la app Android ---------- */
+try{if(window.Android){const r=Android.getRounds();if(r>=1&&r<=6){rounds=r;build();ui();}}}catch(e){}
 window.autoStart=()=>{try{window.scrollTo(0,0);if(!running)bplay.click();}catch(e){}};
 window.refreshStats=()=>{try{if(!window.Android)return;const s=JSON.parse(Android.stats());
   const el=document.getElementById("stats");el.hidden=false;

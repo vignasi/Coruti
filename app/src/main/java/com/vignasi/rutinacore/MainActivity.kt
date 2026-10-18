@@ -1,6 +1,9 @@
 package com.vignasi.rutinacore
 
+import android.Manifest
 import android.annotation.SuppressLint
+import android.content.pm.PackageManager
+import android.os.Build
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
@@ -62,6 +65,12 @@ class MainActivity : Activity() {
         }
         setContentView(web)
 
+        if (Build.VERSION.SDK_INT >= 33 &&
+            checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
+        ) {
+            requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), 1)
+        }
+
         pendingAutostart = intent?.getBooleanExtra(EXTRA_AUTOSTART, false) == true
         web.loadUrl("file:///android_asset/index.html")
     }
@@ -75,7 +84,7 @@ class MainActivity : Activity() {
 
     override fun onResume() {
         super.onResume()
-        RutinaWidget.refreshAll(this)
+        WidgetUpdater.refresh(this, force = true)
         if (pageReady) js("window.refreshStats && window.refreshStats()")
     }
 
@@ -104,7 +113,16 @@ class MainActivity : Activity() {
         @JavascriptInterface
         fun markDone(rounds: Int) {
             Store.markDone(this@MainActivity, rounds)
-            runOnUiThread { RutinaWidget.refreshAll(this@MainActivity) }
+            runOnUiThread { WidgetUpdater.refresh(this@MainActivity, force = true) }
+        }
+
+        @JavascriptInterface
+        fun getRounds(): Int = Store.rounds(this@MainActivity)
+
+        @JavascriptInterface
+        fun setRounds(r: Int) {
+            Store.setRounds(this@MainActivity, r)
+            runOnUiThread { WidgetUpdater.refresh(this@MainActivity, force = true) }
         }
 
         @JavascriptInterface
