@@ -15,8 +15,21 @@ class Config(
     var mancuernas: Boolean = false,
     var rounds: Int = 3,
     var count: Boolean = true,
-    var taper: Boolean = true
+    var taper: Boolean = false,
+    /** Nivel de cada módulo: sube o baja según cómo te haya ido al terminar. */
+    val lv: MutableMap<String, String> = linkedMapOf()
 ) {
+    fun level(mod: String): String = lv[mod]?.takeIf { it in INTENSITIES } ?: intensity
+
+    /** El selector de intensidad iguala todos los módulos. */
+    fun setAll(i: String) {
+        intensity = i
+        for (k in mods.keys) lv[k] = i
+    }
+
+    /** Nivel común de [keys], o null si van a niveles distintos. */
+    fun commonLevel(keys: List<String>): String? = keys.map { level(it) }.toSet().singleOrNull()
+
     fun has(needs: String?): Boolean = when (needs) {
         null -> true
         "correas" -> correas
@@ -27,8 +40,10 @@ class Config(
     fun toJson(): String {
         val m = JSONObject()
         for ((k, v) in mods) m.put(k, v)
+        val l = JSONObject()
+        for (k in mods.keys) l.put(k, level(k))
         return JSONObject()
-            .put("mods", m).put("auto", auto).put("int", intensity)
+            .put("v", 2).put("mods", m).put("lv", l).put("auto", auto).put("int", intensity)
             .put("correas", correas).put("mancuernas", mancuernas)
             .put("rounds", rounds).put("count", count).put("taper", taper)
             .toString()
@@ -37,7 +52,7 @@ class Config(
     companion object {
         fun fromJson(s: String?, fallbackRounds: Int = 3): Config {
             val c = Config(rounds = fallbackRounds.coerceIn(1, 6))
-            if (s.isNullOrBlank()) return c
+            if (s.isNullOrBlank()) { c.setAll(c.intensity); return c }
             return try {
                 val o = JSONObject(s)
                 o.optJSONObject("mods")?.let { m -> for (k in m.keys()) c.mods[k] = m.optBoolean(k, false) }
@@ -47,9 +62,12 @@ class Config(
                 c.mancuernas = o.optBoolean("mancuernas", false)
                 c.rounds = o.optInt("rounds", c.rounds).coerceIn(1, 6)
                 c.count = o.optBoolean("count", true)
-                c.taper = o.optBoolean("taper", true)
+                // Hasta la versión 2 el volumen bajaba en cada ronda por defecto: ahora es opcional
+                c.taper = if (o.optInt("v", 1) < 2) false else o.optBoolean("taper", false)
+                val l = o.optJSONObject("lv")
+                for (k in c.mods.keys) c.lv[k] = l?.optString(k, "")?.takeIf { it in INTENSITIES } ?: c.intensity
                 c
-            } catch (e: Exception) { c }
+            } catch (e: Exception) { c.setAll(c.intensity); c }
         }
     }
 }
@@ -71,10 +89,10 @@ class Step(
 
 class Resolved(val v: Variant, val d: Dose, val ex: String)
 
-fun resolve(slot: Slot, cfg: Config): Resolved? {
+fun resolve(slot: Slot, cfg: Config, level: String = cfg.intensity): Resolved? {
     for (v in slot.variants) {
         if (!cfg.has(v.needs)) continue
-        val d = v.dose ?: v.byInt[cfg.intensity] ?: continue
+        val d = v.dose ?: v.byInt[level] ?: continue
         return Resolved(v, d, d.ex ?: v.ex)
     }
     return null
@@ -103,7 +121,7 @@ fun buildSteps(data: Rutina, cfg: Config, lastDay: String, offset: Int): List<St
         val items = ArrayList<Pair<Resolved, Module?>>()
         data.base.forEach { s -> resolve(s, cfg)?.let { items.add(it to null) } }
         for (m in mods) {
-            val res = m.slots.mapNotNull { resolve(it, cfg) }
+            val res = m.slots.mapNotNull { resolve(it, cfg, cfg.level(m.key)) }
             if (res.isEmpty()) continue
             val pick = if (m.rotate) listOf(res[(r - 1 + offset) % res.size]) else res
             pick.forEach { items.add(it to m) }

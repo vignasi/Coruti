@@ -4,7 +4,8 @@ App Android personal con la rutina diaria de core y pelvis neutra y un widget pa
 
 - **Base (siempre):** psoas, puente de glúteo, dead bug, plancha con retroversión y gato-camello.
 - **Módulos opcionales de fuerza suave:** Abdomen, Pecho, Espalda y Brazos, sin banco. Se activan antes de empezar, en la app o en el widget grande. Con «Alternar automáticamente», un día toca A (Abdomen + Pecho) y el siguiente B (Espalda + Brazos).
-- **Intensidad** Suave / Normal / Fuerte, **material** (correas tipo TRX, mancuernas) y de 1 a 6 **rondas**. Antes de empezar se ve la duración total.
+- **Intensidad** Suave / Normal / Fuerte por módulo: al terminar dices si te ha ido fácil, justo o demasiado y el módulo sube o baja de nivel la próxima vez.
+- **Material**  (correas tipo TRX, mancuernas) y de 1 a 6 **rondas**. Antes de empezar se ve la duración total.
 - **Sin mirar el móvil:** tono agudo al subir o empujar y grave al bajar o volver en cada repetición, cuenta en voz alta opcional, «mitad» y pitidos finales en los ejercicios de mantener. Funciona igual en la app y desde el widget.
 - Peso orientativo por rango y el último peso usado de cada ejercicio con mancuernas.
 

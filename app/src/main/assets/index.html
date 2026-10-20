@@ -92,6 +92,17 @@ fieldset:disabled{opacity:.55}
 .chip{border-radius:999px;padding:0 10px}
 .chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
 .chip[aria-pressed="true"]::before{content:"✓ "}
+.chip{display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.15;padding:6px 10px;min-height:56px;border-radius:16px}
+.chip small{font-weight:400;font-size:.8rem;opacity:.85}
+.chip[aria-pressed="true"]::before{content:none}
+.chip[aria-pressed="true"] span::before{content:"✓ "}
+.hint{color:var(--soft);font-size:.88rem;margin-top:-4px}
+.fb{display:flex;flex-direction:column;gap:10px;background:var(--accent-soft);border-radius:12px;padding:12px}
+.fb h3{font-size:1.4rem}.fb p{margin:0;color:var(--soft);font-size:.92rem}
+#fblist{display:flex;flex-direction:column;gap:12px}
+.fbrow{display:flex;flex-direction:column;gap:6px}
+.fbname{font-weight:700}.fbname small{display:block;font-weight:400;color:var(--soft);font-size:.88rem}
+.fb .seg{background:var(--surface)}
 .seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;border:1.5px solid var(--line);border-radius:12px;overflow:hidden}
 .seg button{border:0;border-radius:0;padding:0 6px;background:transparent}
 .seg button+button{border-left:1.5px solid var(--line)}
@@ -157,6 +168,11 @@ fieldset:disabled{opacity:.55}
       </div>
       <div class="bar" aria-hidden="true"><i id="pbar"></i></div>
       <div class="next" id="pnext"></div>
+      <div class="fb" id="fb" hidden>
+        <h3>¿Cómo te ha ido?</h3>
+        <p>Las 2–3 últimas repeticiones de cada serie tienen que costar. Si no, sube de nivel.</p>
+        <div id="fblist"></div>
+      </div>
       <div class="controls">
         <button class="primary" id="bplay">Empezar</button>
         <button id="bskip">Saltar</button>
@@ -174,7 +190,7 @@ fieldset:disabled{opacity:.55}
         <div class="field"><span class="lbl" id="lmods">Módulos de fuerza</span>
           <div class="chips" id="mods" role="group" aria-labelledby="lmods"></div>
           <label class="tog"><input type="checkbox" id="cauto"><span>Alternar automáticamente<small id="autoinfo"></small></span></label></div>
-        <div class="field"><span class="lbl" id="lint">Intensidad</span>
+        <div class="field"><span class="lbl" id="lint">Intensidad</span><small class="hint" id="intinfo"></small>
           <div class="seg" id="segint" role="group" aria-labelledby="lint">
             <button data-i="S">Suave</button><button data-i="N">Normal</button><button data-i="F">Fuerte</button>
           </div></div>
@@ -188,7 +204,7 @@ fieldset:disabled{opacity:.55}
           <label class="tog"><input type="checkbox" id="cmanc"><span>Tengo mancuernas</span></label></div>
         <div class="field"><span class="lbl">Sonido y volumen</span>
           <label class="tog"><input type="checkbox" id="ccount"><span>Contar en voz alta<small>Si no, solo suenan los tonos de cada repetición</small></span></label>
-          <label class="tog"><input type="checkbox" id="ctaper"><span>Menos volumen en cada ronda<small>Módulos al 100 % en la 1.ª ronda, 80 % en la 2.ª y 60 % desde la 3.ª</small></span></label></div>
+          <label class="tog"><input type="checkbox" id="ctaper"><span>Menos volumen en cada ronda<small>Opcional, para días con poco tiempo: módulos al 100 %, 80 % y 60 %</small></span></label></div>
       </fieldset>
       <div class="lock" id="lockmsg" role="status" hidden>La sesión está en marcha. Pulsa Reiniciar para cambiar los ajustes.</div>
       <details class="plan"><summary>Ver el plan de cada ronda</summary><ol id="plan"></ol></details>
@@ -219,9 +235,14 @@ let D=null;
 
 /* ---------- Guardado: en la app va a Android (compartido con el widget); en el navegador, localStorage ---------- */
 const LS={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
-const DEF_CFG={mods:{abdomen:false,pecho:false,espalda:false,brazos:false},auto:false,int:"S",correas:false,mancuernas:false,rounds:3,count:true,taper:true};
-function normCfg(c){c=c&&typeof c==="object"?c:{};const o={...DEF_CFG,...c,mods:{...DEF_CFG.mods,...(c.mods||{})}};
-  if(!["S","N","F"].includes(o.int))o.int="S"; o.rounds=Math.min(6,Math.max(1,Math.round(+o.rounds)||3)); return o;}
+const LV=["S","N","F"];
+const DEF_CFG={v:2,mods:{abdomen:false,pecho:false,espalda:false,brazos:false},lv:{},auto:false,int:"S",correas:false,mancuernas:false,rounds:3,count:true,taper:false};
+/* Misma normalización que Config.fromJson en Plan.kt. lv = nivel de cada módulo (sube o baja según cómo te haya ido). */
+function normCfg(c){c=c&&typeof c==="object"?c:{};const o={...DEF_CFG,...c,mods:{...DEF_CFG.mods,...(c.mods||{})},lv:{...(c.lv||{})}};
+  if(!LV.includes(o.int))o.int="S"; o.rounds=Math.min(6,Math.max(1,Math.round(+o.rounds)||3));
+  if((+c.v||1)<2) o.taper=false; o.v=2;
+  for(const k in o.mods) if(!LV.includes(o.lv[k])) o.lv[k]=o.int;
+  return o;}
 const store={
   cfg(){try{return normCfg(JSON.parse(A?A.getConfig():LS.get("rutina.cfg")))}catch(e){return normCfg(null)}},
   saveCfg(c){const s=JSON.stringify(c);try{A?A.setConfig(s):LS.set("rutina.cfg",s)}catch(e){}},
@@ -236,10 +257,10 @@ const store={
 const INT={S:"Suave",N:"Normal",F:"Fuerte"};
 const fkg=n=>Number.isInteger(n)?String(n):String(n).replace(".",",");
 const kgRange=kg=>`${fkg(kg[0])}–${fkg(kg[1])} kg por mano`;
-function resolve(slot,cfg){
+function resolve(slot,cfg,level=cfg.int){
   for(const v of (slot.variants||[slot])){
     if(v.needs&&!cfg[v.needs]) continue;
-    const d=v.dose||v[cfg.int]; if(!d) continue;
+    const d=v.dose||v[level]; if(!d) continue;
     return {v,d,ex:d.ex||v.ex};
   }
   return null;
@@ -256,7 +277,7 @@ function buildPlan(cfg,lastDay,offset){
     const f=cfg.taper?D.taper[Math.min(r,D.taper.length)-1]:1, items=[];
     D.base.forEach(it=>{const x=resolve(it,cfg);if(x)items.push([x,null]);});
     mods.forEach(m=>{
-      const res=m.slots.map(s=>resolve(s,cfg)).filter(Boolean); if(!res.length) return;
+      const res=m.slots.map(s=>resolve(s,cfg,cfg.lv[m.key]||cfg.int)).filter(Boolean); if(!res.length) return;
       (m.rotate?[res[(r-1+offset)%res.length]]:res).forEach(x=>items.push([x,m]));
     });
     D.close.forEach(it=>{const x=resolve(it,cfg);if(x)items.push([x,null]);});
@@ -395,7 +416,7 @@ function buildCards(){
   const groups=[{name:"Base",sub:"siempre",keys:[...D.base,...D.close].map(i=>i.ex)}];
   D.modules.forEach(m=>{const keys=[];m.slots.forEach(sl=>sl.variants.forEach(v=>{
     [v.ex,...["S","N","F"].map(i=>v[i]&&v[i].ex)].forEach(k=>{if(k&&!keys.includes(k)&&D.exercises[k])keys.push(k);});}));
-    groups.push({name:m.name,sub:`opcional · día ${m.day}${m.rotate?" · un ejercicio distinto en cada ronda":""}`,keys});});
+    groups.push({name:m.name,sub:`opcional · día ${m.day}`,keys});});
   groups.forEach(g=>{
     const h=document.createElement("h3");h.className="gh";h.innerHTML=`${g.name}<small></small>`;h.querySelector("small").textContent=g.sub;
     const grid=document.createElement("div");grid.className="grid";wrap.append(h,grid);
@@ -424,15 +445,18 @@ const locked=()=>!done&&(running||idx>0||(!!steps[0]&&left<steps[0].s));
 function modsLabel(mods){return mods.length?"Base + "+mods.map(m=>m.name).join(" + "):"Solo la base";}
 function renderSetup(){
   const am=activeModules(cfg,lastDay);
-  $("mods").querySelectorAll(".chip").forEach(b=>{b.setAttribute("aria-pressed",am.some(m=>m.key===b.dataset.m));b.disabled=cfg.auto;});
+  $("mods").querySelectorAll(".chip").forEach(b=>{const on=am.some(m=>m.key===b.dataset.m);b.setAttribute("aria-pressed",on);b.disabled=cfg.auto;
+    b.querySelector("small").textContent=INT[cfg.lv[b.dataset.m]];});
   $("cauto").checked=cfg.auto;
   const nd=lastDay==="A"?"B":"A";
   $("autoinfo").textContent=cfg.auto?`Hoy toca ${nd}: ${D.modules.filter(m=>m.day===nd).map(m=>m.name).join(" + ")}`:"Día A = Abdomen + Pecho, día B = Espalda + Brazos, según la última sesión hecha";
-  $("segint").querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.i===cfg.int));
+  const lvs=[...new Set((am.length?am:D.modules).map(m=>cfg.lv[m.key]))], one=lvs.length===1?lvs[0]:null;
+  $("segint").querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.i===one));
+  $("intinfo").textContent=one?"Para todos los módulos. Cada módulo sube o baja solo según cómo te vaya.":"Cada módulo va a su nivel (lo ves en su botón). Elige uno para igualarlos.";
   $("segr").querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",+b.dataset.r===cfg.rounds));
   $("ccorreas").checked=cfg.correas; $("cmanc").checked=cfg.mancuernas; $("ccount").checked=cfg.count; $("ctaper").checked=cfg.taper;
   $("sumtime").textContent="≈ "+fmt(totalOf(steps));
-  $("sumtxt").textContent=`${modsLabel(am)} · ${cfg.rounds} ${cfg.rounds===1?"ronda":"rondas"} · ${INT[cfg.int]}`;
+  $("sumtxt").textContent=`${modsLabel(am)} · ${cfg.rounds} ${cfg.rounds===1?"ronda":"rondas"}`+(am.length?" · "+(one?INT[one]:"niveles por módulo"):"");
   const plan=$("plan"); plan.innerHTML="";
   for(let r=1;r<=cfg.rounds;r++){const rs=steps.filter(s=>s.r===r&&!s.prep&&!s.rest);
     const li=document.createElement("li"), b=document.createElement("b");
@@ -442,10 +466,10 @@ function renderSetup(){
 }
 function applyCfg(save=true){if(save)store.saveCfg(cfg);running=false;bplay.textContent="Empezar";build();ui();}
 function setupEvents(){
-  D.modules.forEach(m=>{const b=document.createElement("button");b.className="chip";b.dataset.m=m.key;b.textContent=m.name;
+  D.modules.forEach(m=>{const b=document.createElement("button");b.className="chip";b.dataset.m=m.key;b.innerHTML=`<span></span><small></small>`;b.firstChild.textContent=m.name;
     b.onclick=()=>{cfg.mods[m.key]=!cfg.mods[m.key];applyCfg();};$("mods").appendChild(b);});
   $("cauto").onchange=e=>{cfg.auto=e.target.checked;applyCfg();};
-  $("segint").querySelectorAll("button").forEach(b=>b.onclick=()=>{cfg.int=b.dataset.i;applyCfg();});
+  $("segint").querySelectorAll("button").forEach(b=>b.onclick=()=>{cfg.int=b.dataset.i;for(const k in cfg.lv)cfg.lv[k]=cfg.int;applyCfg();});
   $("segr").querySelectorAll("button").forEach(b=>b.onclick=()=>{cfg.rounds=+b.dataset.r;applyCfg();});
   [["ccorreas","correas"],["cmanc","mancuernas"],["ccount","count"],["ctaper","taper"]].forEach(([id,k])=>$(id).onchange=e=>{cfg[k]=e.target.checked;applyCfg();});
 }
@@ -492,7 +516,32 @@ async function lock(on){try{if(on&&navigator.wakeLock) wake=await navigator.wake
 function say(txt){if(A){try{A.speak(txt)}catch(e){}return;}try{if(!window.speechSynthesis)return;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(txt);u.lang="es-ES";u.rate=1.05;speechSynthesis.speak(u);}catch(e){}}
 function chime(){[523,659,784,1047].forEach((f,i)=>setTimeout(()=>beep(f,i===3?.6:.18),i*190));}
 function saveWeight(){if(wcur){store.setWeight(wcur.k,wcur.v);wcur.had=true;}}
+/* Al terminar: cómo te ha ido cada módulo. Fácil = sube de nivel la próxima vez; demasiado = baja. */
+function feedback(mods){
+  const box=$("fb"), list=$("fblist"); list.innerHTML=""; box.hidden=!mods.length;
+  mods.forEach(m=>{
+    const row=document.createElement("div");row.className="fbrow";
+    const lbl=document.createElement("div");lbl.className="fbname";
+    const st=document.createElement("small");
+    const today=cfg.lv[m.key], paint=()=>{lbl.textContent=`${m.name} · hoy en ${INT[today]}`;lbl.appendChild(st);};
+    const seg=document.createElement("div");seg.className="seg";seg.setAttribute("role","group");seg.setAttribute("aria-label",`¿Cómo te ha ido ${m.name}?`);
+    [["up","Fácil"],["ok","Justo"],["down","Demasiado"]].forEach(([k,t])=>{const b=document.createElement("button");b.textContent=t;b.dataset.k=k;
+      b.onclick=()=>{
+        if(row.dataset.prev) cfg.lv[m.key]=row.dataset.prev; else row.dataset.prev=cfg.lv[m.key];
+        const i=LV.indexOf(cfg.lv[m.key]);
+        if(k==="up"&&i<2) cfg.lv[m.key]=LV[i+1];
+        if(k==="down"&&i>0) cfg.lv[m.key]=LV[i-1];
+        st.textContent=k==="up"?(i<2?"La próxima vez sube a "+INT[cfg.lv[m.key]]:"Ya estás en Fuerte: añade una ronda o más peso")
+          :k==="down"?(i>0?"La próxima vez baja a "+INT[cfg.lv[m.key]]:"Ya estás en Suave: baja el rango o descansa más")
+          :"Se queda igual: es el nivel bueno (las 2–3 últimas cuestan)";
+        seg.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b));
+        store.saveCfg(cfg); renderSetup(); paint();
+      };seg.appendChild(b);});
+    paint(); row.append(lbl,seg); list.appendChild(row);
+  });
+}
 function finish(){running=false;done=true;idx=steps.length-1;left=0;bplay.textContent="Repetir";
+  feedback(activeModules(cfg,lastDay));
   player.classList.add("fin");chime();$("live").textContent="Rutina terminada";$("setup").open=true;setTimeout(()=>say("Rutina terminada. Buen trabajo."),900);
   store.done(cfg.rounds,dayType(activeModules(cfg,lastDay)));
   lastDay=store.lastDay(); offset=store.sessions();
@@ -524,13 +573,13 @@ function cues(st,before){
 bplay.onclick=()=>{
   if(!actx){try{actx=new (window.AudioContext||window.webkitAudioContext)();}catch(e){}}
   try{actx&&actx.resume()}catch(e){}
-  if(done) build();
+  if(done){$("fb").hidden=true;build();}
   if(!running&&idx===0&&left===steps[0].s) say(steps[0].say);
   if(!running&&!locked()){$("setup").open=false;player.scrollIntoView({block:"start",behavior:"auto"});}
   running=!running; bplay.textContent=running?"Pausa":"Seguir"; last=performance.now(); lock(running); ui();
 };
 bskip.onclick=()=>{if(!done){advance();ui();}};
-breset.onclick=()=>{running=false;bplay.textContent="Empezar";build();lock(false);ui();$("setup").open=true;};
+breset.onclick=()=>{$("fb").hidden=true;running=false;bplay.textContent="Empezar";build();lock(false);ui();$("setup").open=true;};
 $("wminus").onclick=()=>{if(wcur){wcur.v=Math.max(0.5,wcur.v-0.5);saveWeight();ui();}};
 $("wplus").onclick=()=>{if(wcur){wcur.v=Math.min(60,wcur.v+0.5);saveWeight();ui();}};
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&running)lock(true)});

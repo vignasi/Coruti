@@ -22,7 +22,7 @@ class RutinaWidget : AppWidgetProvider() {
         when (intent.action) {
             ACTION_PLUS -> cfg.rounds = (cfg.rounds + 1).coerceAtMost(6)
             ACTION_MINUS -> cfg.rounds = (cfg.rounds - 1).coerceAtLeast(1)
-            ACTION_INT -> cfg.intensity = INTENSITIES[(INTENSITIES.indexOf(cfg.intensity) + 1) % INTENSITIES.size]
+            ACTION_INT -> cfg.setAll(INTENSITIES[(INTENSITIES.indexOf(cfg.intensity) + 1) % INTENSITIES.size])
             ACTION_AUTO -> cfg.auto = !cfg.auto
             ACTION_MOD -> {
                 val m = intent.getStringExtra(EXTRA_MOD) ?: return
@@ -172,7 +172,9 @@ object WidgetUpdater {
                 rv.setTextViewText(R.id.ex_cap, if (cfg.auto) "Alterna sola: hoy toca el día ${if (Store.lastDay(ctx) == "A") "B" else "A"}" else "Toca los módulos para añadirlos o quitarlos")
             }
             rv.setTextViewText(R.id.time, fmt(totalSeconds(steps)))
-            rv.setTextViewText(R.id.info, "${cfg.rounds} ${if (cfg.rounds == 1) "ronda" else "rondas"} · ${INT_NAME[cfg.intensity]}")
+            val lvl = cfg.commonLevel((if (mods.isEmpty()) data.modules else mods).map { it.key })
+            val lvlName = lvl?.let { INT_NAME[it] } ?: "Mixto"
+            rv.setTextViewText(R.id.info, "${cfg.rounds} ${if (cfg.rounds == 1) "ronda" else "rondas"}" + if (mods.isNotEmpty()) " · $lvlName" else "")
             rv.setProgressBar(R.id.progress, 100, if (Workout.done) 100 else 0, false)
             rv.setTextViewText(R.id.btn_play, if (Workout.done) "▶  Otra vez" else "▶  Empezar")
             rv.setTextViewText(R.id.rounds_lbl, "${cfg.rounds}")
@@ -191,8 +193,8 @@ object WidgetUpdater {
             }
             chip(rv, R.id.chip_auto, "A/B", cfg.auto)
             rv.setContentDescription(R.id.chip_auto, "Alternar automáticamente: ${if (cfg.auto) "activado" else "desactivado"}")
-            chip(rv, R.id.chip_int, INT_NAME[cfg.intensity] ?: "Suave", false)
-            rv.setContentDescription(R.id.chip_int, "Intensidad ${INT_NAME[cfg.intensity]}. Toca para cambiarla")
+            chip(rv, R.id.chip_int, lvlName, false)
+            rv.setContentDescription(R.id.chip_int, "Intensidad $lvlName. Toca para cambiarla en todos los módulos")
             rv.setOnClickPendingIntent(R.id.chip_auto, bc(ctx, 55, RutinaWidget.ACTION_AUTO))
             rv.setOnClickPendingIntent(R.id.chip_int, bc(ctx, 56, RutinaWidget.ACTION_INT))
         }

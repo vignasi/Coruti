@@ -131,14 +131,14 @@
     },
     "crunch_inv": {
       "name": "Crunch inverso",
-      "rep": 4,
+      "rep": 5,
       "unit": "Repetición",
       "vid": "crunch inverso técnica correcta retroversión",
       "cues": [
         "Boca arriba, rodillas dobladas a 90° en el aire, brazos en el suelo",
         "Lleva las rodillas al pecho despegando solo el coxis",
         "Sin impulso: sube con el abdomen, no con las piernas",
-        "Baja despacio sin que se arquee la lumbar"
+        "Las 2–3 últimas tienen que costar: si no, sube de nivel"
       ],
       "marks": {"ab":{"at":["c"],"off":[0,-7],"lab":[40,62]}},
       "poses": [
@@ -146,8 +146,8 @@
         {"h":[26,94],"s":[40,97],"c":[62,95],"p":[82,88],"k1":[66,60],"a1":[94,50],"k2":[68,61],"a2":[96,51],"e1":[58,100],"w1":[76,100],"e2":[60,100],"w2":[78,100]}
       ],
       "phases": [
-        {"pose":1,"move":1.6,"hold":0.4,"tone":"up","sq":["ab"],"arrow":[116,84,96,62],"cap":"Sube (2 s): rodillas al pecho, despega el coxis"},
-        {"pose":0,"move":1.6,"hold":0.4,"tone":"down","sq":["ab"],"cap":"Baja despacio (2 s) sin arquear la lumbar"}
+        {"pose":1,"move":1.5,"hold":0.5,"tone":"up","sq":["ab"],"arrow":[116,84,96,62],"cap":"Sube: rodillas al pecho, despega el coxis y aprieta 1 s"},
+        {"pose":0,"move":2.5,"hold":0.5,"tone":"down","sq":["ab"],"cap":"Baja muy despacio (3 s) sin arquear la lumbar"}
       ]
     },
     "hollow_k": {
@@ -596,17 +596,16 @@
       "key": "abdomen",
       "name": "Abdomen",
       "day": "A",
-      "rotate": true,
       "slots": [
-        {"variants":[{"ex":"crunch_inv","S":{"reps":10},"N":{"reps":12},"F":{"reps":15}}]},
+        {"variants":[{"ex":"crunch_inv","S":{"reps":12},"N":{"reps":15},"F":{"reps":20}}]},
         {
           "variants": [
             {
               "ex": "plancha_lat",
               "sides": ["Lado derecho","Lado izquierdo"],
-              "S": {"ex":"plancha_lat_k","secs":15,"note":"Rodillas apoyadas"},
-              "N": {"secs":25},
-              "F": {"secs":35}
+              "S": {"ex":"plancha_lat_k","secs":20,"note":"Rodillas apoyadas"},
+              "N": {"secs":30},
+              "F": {"secs":40}
             }
           ]
         },
@@ -614,9 +613,9 @@
           "variants": [
             {
               "ex": "hollow_k",
-              "S": {"secs":15,"note":"Rodillas dobladas"},
-              "N": {"ex":"hollow_kb","secs":25,"note":"Rodillas dobladas, brazos atrás"},
-              "F": {"ex":"hollow_l","secs":35,"note":"Piernas estiradas"}
+              "S": {"secs":20,"note":"Rodillas dobladas"},
+              "N": {"ex":"hollow_kb","secs":30,"note":"Rodillas dobladas, brazos atrás"},
+              "F": {"ex":"hollow_l","secs":40,"note":"Piernas estiradas"}
             }
           ]
         }
