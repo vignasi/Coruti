@@ -94,7 +94,7 @@ Tres fases. Cada una tiene un criterio de "hecho" que se puede comprobar con hec
 
 ### Fase 0: cimientos (antes del MVP, 2 a 3 semanas)
 
-No añade funciones visibles, pero hace posible todo lo demás. Es el trabajo que, si se salta, se paga tres veces después.
+No añade funciones visibles, pero hace posible todo lo demás. Es el trabajo que, si se salta, se paga tres veces después. **Se hace entero en la carpeta `next/`, sin modificar `app/`** (ver apartado 3.5): la app actual sigue compilando y publicándose igual mientras tanto.
 
 Funcionalidades:
 - Separar **dominio** (modelo de ejercicio, motor de pasos, lógica de sesión) de **plataforma** (WebView, widget, servicio) en un módulo Kotlin puro sin dependencias de Android. Hoy `Model.kt`, `Data.kt` y `Workout.kt` ya son casi puros; `Store.kt` y el resto no.
@@ -104,9 +104,10 @@ Funcionalidades:
 - Tests del motor de sesión (pasos, tiempos, fases, racha) porque es lo que no puede romperse.
 
 Criterio de hecho:
-- La app hace exactamente lo mismo que hoy desde el punto de vista del usuario (misma rutina, mismo widget, misma voz).
+- La app nueva (`next/`, instalada al lado de la actual con otro `applicationId`) hace exactamente lo mismo que la actual desde el punto de vista del usuario (misma rutina, mismo widget, misma voz).
+- La app actual sigue compilando y publicando `rutina-core.apk` sin un solo cambio en `app/`.
 - Los 5 ejercicios se cargan desde JSON y el renderer es uno solo.
-- La racha y los días hechos migran automáticamente de SharedPreferences a Room al abrir la app actualizada, sin perder nada.
+- La migración de racha y días desde SharedPreferences a Room está escrita y probada con una copia de tus datos reales, aunque no se ejecute en producción hasta que la nueva sustituya a la actual (final de la fase 1).
 - Hay tests que cubren `buildSteps`, `phaseAt`, el cálculo de racha y la migración.
 
 ### Fase 1: MVP, "lo usamos los dos" (8 a 11 semanas)
@@ -222,14 +223,14 @@ Criterios, de más a menos importante para este producto: widget, voz y sonido e
 ### 3.4 Arquitectura objetivo (Android)
 
 ```
-app/                         Android: Compose UI, Glance widget, WorkoutService, Room, Google Sign-In
+next/app/                    Android: Compose UI, Glance widget, WorkoutService, Room, Google Sign-In
 ├── ui/                      pantallas: Hoy, Biblioteca, Planes, Editor de plan, Sesión, Historial, Perfil
 ├── widget/                  Glance/RemoteViews + PoseRenderer (bitmap)
 ├── service/                 WorkoutService (foreground), TTS, tonos, vibración, wake lock
 ├── data/                    Room (entidades del apartado 5), repositorios, cola de sincronización
 └── sync/                    cliente Supabase, auth, push/pull
 
-core/  (Kotlin puro, listo para KMP)
+next/core/  (Kotlin puro, listo para KMP)
 ├── model/                   Exercise, Variant, Plan, Session, SetLog, Preferences
 ├── engine/                  SessionEngine (pasos, tiempos, fases), StreakCalculator, ProgressionRules
 ├── content/                 carga y validación de Exercise JSON v1
@@ -253,7 +254,36 @@ tools/
 
 **Qué cambia respecto a hoy:** `WorkoutService`, `Widgets` y `Workout` dependen de `ROUND`, `EXERCISES` y `buildSteps(rounds)`. Pasan a recibir un plan. Es el cambio más delicado del MVP y conviene hacerlo en fase 0 con tests.
 
-### 3.5 Si tu mujer hubiera tenido iPhone (o cuando alguien lo tenga)
+### 3.5 Convivencia con la app actual: dos proyectos en el mismo repo
+
+Regla fija: **la app que usáis hoy no se toca.** `app/`, `build.gradle.kts`, `settings.gradle.kts` y `.github/workflows/build.yml` siguen exactamente como están y siguen publicando `rutina-core.apk` en cada push a `main`. Cualquier arreglo que necesite la rutina actual se hace ahí, en commits pequeños, sin depender del proyecto nuevo.
+
+El proyecto nuevo vive en una carpeta hermana con su propio Gradle y su propio workflow:
+
+```
+Coruti/
+├── app/                   app actual (Rutina core). No se modifica. Publica rutina-core.apk.
+├── build.gradle.kts       del proyecto actual. No se modifica.
+├── settings.gradle.kts    del proyecto actual. No se modifica.
+├── .github/workflows/
+│   ├── build.yml          actual. Se le añade solo un filtro `paths` para que no compile cuando cambia `next/`.
+│   └── build-next.yml     nuevo. Compila `next/` solo cuando cambia `next/` o `content/`.
+├── next/                  proyecto nuevo (fase 0 en adelante): su propio settings.gradle.kts, módulos :core y :app
+├── content/               ejercicios y planes en JSON, compartidos. La app actual no los lee; la nueva sí.
+├── tools/pose-editor/     editor de poses
+└── docs/                  este plan
+```
+
+Por qué no mover la app actual a una subcarpeta: cambiar las rutas del proyecto que compila la versión en uso es justo el riesgo que se quiere evitar. Lo que se mueve es lo nuevo, que todavía no existe.
+
+Cómo conviven en el móvil durante el desarrollo:
+- El proyecto nuevo se compila con `applicationId` `com.vignasi.rutinacore.next` y otro icono mientras está en pruebas. Así tenéis las dos instaladas a la vez: la de siempre para entrenar y la nueva para probar, sin que una pise a la otra.
+- Cuando la nueva esté lista para sustituir a la actual (final de la fase 1), se cambia el `applicationId` al original `com.vignasi.rutinacore` y se firma con la misma clave: se instala encima, ejecuta la migración de racha y días (apartado 5.5) y la antigua desaparece. Hasta ese día, los dos APK se publican en Releases con nombres distintos (`rutina-core.apk` y `rutina-next.apk`).
+- Si en algún momento el reparto en carpetas molesta (por ejemplo para abrir en Android Studio), la alternativa es un repositorio aparte para `next/`. Es equivalente; la carpeta hermana es más cómoda para compartir `content/`.
+
+Lo que sí puede hacer el proyecto nuevo con el actual: copiar código (`PoseRenderer.kt`, `WorkoutService.kt`, `Model.kt`) y leerlo como referencia. Nunca importarlo como módulo: eso volvería a acoplar los dos.
+
+### 3.6 Si tu mujer hubiera tenido iPhone (o cuando alguien lo tenga)
 
 Aunque hoy no aplica, para que quede escrito:
 
@@ -770,7 +800,7 @@ A 10 a 15 horas por semana, contando una sola persona que conoce el proyecto y u
 
 ## Anexo A: punto de partida
 
-Lo que hay en el repo a fecha de este documento, para que el plan se lea con el código delante:
+Lo que hay en el repo a fecha de este documento, para que el plan se lea con el código delante. Importante: la columna "qué le pasa en el plan" describe qué papel tiene cada archivo en el proyecto nuevo (`next/`); **ninguno de estos archivos se modifica ni se borra** mientras la app actual esté en uso (apartado 3.5).
 
 | Archivo | Qué hace | Qué le pasa en el plan |
 |---|---|---|
