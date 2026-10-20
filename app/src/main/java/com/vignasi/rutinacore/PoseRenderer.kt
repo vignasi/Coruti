@@ -12,7 +12,6 @@ import android.graphics.Typeface
 object PoseRenderer {
     private const val BG = 0xFF1E6B74.toInt()
     private const val INK = 0xFFFFFFFF.toInt()
-    private const val FAR = 0xFF86B9BF.toInt()
     private const val HL = 0xFFF0B04A.toInt()
     private const val HL_INK = 0xFF1D1406.toInt()
     private const val ARROW = 0xFFBDF0F5.toInt()
@@ -71,7 +70,7 @@ object PoseRenderer {
         c.drawLine(4f, 103.5f, 176f, 103.5f, line)
 
         // lado lejano (en vista de frente se ve igual que el cercano)
-        val far = if (ex.front) INK else FAR
+        val far = INK // todas las extremidades del mismo color: es el mismo cuerpo
         limb("p", "k2", far, 4.5f); limb("k2", "a2", far, 4f)
         limb("s", "e2", far, 4f); limb("e2", "w2", far, 3.5f)
 
@@ -106,6 +105,16 @@ object PoseRenderer {
                     fill.color = INK
                     c.drawRect(at[0] - 8f, at[1] - 4.5f, at[0] - 4.5f, at[1] + 4.5f, fill)
                     c.drawRect(at[0] + 4.5f, at[1] - 4.5f, at[0] + 8f, at[1] + 4.5f, fill)
+                }
+                "goma" -> q.to?.let { pose[it] }?.let { to ->
+                    line.color = ARROW; line.strokeWidth = 1.8f
+                    c.drawLine(at[0], at[1], to[0], to[1], line)
+                    fill.color = ARROW
+                    c.drawRect(at[0] - 3f, at[1] - 1.5f, at[0] + 3f, at[1] + 1.5f, fill)
+                }
+                "loop" -> {
+                    line.color = ARROW; line.strokeWidth = 2.4f
+                    c.drawOval(RectF(at[0] - 4f, at[1] - 6.5f, at[0] + 4f, at[1] + 6.5f), line)
                 }
                 "towel" -> q.to?.let { pose[it] }?.let { to ->
                     line.color = GEAR; line.strokeWidth = 3f

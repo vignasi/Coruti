@@ -57,7 +57,7 @@ object WidgetUpdater {
     private var lastSig: String? = null
 
     private val CHIPS = listOf(
-        "abdomen" to R.id.chip_abd, "pecho" to R.id.chip_pec, "espalda" to R.id.chip_esp, "brazos" to R.id.chip_bra
+        "abdomen" to R.id.chip_abd, "pecho" to R.id.chip_pec, "espalda" to R.id.chip_esp, "brazos" to R.id.chip_bra, "gluteo" to R.id.chip_glu
     )
 
     private fun pi(ctx: Context, req: Int, action: String): PendingIntent {
@@ -187,7 +187,7 @@ object WidgetUpdater {
             CHIPS.forEachIndexed { i, (key, id) ->
                 val on = mods.any { it.key == key }
                 val name = data.modules.firstOrNull { it.key == key }?.name ?: key
-                chip(rv, id, (if (on) "✓ " else "") + name, on)
+                chip(rv, id, name, on)
                 rv.setContentDescription(id, "$name: ${if (on) "activado" else "desactivado"}")
                 rv.setOnClickPendingIntent(id, bc(ctx, 50 + i, RutinaWidget.ACTION_MOD, key))
             }

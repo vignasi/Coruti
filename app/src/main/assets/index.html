@@ -88,7 +88,7 @@ fieldset{border:0;margin:0;padding:0;min-width:0;display:flex;flex-direction:col
 fieldset:disabled{opacity:.55}
 .field{display:flex;flex-direction:column;gap:8px}
 .field>.lbl{font-weight:700;font-size:1rem}
-.chips{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.chips{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
 .chip{border-radius:999px;padding:0 10px}
 .chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
 .chip[aria-pressed="true"]::before{content:"✓ "}
@@ -139,7 +139,7 @@ fieldset:disabled{opacity:.55}
   .player{grid-template-columns:1fr;padding:14px}
   .clock{font-size:4.6rem}
   .notes{grid-template-columns:1fr}
-  .chips{grid-template-columns:repeat(2,1fr)}
+  .chips{grid-template-columns:repeat(3,1fr)}
 }
 @media (prefers-reduced-motion: reduce){.setup>summary::after{transition:none}}
 </style>
@@ -201,7 +201,9 @@ fieldset:disabled{opacity:.55}
           </div></div>
         <div class="field"><span class="lbl">Material</span>
           <label class="tog"><input type="checkbox" id="ccorreas"><span>Tengo correas de suspensión (tipo TRX)</span></label>
-          <label class="tog"><input type="checkbox" id="cmanc"><span>Tengo mancuernas</span></label></div>
+          <label class="tog"><input type="checkbox" id="cmanc"><span>Tengo mancuernas</span></label>
+          <label class="tog"><input type="checkbox" id="cgomas"><span>Tengo gomas elásticas con asas<small>Las que se pisan con los pies</small></span></label>
+          <label class="tog"><input type="checkbox" id="cbanda"><span>Tengo banda de glúteo<small>La goma que va por encima de las rodillas</small></span></label></div>
         <div class="field"><span class="lbl">Sonido y volumen</span>
           <label class="tog"><input type="checkbox" id="ccount"><span>Contar en voz alta<small>Si no, solo suenan los tonos de cada repetición</small></span></label>
           <label class="tog"><input type="checkbox" id="ctaper"><span>Menos volumen en cada ronda<small>Opcional, para días con poco tiempo: módulos al 100 %, 80 % y 60 %</small></span></label></div>
@@ -215,7 +217,6 @@ fieldset:disabled{opacity:.55}
     <h2 id="hex">Los ejercicios</h2>
     <div class="legend">
       <span><i class="sw" style="background:var(--hl)"></i>Lo que aprietas o estiras</span><span><i class="sw" style="background:var(--accent)"></i>Hacia dónde te mueves</span>
-      <span><i class="sw" style="background:var(--far)"></i>Extremidad del otro lado</span>
     </div>
     <div class="group" id="groups"></div>
   </section>
@@ -236,7 +237,7 @@ let D=null;
 /* ---------- Guardado: en la app va a Android (compartido con el widget); en el navegador, localStorage ---------- */
 const LS={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
 const LV=["S","N","F"];
-const DEF_CFG={v:2,mods:{abdomen:false,pecho:false,espalda:false,brazos:false},lv:{},auto:false,int:"S",correas:false,mancuernas:false,rounds:3,count:true,taper:false};
+const DEF_CFG={v:2,mods:{abdomen:false,pecho:false,espalda:false,brazos:false,gluteo:false},lv:{},auto:false,int:"S",correas:false,mancuernas:false,gomas:false,banda:false,rounds:3,count:true,taper:false};
 /* Misma normalización que Config.fromJson en Plan.kt. lv = nivel de cada módulo (sube o baja según cómo te haya ido). */
 function normCfg(c){c=c&&typeof c==="object"?c:{};const o={...DEF_CFG,...c,mods:{...DEF_CFG.mods,...(c.mods||{})},lv:{...(c.lv||{})}};
   if(!LV.includes(o.int))o.int="S"; o.rounds=Math.min(6,Math.max(1,Math.round(+o.rounds)||3));
@@ -359,6 +360,9 @@ function gear(ctx,ex,p){
       ctx.fillStyle=COL.soft;ctx.fillRect(h[0]-3,h[1]-1.5,6,3);}
     else if(q.t==="db"){const [x,y]=p[q.at];ctx.strokeStyle=COL.soft;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x-6,y);ctx.lineTo(x+6,y);ctx.stroke();
       ctx.fillStyle=COL.ink;ctx.fillRect(x-8,y-4.5,3.5,9);ctx.fillRect(x+4.5,y-4.5,3.5,9);}
+    else if(q.t==="goma"){const a=p[q.at],b=p[q.to];ctx.strokeStyle=COL.accent;ctx.lineWidth=1.8;ctx.beginPath();ctx.moveTo(...a);ctx.lineTo(...b);ctx.stroke();
+      ctx.fillStyle=COL.accent;ctx.fillRect(a[0]-3,a[1]-1.5,6,3);}
+    else if(q.t==="loop"){const [x,y]=p[q.at];ctx.strokeStyle=COL.accent;ctx.lineWidth=2.4;ctx.beginPath();ctx.ellipse(x,y,4,6.5,0,0,7);ctx.stroke();}
     else if(q.t==="towel"){ctx.strokeStyle=COL.soft;ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(...p[q.at]);ctx.lineTo(p[q.to][0]-2,p[q.to][1]+2);ctx.stroke();}
   });
 }
@@ -375,7 +379,7 @@ function draw(cv,ex,t,clamp,pt){
   const stretchOn=ph.stretch&&ex.stretch, sset=stretchOn?ex.stretch.segs.map(s=>s.join("-")):[];
   const seg=(a,b,col,w)=>{ctx.strokeStyle=col;ctx.lineWidth=w;ctx.beginPath();ctx.moveTo(...p[a]);ctx.lineTo(...p[b]);ctx.stroke();};
   const limb=(a,b,base,w)=>seg(a,b,sset.includes(a+"-"+b)?COL.hl:base,w);
-  const far=ex.front?COL.ink:COL.far;
+  const far=COL.ink;   // todas las extremidades del mismo color: es el mismo cuerpo
   limb("p","k2",far,4.5); limb("k2","a2",far,4); limb("s","e2",far,4); limb("e2","w2",far,3.5);
   ctx.strokeStyle=COL.ink; ctx.lineWidth=6;
   ctx.beginPath(); ctx.moveTo(...p.s); ctx.quadraticCurveTo(2*p.c[0]-(p.s[0]+p.p[0])/2,2*p.c[1]-(p.s[1]+p.p[1])/2,...p.p); ctx.stroke();
@@ -393,7 +397,7 @@ function setCap(o,st){const k=st.idx+"/"+st.n+st.phase.cap; if(o.last===k)return
   o.step.textContent=(st.idx+1)+"/"+st.n; o.txt.textContent=st.phase.cap;}
 
 /* ---------- Fichas por grupo ---------- */
-const NEEDS={correas:"Con correas",mancuernas:"Con mancuernas"};
+const NEEDS={correas:"Con correas",mancuernas:"Con mancuernas",gomas:"Con gomas",banda:"Con banda de glúteo"};
 const cards=[];
 function doseText(key){
   const ex=D.exercises[key];
@@ -409,11 +413,11 @@ function doseText(key){
   }
   return "";
 }
-function needsOf(key){for(const m of D.modules)for(const sl of m.slots)for(const v of sl.variants)
+function needsOf(key){for(const sl of [...D.base,...D.close.map(x=>x),...D.modules.flatMap(m=>m.slots)])for(const v of (sl.variants||[sl]))
   if(v.ex===key||["S","N","F"].some(i=>v[i]&&v[i].ex===key)) return v;return null;}
 function buildCards(){
   const wrap=$("groups"), weights=store.weights();
-  const groups=[{name:"Base",sub:"siempre",keys:[...D.base,...D.close].map(i=>i.ex)}];
+  const groups=[{name:"Base",sub:"siempre",keys:[...D.base,...D.close].flatMap(i=>(i.variants||[i]).map(v=>v.ex))}];
   D.modules.forEach(m=>{const keys=[];m.slots.forEach(sl=>sl.variants.forEach(v=>{
     [v.ex,...["S","N","F"].map(i=>v[i]&&v[i].ex)].forEach(k=>{if(k&&!keys.includes(k)&&D.exercises[k])keys.push(k);});}));
     groups.push({name:m.name,sub:`opcional · día ${m.day}`,keys});});
@@ -424,7 +428,7 @@ function buildCards(){
       const el=document.createElement("article"); el.className="card";
       el.innerHTML=`<canvas aria-hidden="true"></canvas><div class="cap"><span class="step"></span><span class="txt"></span></div><h4></h4><span class="badge"></span><div class="dose"></div><ul></ul><a class="vid" target="_blank" rel="noopener">Ver vídeos en YouTube</a>`;
       el.querySelector("h4").textContent=ex.name;
-      const b=el.querySelector(".badge"); if(g.name==="Base") b.remove(); else b.textContent=v&&v.needs?NEEDS[v.needs]:"Sin material";
+      const b=el.querySelector(".badge"); if(g.name==="Base"&&!(v&&v.needs)) b.remove(); else b.textContent=v&&v.needs?NEEDS[v.needs]:"Sin material";
       let dt=doseText(key); if(weights[key]!=null) dt+=` · último: ${fkg(weights[key])} kg`;
       el.querySelector(".dose").textContent=dt;
       el.querySelector(".vid").setAttribute("aria-label","Ver vídeos de "+ex.name+" en YouTube (se abre fuera de la app)");
@@ -449,12 +453,12 @@ function renderSetup(){
     b.querySelector("small").textContent=INT[cfg.lv[b.dataset.m]];});
   $("cauto").checked=cfg.auto;
   const nd=lastDay==="A"?"B":"A";
-  $("autoinfo").textContent=cfg.auto?`Hoy toca ${nd}: ${D.modules.filter(m=>m.day===nd).map(m=>m.name).join(" + ")}`:"Día A = Abdomen + Pecho, día B = Espalda + Brazos, según la última sesión hecha";
+  $("autoinfo").textContent=cfg.auto?`Hoy toca ${nd}: ${D.modules.filter(m=>m.day===nd).map(m=>m.name).join(" + ")}`:"Día A = Abdomen + Pecho, día B = Espalda + Brazos + Glúteo, según la última sesión hecha";
   const lvs=[...new Set((am.length?am:D.modules).map(m=>cfg.lv[m.key]))], one=lvs.length===1?lvs[0]:null;
   $("segint").querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.i===one));
   $("intinfo").textContent=one?"Para todos los módulos. Cada módulo sube o baja solo según cómo te vaya.":"Cada módulo va a su nivel (lo ves en su botón). Elige uno para igualarlos.";
   $("segr").querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",+b.dataset.r===cfg.rounds));
-  $("ccorreas").checked=cfg.correas; $("cmanc").checked=cfg.mancuernas; $("ccount").checked=cfg.count; $("ctaper").checked=cfg.taper;
+  $("ccorreas").checked=cfg.correas; $("cmanc").checked=cfg.mancuernas; $("cgomas").checked=cfg.gomas; $("cbanda").checked=cfg.banda; $("ccount").checked=cfg.count; $("ctaper").checked=cfg.taper;
   $("sumtime").textContent="≈ "+fmt(totalOf(steps));
   $("sumtxt").textContent=`${modsLabel(am)} · ${cfg.rounds} ${cfg.rounds===1?"ronda":"rondas"}`+(am.length?" · "+(one?INT[one]:"niveles por módulo"):"");
   const plan=$("plan"); plan.innerHTML="";
@@ -471,7 +475,7 @@ function setupEvents(){
   $("cauto").onchange=e=>{cfg.auto=e.target.checked;applyCfg();};
   $("segint").querySelectorAll("button").forEach(b=>b.onclick=()=>{cfg.int=b.dataset.i;for(const k in cfg.lv)cfg.lv[k]=cfg.int;applyCfg();});
   $("segr").querySelectorAll("button").forEach(b=>b.onclick=()=>{cfg.rounds=+b.dataset.r;applyCfg();});
-  [["ccorreas","correas"],["cmanc","mancuernas"],["ccount","count"],["ctaper","taper"]].forEach(([id,k])=>$(id).onchange=e=>{cfg[k]=e.target.checked;applyCfg();});
+  [["ccorreas","correas"],["cmanc","mancuernas"],["cgomas","gomas"],["cbanda","banda"],["ccount","count"],["ctaper","taper"]].forEach(([id,k])=>$(id).onchange=e=>{cfg[k]=e.target.checked;applyCfg();});
 }
 
 /* ---------- Modo guiado ---------- */

@@ -125,7 +125,7 @@
             android:maxLines="1"
             android:text="Abdomen"
             android:textColor="#FFFFFF"
-            android:textSize="12sp"
+            android:textSize="11sp"
             android:textStyle="bold" />
         <TextView
             android:id="@+id/chip_pec"
@@ -139,7 +139,7 @@
             android:maxLines="1"
             android:text="Pecho"
             android:textColor="#FFFFFF"
-            android:textSize="12sp"
+            android:textSize="11sp"
             android:textStyle="bold" />
         <TextView
             android:id="@+id/chip_esp"
@@ -153,10 +153,24 @@
             android:maxLines="1"
             android:text="Espalda"
             android:textColor="#FFFFFF"
-            android:textSize="12sp"
+            android:textSize="11sp"
             android:textStyle="bold" />
         <TextView
             android:id="@+id/chip_bra"
+            android:layout_width="0dp"
+            android:layout_height="36dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="4dp"
+                        android:background="@drawable/widget_btn_ghost"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:maxLines="1"
+            android:text="Brazos"
+            android:textColor="#FFFFFF"
+            android:textSize="11sp"
+            android:textStyle="bold" />
+        <TextView
+            android:id="@+id/chip_glu"
             android:layout_width="0dp"
             android:layout_height="36dp"
             android:layout_weight="1"
@@ -164,9 +178,9 @@
             android:ellipsize="end"
             android:gravity="center"
             android:maxLines="1"
-            android:text="Brazos"
+            android:text="Glúteo"
             android:textColor="#FFFFFF"
-            android:textSize="12sp"
+            android:textSize="11sp"
             android:textStyle="bold" />
     </LinearLayout>
 

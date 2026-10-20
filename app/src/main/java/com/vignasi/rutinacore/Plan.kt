@@ -8,11 +8,13 @@ val INTENSITIES = listOf("S", "N", "F")
 val INT_NAME = mapOf("S" to "Suave", "N" to "Normal", "F" to "Fuerte")
 
 class Config(
-    val mods: MutableMap<String, Boolean> = linkedMapOf("abdomen" to false, "pecho" to false, "espalda" to false, "brazos" to false),
+    val mods: MutableMap<String, Boolean> = linkedMapOf("abdomen" to false, "pecho" to false, "espalda" to false, "brazos" to false, "gluteo" to false),
     var auto: Boolean = false,
     var intensity: String = "S",
     var correas: Boolean = false,
     var mancuernas: Boolean = false,
+    var gomas: Boolean = false,
+    var banda: Boolean = false,
     var rounds: Int = 3,
     var count: Boolean = true,
     var taper: Boolean = false,
@@ -34,6 +36,8 @@ class Config(
         null -> true
         "correas" -> correas
         "mancuernas" -> mancuernas
+        "gomas" -> gomas
+        "banda" -> banda
         else -> false
     }
 
@@ -44,7 +48,7 @@ class Config(
         for (k in mods.keys) l.put(k, level(k))
         return JSONObject()
             .put("v", 2).put("mods", m).put("lv", l).put("auto", auto).put("int", intensity)
-            .put("correas", correas).put("mancuernas", mancuernas)
+            .put("correas", correas).put("mancuernas", mancuernas).put("gomas", gomas).put("banda", banda)
             .put("rounds", rounds).put("count", count).put("taper", taper)
             .toString()
     }
@@ -60,6 +64,8 @@ class Config(
                 c.intensity = o.optString("int", "S").takeIf { it in INTENSITIES } ?: "S"
                 c.correas = o.optBoolean("correas", false)
                 c.mancuernas = o.optBoolean("mancuernas", false)
+                c.gomas = o.optBoolean("gomas", false)
+                c.banda = o.optBoolean("banda", false)
                 c.rounds = o.optInt("rounds", c.rounds).coerceIn(1, 6)
                 c.count = o.optBoolean("count", true)
                 // Hasta la versión 2 el volumen bajaba en cada ronda por defecto: ahora es opcional
