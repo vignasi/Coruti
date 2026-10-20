@@ -111,10 +111,22 @@ object PoseRenderer {
                     c.drawLine(at[0], at[1], to[0], to[1], line)
                     fill.color = ARROW
                     c.drawRect(at[0] - 3f, at[1] - 1.5f, at[0] + 3f, at[1] + 1.5f, fill)
+                    q.label?.let { tag(c, it, (at[0] + to[0]) / 2f + 10f, (at[1] + to[1]) / 2f) }
                 }
-                "loop" -> {
-                    line.color = ARROW; line.strokeWidth = 2.4f
-                    c.drawOval(RectF(at[0] - 4f, at[1] - 6.5f, at[0] + 4f, at[1] + 6.5f), line)
+                "band" -> q.to?.let { pose[it] }?.let { to ->
+                    // banda de glúteo: anillo alrededor de los dos muslos, justo encima de las rodillas
+                    val ax = p[0] + (at[0] - p[0]) * 0.82f; val ay = p[1] + (at[1] - p[1]) * 0.82f
+                    val bx = p[0] + (to[0] - p[0]) * 0.82f; val by = p[1] + (to[1] - p[1]) * 0.82f
+                    val mx = (ax + bx) / 2f; val my = (ay + by) / 2f
+                    val len = Math.hypot((bx - ax).toDouble(), (by - ay).toDouble()).toFloat()
+                    val ang = if (len < 1f) 90f else Math.toDegrees(Math.atan2((by - ay).toDouble(), (bx - ax).toDouble())).toFloat()
+                    line.color = ARROW; line.strokeWidth = 2.6f
+                    c.save(); c.rotate(ang, mx, my)
+                    c.drawOval(RectF(mx - len / 2f - 4f, my - 4.5f, mx + len / 2f + 4f, my + 4.5f), line)
+                    c.restore()
+                    q.label?.let {
+                        if (Math.abs(Math.cos(Math.toRadians(ang.toDouble()))) > 0.7) tag(c, it, mx + len / 2f + 20f, my) else tag(c, it, mx + 16f, my - 10f)
+                    }
                 }
                 "towel" -> q.to?.let { pose[it] }?.let { to ->
                     line.color = GEAR; line.strokeWidth = 3f
@@ -142,6 +154,16 @@ object PoseRenderer {
         // flecha de dirección
         ph.arrow?.let { a -> arrow(c, a[0], a[1], a[2], a[3]) }
         return bmp
+    }
+
+    /** Nombre del material junto al dibujo (BANDA, GOMA). */
+    private fun tag(c: Canvas, text: String, x: Float, y: Float) {
+        val tp = Paint(Paint.ANTI_ALIAS_FLAG).apply { textSize = 6.5f; typeface = Typeface.DEFAULT_BOLD; textAlign = Paint.Align.CENTER }
+        val w = tp.measureText(text) + 6f
+        val cx = x.coerceIn(1f + w / 2f, 179f - w / 2f)
+        c.drawRect(cx - w / 2f, y - 5f, cx + w / 2f, y + 4f, Paint().apply { color = BG })
+        tp.color = ARROW
+        c.drawText(text, cx, y + 2f, tp)
     }
 
     private fun label(c: Canvas, lx: Float, ly: Float, tx: Float, ty: Float, text: String) {

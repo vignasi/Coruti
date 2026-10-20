@@ -361,11 +361,23 @@ function gear(ctx,ex,p){
     else if(q.t==="db"){const [x,y]=p[q.at];ctx.strokeStyle=COL.soft;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x-6,y);ctx.lineTo(x+6,y);ctx.stroke();
       ctx.fillStyle=COL.ink;ctx.fillRect(x-8,y-4.5,3.5,9);ctx.fillRect(x+4.5,y-4.5,3.5,9);}
     else if(q.t==="goma"){const a=p[q.at],b=p[q.to];ctx.strokeStyle=COL.accent;ctx.lineWidth=1.8;ctx.beginPath();ctx.moveTo(...a);ctx.lineTo(...b);ctx.stroke();
-      ctx.fillStyle=COL.accent;ctx.fillRect(a[0]-3,a[1]-1.5,6,3);}
-    else if(q.t==="loop"){const [x,y]=p[q.at];ctx.strokeStyle=COL.accent;ctx.lineWidth=2.4;ctx.beginPath();ctx.ellipse(x,y,4,6.5,0,0,7);ctx.stroke();}
+      ctx.fillStyle=COL.accent;ctx.fillRect(a[0]-3,a[1]-1.5,6,3);
+      if(q.label) tag(ctx,q.label,(a[0]+b[0])/2+10,(a[1]+b[1])/2);}
+    else if(q.t==="band"){
+      /* Banda de glúteo: un anillo alrededor de los dos muslos, justo encima de las rodillas; se estira al abrirlas */
+      const at=(j,f)=>[p.p[0]+(p[j][0]-p.p[0])*f,p.p[1]+(p[j][1]-p.p[1])*f], A=at(q.at,.82), B=at(q.to,.82);
+      const m=[(A[0]+B[0])/2,(A[1]+B[1])/2], len=Math.hypot(B[0]-A[0],B[1]-A[1]);
+      ctx.strokeStyle=COL.accent;ctx.lineWidth=2.6;ctx.beginPath();
+      const ang=len<1?Math.PI/2:Math.atan2(B[1]-A[1],B[0]-A[0]);
+      ctx.ellipse(m[0],m[1],len/2+4,4.5,ang,0,7);ctx.stroke();
+      if(q.label) Math.abs(Math.cos(ang))>.7?tag(ctx,q.label,m[0]+len/2+20,m[1]):tag(ctx,q.label,m[0]+16,m[1]-10);}
     else if(q.t==="towel"){ctx.strokeStyle=COL.soft;ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(...p[q.at]);ctx.lineTo(p[q.to][0]-2,p[q.to][1]+2);ctx.stroke();}
   });
 }
+/* Nombre del material junto al dibujo (BANDA, GOMA) */
+function tag(ctx,text,x,y){ctx.save();ctx.font="700 6.5px system-ui,sans-serif";ctx.textAlign="center";
+  const w=ctx.measureText(text).width+6, cx=Math.min(179-w/2,Math.max(1+w/2,x));
+  ctx.fillStyle=COL.surface;ctx.fillRect(cx-w/2,y-5,w,9);ctx.fillStyle=COL.accent;ctx.fillText(text,cx,y+2);ctx.restore();}
 function markPos(m,p){const pts=m.at.map(j=>p[j]);
   return [pts.reduce((a,b)=>a+b[0],0)/pts.length+m.off[0], pts.reduce((a,b)=>a+b[1],0)/pts.length+m.off[1]];}
 function draw(cv,ex,t,clamp,pt){
