@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Rutina core</string>
-    <string name="widget_desc">Reproductor de la rutina: ejercicio en curso, dibujo, tiempo, rondas y botones.</string>
+    <string name="widget_desc">Reproductor de la rutina: módulos, intensidad, rondas, ejercicio en curso, dibujo, tiempo y botones.</string>
     <string name="widget_mini_desc">Ejercicio en curso, tiempo y botón de empezar.</string>
     <string name="widget_mini_label">Rutina core · mini</string>
 </resources>

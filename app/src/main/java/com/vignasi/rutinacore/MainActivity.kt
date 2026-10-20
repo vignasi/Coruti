@@ -85,7 +85,7 @@ class MainActivity : Activity() {
     override fun onResume() {
         super.onResume()
         WidgetUpdater.refresh(this, force = true)
-        if (pageReady) js("window.refreshStats && window.refreshStats()")
+        if (pageReady) js("window.reloadConfig && window.reloadConfig(); window.refreshStats && window.refreshStats()")
     }
 
     override fun onDestroy() {
@@ -111,19 +111,35 @@ class MainActivity : Activity() {
         }
 
         @JavascriptInterface
-        fun markDone(rounds: Int) {
-            Store.markDone(this@MainActivity, rounds)
+        fun markDone(rounds: Int, day: String) {
+            Store.markDone(this@MainActivity, rounds, day)
+            runOnUiThread { WidgetUpdater.refresh(this@MainActivity, force = true) }
+        }
+
+        /** El contenido de assets/rutina.json: la página y el widget usan los mismos datos. */
+        @JavascriptInterface
+        fun rutina(): String = Rutina.text(this@MainActivity)
+
+        @JavascriptInterface
+        fun getConfig(): String = Store.configJson(this@MainActivity)
+
+        @JavascriptInterface
+        fun setConfig(json: String) {
+            Store.setConfigJson(this@MainActivity, json)
             runOnUiThread { WidgetUpdater.refresh(this@MainActivity, force = true) }
         }
 
         @JavascriptInterface
-        fun getRounds(): Int = Store.rounds(this@MainActivity)
+        fun getWeights(): String = Store.weightsJson(this@MainActivity)
 
         @JavascriptInterface
-        fun setRounds(r: Int) {
-            Store.setRounds(this@MainActivity, r)
-            runOnUiThread { WidgetUpdater.refresh(this@MainActivity, force = true) }
-        }
+        fun setWeight(key: String, kg: Double) = Store.setWeight(this@MainActivity, key, kg)
+
+        @JavascriptInterface
+        fun lastDay(): String = Store.lastDay(this@MainActivity)
+
+        @JavascriptInterface
+        fun sessions(): Int = Store.sessions(this@MainActivity)
 
         @JavascriptInterface
         fun stats(): String {

@@ -9,10 +9,14 @@ object Workout {
     var active = false
     var done = false
     var rounds = 3
+    var day = ""
+    var count = true
 
-    fun start(r: Int) {
-        rounds = r
-        steps = buildSteps(r)
+    fun start(plan: List<Step>, cfg: Config, dayType: String) {
+        rounds = cfg.rounds
+        count = cfg.count
+        day = dayType
+        steps = plan
         idx = 0
         leftMs = steps[0].s * 1000L
         running = true

@@ -8,8 +8,6 @@ import android.app.Service
 import android.content.Intent
 import android.content.pm.ServiceInfo
 import android.graphics.drawable.Icon
-import android.media.AudioManager
-import android.media.ToneGenerator
 import android.os.Build
 import android.os.Handler
 import android.os.IBinder
@@ -34,13 +32,17 @@ class WorkoutService : Service() {
 
     private val handler = Handler(Looper.getMainLooper())
     private var tts: TextToSpeech? = null
-    private var tone: ToneGenerator? = null
+    private var beeper: Beeper? = null
     private var wake: PowerManager.WakeLock? = null
     private var lastTick = 0L
     private var lastShownSec = -1
     private var finishing = false
     private var ttsReady = false
     private var pendingSay: String? = null
+    // Señales de la fase en curso: último tono, última repetición contada y si ya se dijo «mitad»
+    private var cuePhase = -1
+    private var cueRep = -1
+    private var cueHalf = false
 
     private val ticker = object : Runnable {
         override fun run() { tick() }
@@ -60,7 +62,7 @@ class WorkoutService : Service() {
                 pendingSay = null
             }
         }
-        tone = try { ToneGenerator(AudioManager.STREAM_MUSIC, 90) } catch (e: Exception) { null }
+        beeper = Beeper()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -76,7 +78,11 @@ class WorkoutService : Service() {
 
     private fun toggle() {
         if (!Workout.active) {
-            Workout.start(Store.rounds(this))
+            val cfg = Store.config(this)
+            val data = Rutina.get(this)
+            Workout.start(buildSteps(data, cfg, Store.lastDay(this), Store.sessions(this)), cfg,
+                dayType(activeModules(data, cfg, Store.lastDay(this))))
+            resetCues()
             acquireWake()
             lastTick = SystemClock.elapsedRealtime()
             announce(Workout.current())
@@ -97,17 +103,50 @@ class WorkoutService : Service() {
             val before = Workout.leftSec()
             Workout.leftMs -= now - lastTick
             val after = Workout.leftSec()
-            if (after != before && after in 1..3) beep(ToneGenerator.TONE_PROP_BEEP, 120)
-            if (Workout.leftMs <= 0) advance()
+            if (Workout.leftMs <= 0) advance() else Workout.current()?.let { cues(it, before, after) }
         }
         lastTick = now
         if (Workout.active) {
             refresh(force = false)
-            handler.postDelayed(ticker, 250)
+            handler.postDelayed(ticker, 40)
         }
     }
 
+    private fun resetCues() { cuePhase = -1; cueRep = -1; cueHalf = false }
+
+    /** Sonido durante el ejercicio: tono agudo al subir/empujar y grave al bajar/volver, cuenta en voz alta,
+     *  «mitad» en los de mantener y pitidos en los 3 últimos segundos. Igual que cues() en index.html. */
+    private fun cues(st: Step, before: Int, after: Int) {
+        val el = Workout.elapsedInStep()
+        if (!st.prep && !st.rest && st.reps > 0) {
+            val ex = Rutina.get(this).ex(st.k)
+            val k = ex.phaseCount(el)
+            if (k != cuePhase) {
+                cuePhase = k
+                when (ex.phases[k % ex.phases.size].tone) {
+                    1 -> beeper?.beep(Beeper.UP, 150)
+                    -1 -> beeper?.beep(Beeper.DOWN, 150)
+                }
+            }
+            val n = (el / ex.rep).toInt()
+            if (n != cueRep && n < st.reps) {
+                cueRep = n
+                if (Workout.count) {
+                    val nums = Rutina.get(this).numbers
+                    speak(if (n == st.reps - 1) "Última" else nums.getOrElse(n) { (n + 1).toString() })
+                }
+            }
+            return
+        }
+        if (!st.prep && !st.rest && !cueHalf && st.s >= 10 && el >= st.s / 2f) {
+            cueHalf = true
+            speak("Mitad")
+        }
+        if (after != before && after in 1..3) beeper?.beep(Beeper.COUNT, 80)
+    }
+
     private fun advance() {
+        resetCues()
         Workout.idx++
         val st = Workout.current()
         if (st == null) {
@@ -121,21 +160,22 @@ class WorkoutService : Service() {
     private fun announce(st: Step?) {
         st ?: return
         when {
-            st.rest -> { beep(ToneGenerator.TONE_PROP_ACK, 250); speak(st.say) }
-            st.prep -> { beep(ToneGenerator.TONE_PROP_ACK, 250); speak(st.say) }
-            else -> { beep(ToneGenerator.TONE_PROP_BEEP2, 350); speak("Empieza") }
+            st.rest || st.prep -> { beeper?.beep(Beeper.PREP, 250); speak(st.say) }
+            st.reps > 0 -> if (!Workout.count) speak("Empieza") // el tono de la fase y la cuenta marcan el inicio
+            else -> { beeper?.beep(Beeper.START, 350); speak("Empieza") }
         }
     }
 
     private fun finish() {
         finishing = true
         val rounds = Workout.rounds
+        val day = Workout.day
         Workout.active = false
         Workout.running = false
         Workout.done = true
         Workout.idx = 0
-        Store.markDone(this, rounds)
-        beep(ToneGenerator.TONE_CDMA_CONFIRM, 600)
+        Store.markDone(this, rounds, day)
+        beeper?.chime()
         speak("Rutina terminada. Buen trabajo.")
         try {
             getSystemService(Vibrator::class.java)?.vibrate(
@@ -187,9 +227,15 @@ class WorkoutService : Service() {
             .setOnlyAlertOnce(true)
             .setContentIntent(open)
         if (st != null && Workout.active) {
-            val title = if (st.prep) "Prepárate: " + EXERCISES.getValue(st.k).name else st.name
+            val title = if (st.prep) "Prepárate: " + Rutina.get(this).ex(st.k).name else st.name
+            var text = "${fmt(Workout.leftSec())} · Ronda ${st.r}/${Workout.rounds}"
+            if (!st.prep && !st.rest && st.reps > 0) {
+                val n = minOf(st.reps, (Workout.elapsedInStep() / Rutina.get(this).ex(st.k).rep).toInt() + 1)
+                text += " · $n/${st.reps}"
+            }
+            st.kg?.let { text += " · " + kgRange(it) }
             b.setContentTitle(title)
-                .setContentText("${fmt(Workout.leftSec())} · Ronda ${st.r}/${Workout.rounds}")
+                .setContentText(text)
                 .setProgress(st.s, st.s - Workout.leftSec(), false)
                 .addAction(action(if (Workout.running) "Pausa" else "Seguir", ACTION_TOGGLE, 41))
                 .addAction(action("Saltar", ACTION_SKIP, 42))
@@ -213,10 +259,6 @@ class WorkoutService : Service() {
         if (ttsReady) tts?.speak(text, TextToSpeech.QUEUE_FLUSH, null, "rutina") else pendingSay = text
     }
 
-    private fun beep(type: Int, ms: Int) {
-        try { tone?.startTone(type, ms) } catch (e: Exception) { }
-    }
-
     private fun acquireWake() {
         if (wake == null) {
             wake = getSystemService(PowerManager::class.java)
@@ -233,7 +275,7 @@ class WorkoutService : Service() {
         handler.removeCallbacksAndMessages(null)
         releaseWake()
         tts?.shutdown()
-        tone?.release()
+        beeper?.release()
         super.onDestroy()
     }
 }
