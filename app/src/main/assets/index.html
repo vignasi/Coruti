@@ -160,6 +160,13 @@ fieldset:disabled{opacity:.55}
 .num output{font-family:var(--display);font-weight:700;font-size:1.5rem;min-width:3.4em;text-align:center;font-variant-numeric:tabular-nums}
 .sel .num output{font-size:1.3rem;min-width:3.2em}
 .sel .rm{min-width:var(--tap);padding:0 10px;font-size:.9rem}
+.bchips{display:flex;flex-wrap:wrap;gap:6px}
+.bchips button{border-radius:999px;min-height:44px;padding:0 14px;background:var(--surface)}
+.bchips button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.sel select{min-height:var(--tap);border-radius:12px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);font:600 .95rem var(--body);padding:0 8px;max-width:100%}
+.mybands>summary{cursor:pointer;color:var(--accent);font-weight:700;min-height:var(--tap);display:flex;align-items:center}
+.bandsed{display:flex;flex-direction:column;gap:8px;margin-top:6px}
+.bandsed input{min-height:var(--tap);border-radius:12px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);font:1rem var(--body);padding:0 12px}
 .favs{display:flex;flex-direction:column;gap:8px}
 .fav{display:flex;gap:8px}
 .fav .go{flex:1;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;text-align:left;line-height:1.25;padding:8px 14px;min-height:56px;background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
@@ -197,6 +204,10 @@ fieldset:disabled{opacity:.55}
         <span id="wlbl">Peso usado</span>
         <button id="wminus" aria-label="Medio kilo menos">−</button><output id="wval" aria-live="polite">0 kg</output><button id="wplus" aria-label="Medio kilo más">+</button>
         <small id="whint"></small>
+      </div>
+      <div class="weight" id="pband" role="group" aria-labelledby="blbl" hidden>
+        <span id="blbl">Banda</span><div class="bchips" id="bchips"></div>
+        <small id="bhint">¿Floja o demasiado dura? Cámbiala aquí y la próxima vez te saldrá esta.</small>
       </div>
       <div class="clockrow">
         <div class="clock" id="pclock" role="timer" aria-label="Tiempo restante">0:00</div>
@@ -266,6 +277,9 @@ fieldset:disabled{opacity:.55}
         <div class="field"><label class="lbl" for="ffavname">Guardar como favorita</label>
           <div class="savefav"><input id="ffavname" maxlength="40" autocomplete="off"><button id="ffavsave">Guardar</button></div>
           <small class="hint" id="ffavmsg" role="status"></small></div>
+        <details class="field mybands"><summary>Mis bandas elásticas</summary>
+          <small class="hint">Ponles un nombre que las distinga (color o dureza). Deja una vacía para quitarla.</small>
+          <div class="bandsed" id="fbands"></div></details>
         <div class="field"><span class="lbl" id="lfz">Zona</span><div class="fchips" id="fzone" role="group" aria-labelledby="lfz"></div></div>
         <div class="field"><span class="lbl" id="lfm">Material</span><div class="fchips" id="fneeds" role="group" aria-labelledby="lfm"></div></div>
         <div class="field"><span class="lbl" id="lfl">Elige uno o varios</span><div class="flist" id="flist" role="group" aria-labelledby="lfl"></div></div>
@@ -383,6 +397,21 @@ function normFree(o){o=o&&typeof o==="object"?o:{};const f={...DEF_FREE,...o};
   f.alt=f.alt!==false;
   return f;}
 const isAlt=f=>f.alt&&f.sel.length>1;
+/* Bandas elásticas: tus bandas y cuál usas en cada ejercicio (se recuerda para la próxima vez) */
+const DEF_BANDS=["Banda 1","Banda 2","Banda 3","Banda 4"];
+let BANDS=null, BUSE=null;
+function loadBands(){
+  try{const a=JSON.parse(store.free("free.bands"));BANDS=Array.isArray(a)?a.filter(x=>typeof x==="string"&&x.trim()).slice(0,8):null}catch(e){BANDS=null}
+  if(!BANDS||!BANDS.length) BANDS=DEF_BANDS.slice();
+  try{const u=JSON.parse(store.free("free.bandUse"));BUSE=u&&typeof u==="object"?u:{}}catch(e){BUSE={}}}
+const usesBand=k=>catOf(k).needs==="elasticas";
+const bandOf=k=>{const b=BUSE[k];return b&&BANDS.includes(b)?b:null;};
+function setBand(k,name){if(name)BUSE[k]=name;else delete BUSE[k];store.setFree("free.bandUse",JSON.stringify(BUSE));}
+function setBands(a){
+  const old=BANDS; BANDS=a.map(x=>x.trim()).filter(Boolean).slice(0,8); if(!BANDS.length) BANDS=DEF_BANDS.slice();
+  /* Si renombras una banda, los ejercicios que la usaban siguen con ella */
+  old.forEach((o,i)=>{const n=a[i]&&a[i].trim();if(n&&n!==o)for(const k in BUSE)if(BUSE[k]===o)BUSE[k]=n;});
+  store.setFree("free.bands",JSON.stringify(BANDS)); store.setFree("free.bandUse",JSON.stringify(BUSE));}
 function freeExpand(it,r,out){
   const ex=D.exercises[it.k], ce=catOf(it.k), hold=isHoldEx(it.k);
   const reps=hold?0:it.n, secs=hold?it.n:0, s=reps?Math.round(reps*ex.rep):secs, dose=reps?`${reps} reps`:`${secs} s`;
@@ -391,7 +420,8 @@ function freeExpand(it,r,out){
     let say;
     if(i>0) say="Ahora "+side.toLowerCase();
     else{say=ex.name+", "+(reps?reps+" repeticiones":secs+" segundos");if(side)say+=", "+side.toLowerCase();
-      if(ce.kg)say+=`, de ${fkg(ce.kg[0])} a ${fkg(ce.kg[1])} kilos`;}
+      if(ce.kg)say+=`, de ${fkg(ce.kg[0])} a ${fkg(ce.kg[1])} kilos`;
+      if(usesBand(it.k)&&bandOf(it.k))say+=", "+bandOf(it.k);}
     const base={k:it.k,r,kg:ce.kg||null,mod:null};
     out.push({...base,name:"Prepárate",sub:ex.name+" · "+sub,s:D.prep,prep:true,say:"Prepárate. "+say});
     out.push({...base,name:ex.name,sub,s,reps,hold:hold,say});
@@ -601,7 +631,7 @@ function setupEvents(){
 
 /* ---------- Ejercicios sueltos: pantalla ---------- */
 function freeSub(k){const ce=catOf(k);return [ce.zone,ce.needs?D.catalog.needs[ce.needs]:"Sin material",
-  isHoldEx(k)?`${defN(k)} s`:`${defN(k)} reps`,ce.sides?"por lado":""].filter(Boolean).join(" · ");}
+  isHoldEx(k)?`${defN(k)} s`:`${defN(k)} reps`,ce.sides?"por lado":"",usesBand(k)&&bandOf(k)?bandOf(k):""].filter(Boolean).join(" · ");}
 function saveFree(){store.setFree("free.last",JSON.stringify(fr));}
 function applyFree(){saveFree();running=false;bplay.textContent="Empezar";build();ui();}
 function numCtl(label,val,minus,plus,lm,lp){
@@ -620,7 +650,15 @@ function renderFree(){
     const n=numCtl(ex.name,hold?`${it.n} s`:`${it.n} reps`,chg(-st),chg(st),hold?"5 segundos menos":"Una repetición menos",hold?"5 segundos más":"Una repetición más");
     const rm=document.createElement("button");rm.className="rm";rm.textContent="Quitar";rm.setAttribute("aria-label","Quitar "+ex.name);
     rm.onclick=()=>{fr.sel.splice(i,1);applyFree();};
-    li.append(ab,nm,n,rm);list.appendChild(li);});
+    li.append(ab,nm,n);
+    if(usesBand(it.k)){const bs=document.createElement("select");bs.setAttribute("aria-label","Banda para "+ex.name);
+      [["","Banda: sin apuntar"],...BANDS.map(x=>[x,x])].forEach(([v,t])=>{const o=document.createElement("option");o.value=v;o.textContent=t;bs.appendChild(o);});
+      bs.value=bandOf(it.k)||"";bs.onchange=()=>{setBand(it.k,bs.value);applyFree();};li.appendChild(bs);}
+    li.appendChild(rm);list.appendChild(li);});
+  const be=$("fbands");if(!be.contains(document.activeElement)){be.innerHTML="";
+    [...BANDS,""].forEach((x,i)=>{const inp=document.createElement("input");inp.value=x;inp.maxLength=30;inp.autocomplete="off";
+      inp.placeholder=i<BANDS.length?"":"Añadir otra banda";inp.setAttribute("aria-label",i<BANDS.length?"Nombre de la banda "+(i+1):"Añadir otra banda");
+      inp.onchange=()=>{const a=[...be.querySelectorAll("input")].map(e=>e.value);setBands(a);inp.blur();applyFree();};be.appendChild(inp);});}
   $("fselhint").textContent=fr.sel.length?"Se hacen en este orden.":"Aún no has elegido ninguno: márcalos en la lista de abajo.";
   $("frv").textContent=fr.rounds; $("fdv").textContent=fr.rest+" s";
   $("falt").checked=fr.alt;
@@ -706,14 +744,27 @@ function weightUi(st){
   box.hidden=false; $("wval").textContent=fkg(wcur.v)+" kg";
   $("whint").textContent=`Orientativo: ${kgRange(st.kg)}.`+(wcur.had?" Te sugiero el último que usaste.":" Apunta el que uses.");
 }
+let bandShown="";
+function bandUi(st){
+  const box=$("pband");
+  if(!st||done||st.empty||st.rest||!usesBand(st.k)){box.hidden=true;bandShown="";return;}
+  box.hidden=false; const cur=bandOf(st.k), sig=st.k+"|"+cur+"|"+BANDS.join("|"); if(sig===bandShown) return; bandShown=sig;
+  const c=$("bchips"); c.innerHTML="";
+  BANDS.forEach(x=>{const b=document.createElement("button");b.textContent=x;b.setAttribute("aria-pressed",x===cur);
+    b.onclick=()=>{const nb=x===cur?"":x;setBand(st.k,nb);
+      /* Lo que se dice en las rondas que faltan también cambia */
+      steps.slice(idx+1).forEach(t=>{if(t.k!==st.k)return;if(cur&&t.say.endsWith(", "+cur))t.say=t.say.slice(0,-(cur.length+2));
+        if(nb&&t.say.startsWith("Prepárate. "+D.exercises[st.k].name+","))t.say+=", "+nb;});
+      bandShown="";bandUi(st);};c.appendChild(b);});
+}
 function ui(){
   const st=steps[idx]; if(!st) return;
   renderSetupLock();
   if(st.empty){pstep.textContent="";pname.textContent=st.name;psub.textContent=st.sub;pclock.textContent="–";pbar.style.width="0%";
-    pcount.hidden=true;pnext.textContent="";weightUi(null);return;}
+    pcount.hidden=true;pnext.textContent="";weightUi(null);bandUi(null);return;}
   const N=roundsNow(), W=roundWord();
   if(done){pstep.textContent=mode==="suelto"?"Ejercicios completados":"Rutina completada";pname.textContent=mode==="suelto"?"¡Terminado!":"¡Rutina terminada!";psub.textContent="Apúntala en Polar como «Entrenamiento en circuito»";
-    pclock.textContent="✓";pbar.style.width="100%";pcount.hidden=true;pnext.textContent=`${N>1?N+" "+W.toLowerCase()+"s hechas":"1 "+W.toLowerCase()+" hecha"}. Buen trabajo.`;weightUi(null);return;}
+    pclock.textContent="✓";pbar.style.width="100%";pcount.hidden=true;pnext.textContent=`${N>1?N+" "+W.toLowerCase()+"s hechas":"1 "+W.toLowerCase()+" hecha"}. Buen trabajo.`;weightUi(null);bandUi(null);return;}
   pstep.textContent=st.prep?`${W} ${st.r} de ${N} · siguiente`:`${W} ${st.r} de ${N}`;
   pname.textContent=st.name; pclock.textContent=fmt(left);
   const ex=D.exercises[st.k];
@@ -722,7 +773,7 @@ function ui(){
     pcount.hidden=false;pcn.textContent=`${n}/${st.reps}`;pcu.textContent=ex.unit;}
   else if(!st.prep&&!st.rest&&st.reps){pcount.hidden=false;pcn.textContent=`${st.reps}`;pcu.textContent=ex.unit.toLowerCase().replace(/ón$/,"ones");}
   else pcount.hidden=true;
-  weightUi(st);
+  weightUi(st); bandUi(st);
   pbar.style.width=(100*(1-left/st.s))+"%";
   const rem=steps.slice(idx+1).reduce((a,b)=>a+b.s,0)+left;
   const nx=steps.slice(idx+1).find(s=>!s.prep);
@@ -839,13 +890,13 @@ window.refreshStats=()=>{try{if(!A)return;const s=JSON.parse(A.stats());
   el.classList.toggle("ok",s.today);}catch(e){}
   if(D&&!locked()){lastDay=store.lastDay();offset=store.sessions();}};
 loadData().then(d=>{
-  D=d; window.D=D; reloadState(); fr=normFree((()=>{try{return JSON.parse(store.free("free.last"))}catch(e){return null}})());
+  D=d; window.D=D; reloadState(); loadBands(); fr=normFree((()=>{try{return JSON.parse(store.free("free.last"))}catch(e){return null}})());
   setupEvents(); freeEvents(); buildCards(); build(); ui();
   requestAnimationFrame(frame);
   if(window.__ready) window.__ready();
 }).catch(e=>{console.error(e);$("pname").textContent="No se pudo cargar rutina.json";});
 /* Para las pruebas automáticas */
-window.__t={get steps(){return steps},get idx(){return idx},get left(){return left},get cfg(){return cfg},get fr(){return fr},get mode(){return mode},beepLog,buildPlan,buildFree,activeModules,dayType};
+window.__t={get steps(){return steps},get idx(){return idx},get left(){return left},get cfg(){return cfg},get fr(){return fr},get bands(){return BANDS},get bandUse(){return BUSE},get mode(){return mode},beepLog,buildPlan,buildFree,activeModules,dayType};
 </script>
 </body>
 </html>
