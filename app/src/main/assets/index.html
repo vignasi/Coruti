@@ -174,6 +174,24 @@ fieldset:disabled{opacity:.55}
 .fav .del{padding:0 12px;font-size:.9rem}
 .savefav{display:flex;gap:8px}
 .savefav input{flex:1;min-width:0;min-height:var(--tap);border-radius:12px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);font:1rem var(--body);padding:0 12px}
+/* Historial */
+body.hist .player,body.hist #setup,body.hist #free,body.hist .exhead,body.hist .notes{display:none!important}
+.hdays{display:flex;flex-direction:column;gap:10px}
+.hday{font-family:var(--display);font-weight:700;font-size:1.3rem;margin:8px 0 0}
+.hs{border:1.5px solid var(--line);border-radius:12px;background:var(--surface)}
+.hs>summary{list-style:none;cursor:pointer;display:flex;flex-direction:column;gap:2px;padding:10px 14px;min-height:var(--tap);justify-content:center}
+.hs>summary::-webkit-details-marker{display:none}
+.hs>summary b{line-height:1.25}
+.hs>summary small{color:var(--soft);font-size:.88rem}
+.hs .tag{display:inline-block;font-size:.78rem;font-weight:700;border-radius:999px;padding:0 8px;margin-left:6px;background:var(--hl);color:var(--hl-ink);vertical-align:2px}
+.hs .hb{padding:0 14px 12px;display:flex;flex-direction:column;gap:10px}
+.hs .hx b{display:block}
+.hs ul{margin:2px 0 0;padding-left:18px;font-size:.95rem;color:var(--soft);font-variant-numeric:tabular-nums}
+.hs .hfb{font-size:.92rem;color:var(--soft);margin:0}
+.hexl{display:flex;flex-direction:column;gap:8px;margin-top:6px}
+.hrow{display:flex;flex-direction:column;gap:2px;background:var(--accent-soft);border-radius:12px;padding:8px 12px;line-height:1.3}
+.hrow small{color:var(--soft);font-size:.88rem}
+.hrow small em{font-style:normal;font-weight:700;color:var(--ink)}
 @media (max-width:640px){
   h1{font-size:2.2rem}
   .player{grid-template-columns:1fr;padding:14px}
@@ -190,7 +208,7 @@ fieldset:disabled{opacity:.55}
     <div class="row"><h1>Rutina core</h1><div class="stats" id="stats" role="status" hidden></div></div>
     <p class="lead">Base para la pelvis y módulos de fuerza suaves. Suena un tono en cada repetición: deja el móvil en el suelo y escucha.</p>
     <div class="seg modes" role="group" aria-label="Qué quieres hacer">
-      <button id="mrut" aria-pressed="true">Rutina completa</button><button id="msuel" aria-pressed="false">Ejercicios sueltos</button>
+      <button id="mrut" aria-pressed="true">Rutina completa</button><button id="msuel" aria-pressed="false">Ejercicios sueltos</button><button id="mhist" aria-pressed="false">Historial</button>
     </div>
   </header>
 
@@ -285,6 +303,14 @@ fieldset:disabled{opacity:.55}
         <div class="field"><span class="lbl" id="lfl">Elige uno o varios</span><div class="flist" id="flist" role="group" aria-labelledby="lfl"></div></div>
       </fieldset>
       <div class="lock" id="flock" role="status" hidden>La sesión está en marcha. Pulsa Reiniciar para cambiar los ejercicios.</div>
+    </div>
+  </section>
+
+  <section class="setup free" id="hist" aria-labelledby="hhist" hidden>
+    <div class="fhead"><h2 id="hhist">Historial</h2><span class="s" id="hsum"></span></div>
+    <div class="body">
+      <div class="field"><span class="lbl">Por días</span><div class="hdays" id="hdays"></div><button id="hmore" hidden>Ver más</button></div>
+      <details class="field mybands" id="hexd"><summary>Por ejercicio: la última vez y la mejor</summary><div class="hexl" id="hexl"></div></details>
     </div>
   </section>
 
@@ -722,12 +748,77 @@ function freeEvents(){
   $("fdp").onclick=()=>{fr.rest=Math.min(180,fr.rest+15);applyFree();};
   $("mrut").onclick=()=>setMode("rutina");
   $("msuel").onclick=()=>setMode("suelto");
+  $("mhist").onclick=showHist;
+  $("hmore").onclick=()=>{hshow+=20;renderHist();};
 }
 function setMode(m){
-  if(locked()||m===mode) return;
-  mode=m; $("mrut").setAttribute("aria-pressed",m==="rutina"); $("msuel").setAttribute("aria-pressed",m==="suelto");
-  $("setup").hidden=m!=="rutina"; $("free").hidden=m!=="suelto"; $("fb").hidden=true;
-  running=false; bplay.textContent="Empezar"; build(); ui();
+  if(locked()) return;
+  if(view!=="main"){view="main";document.body.classList.remove("hist");$("hist").hidden=true;}
+  if(m!==mode){
+    mode=m; $("setup").hidden=m!=="rutina"; $("free").hidden=m!=="suelto"; $("fb").hidden=true;
+    running=false; bplay.textContent="Empezar"; build(); ui();
+  }
+  paintModes();
+}
+function paintModes(){$("mrut").setAttribute("aria-pressed",view==="main"&&mode==="rutina");$("msuel").setAttribute("aria-pressed",view==="main"&&mode==="suelto");
+  $("mhist").setAttribute("aria-pressed",view==="hist");}
+function showHist(){if(locked())return;view="hist";document.body.classList.add("hist");$("hist").hidden=false;paintModes();hshow=20;renderHist();window.scrollTo(0,0);}
+
+/* ---------- Historial: pantalla ---------- */
+let view="main", hshow=20;
+const mk=(tag,cls,text)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e;};
+const cap1=t=>t.charAt(0).toUpperCase()+t.slice(1);
+const dayKey=ms=>{const d=new Date(ms);return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");};
+const dayLong=ms=>cap1(new Date(ms).toLocaleDateString("es-ES",{weekday:"long",day:"numeric",month:"long",year:new Date(ms).getFullYear()===new Date().getFullYear()?undefined:"numeric"}));
+const dayShort=ms=>new Date(ms).toLocaleDateString("es-ES",{day:"numeric",month:"short",year:new Date(ms).getFullYear()===new Date().getFullYear()?undefined:"numeric"});
+const hhmm=ms=>new Date(ms).toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"});
+const durTxt=ms=>{const m=Math.round(ms/60000);return m<1?Math.round(ms/1000)+" s":m<60?m+" min":Math.floor(m/60)+" h "+String(m%60).padStart(2,"0")+" min";};
+const doseOf=x=>x.planSecs?(x.skipped?`${x.secs} de ${x.planSecs} s`:`${x.secs} s`):(x.skipped?`${x.reps} de ${x.planReps} reps`:`${x.reps} reps`);
+const FBT={up:"fácil",ok:"justo",down:"demasiado"};
+function setLine(x,type){return [(type==="sueltos"?"Serie ":"Ronda ")+x.r,x.side,doseOf(x),x.kg!=null?fkg(x.kg)+" kg":"",x.band||"",x.skipped?"saltada":""].filter(Boolean).join(" · ");}
+function sessionEl(o){
+  const d=mk("details","hs"), sm=mk("summary");
+  const b=mk("b",null,hhmm(o.start)+" · "+(o.title||(o.type==="sueltos"?"Ejercicios sueltos":"Rutina")));
+  if(!o.complete) b.appendChild(mk("span","tag","Incompleta"));
+  const n=o.sets.length;
+  sm.append(b,mk("small",null,[durTxt(o.end-o.start),n+(n===1?" serie":" series"),o.type==="sueltos"?"Ejercicios sueltos":"Rutina completa",o.src==="widget"?"desde el widget":""].filter(Boolean).join(" · ")));
+  d.appendChild(sm);
+  d.addEventListener("toggle",()=>{if(!d.open||d.querySelector(".hb"))return;
+    const body=mk("div","hb"), groups=new Map();
+    o.sets.forEach(x=>{if(!groups.has(x.k))groups.set(x.k,[]);groups.get(x.k).push(x);});
+    groups.forEach(list=>{const g=mk("div","hx");g.appendChild(mk("b",null,list[0].name));const ul=mk("ul");
+      list.forEach(x=>ul.appendChild(mk("li",null,setLine(x,o.type)+" · "+hhmm(x.start))));g.appendChild(ul);body.appendChild(g);});
+    if(o.fb&&Object.keys(o.fb).length) body.appendChild(mk("p","hfb","Cómo te fue: "+Object.entries(o.fb).map(([k,v])=>{const m=D.modules.find(x=>x.key===k);return (m?m.name:k)+" "+FBT[v];}).join(" · ")));
+    d.appendChild(body);});
+  return d;
+}
+/* La mejor serie: con más kilos (y a igualdad, más repeticiones); sin kilos, más repeticiones o más segundos */
+const better=(a,b)=>!b||((a.kg||0)!==(b.kg||0)?(a.kg||0)>(b.kg||0):(a.reps||a.secs)>(b.reps||b.secs));
+function exSummary(h){
+  const m=new Map();
+  h.forEach(o=>o.sets.forEach(x=>{if(!m.has(x.k))m.set(x.k,{name:x.name,last:null,lastSets:[],best:null,bestAt:0});
+    const e=m.get(x.k);
+    if(!e.last||o.start>e.last){e.last=o.start;e.lastSets=[];} if(o.start===e.last)e.lastSets.push(x);
+    if(better(x,e.best)){e.best=x;e.bestAt=o.start;}}));
+  return [...m.values()].sort((a,b)=>b.last-a.last);
+}
+function lastTxt(e){const L=e.lastSets, hold=!!L[0].planSecs, kgs=[...new Set(L.filter(x=>x.kg!=null).map(x=>x.kg))].sort((a,b)=>a-b), bands=[...new Set(L.map(x=>x.band).filter(Boolean))];
+  return [dayShort(e.last),L.length+(L.length===1?" serie":" series"),L.map(x=>hold?x.secs:x.reps).join("/")+(hold?" s":" reps"),
+    kgs.length?kgs.map(fkg).join("–")+" kg":"",bands.join(", ")].filter(Boolean).join(" · ");}
+function bestTxt(e){const x=e.best;return (x.planSecs?x.secs+" s":x.reps+" reps")+(x.kg!=null?" con "+fkg(x.kg)+" kg":"")+(x.band?" · "+x.band:"")+" · "+dayShort(e.bestAt);}
+function renderHist(){
+  const h=store.history().filter(o=>o&&Array.isArray(o.sets)).sort((a,b)=>b.start-a.start);
+  const box=$("hdays"); box.innerHTML="";
+  $("hsum").textContent=h.length?`${h.length} ${h.length===1?"sesión":"sesiones"} · desde ${dayShort(h[h.length-1].start)}`:"";
+  if(!h.length) box.appendChild(mk("p","hint","Aún no hay sesiones. Al terminar una (o pararla a mitad) aparece aquí."));
+  let prev="";
+  h.slice(0,hshow).forEach(o=>{const k=dayKey(o.start);if(k!==prev){prev=k;box.appendChild(mk("h3","hday",dayLong(o.start)));}box.appendChild(sessionEl(o));});
+  $("hmore").hidden=h.length<=hshow;
+  const ex=exSummary(h), l=$("hexl"); l.innerHTML="";
+  $("hexd").hidden=!ex.length;
+  ex.forEach(e=>{const r=mk("div","hrow");r.appendChild(mk("b",null,e.name));
+    const a=mk("small");a.append(mk("em",null,"Última vez: "),lastTxt(e));const b=mk("small");b.append(mk("em",null,"Mejor: "),bestTxt(e));
+    r.append(a,b);l.appendChild(r);});
 }
 
 /* ---------- Modo guiado ---------- */
@@ -784,7 +875,7 @@ function ui(){
 }
 let lockShown=null;
 function renderSetupLock(){const l=locked();if(l===lockShown)return;lockShown=l;$("setupf").disabled=l;$("lockmsg").hidden=!l;
-  $("freef").disabled=l;$("flock").hidden=!l;$("mrut").disabled=l;$("msuel").disabled=l;}
+  $("freef").disabled=l;$("flock").hidden=!l;$("mrut").disabled=l;$("msuel").disabled=l;$("mhist").disabled=l;}
 const beepLog=[];
 function beep(f=880,d=.12){beepLog.push({f,t:performance.now()});if(!actx)return;try{const o=actx.createOscillator(),g=actx.createGain();o.frequency.value=f;g.gain.value=.15;o.connect(g);g.connect(actx.destination);o.start();o.stop(actx.currentTime+d);}catch(e){}}
 async function lock(on){try{if(on&&navigator.wakeLock) wake=await navigator.wakeLock.request("screen"); else if(wake){wake.release();wake=null;}}catch(e){}}
@@ -915,7 +1006,7 @@ async function loadData(){if(A&&A.rutina) return JSON.parse(A.rutina()); const r
 function reloadState(){cfg=store.cfg();lastDay=store.lastDay();offset=store.sessions();}
 window.reloadConfig=()=>{if(!D||locked())return;reloadState();build();ui();};
 /* El widget abre la app para la rutina completa */
-window.autoStart=()=>{try{window.scrollTo(0,0);if(mode!=="rutina")setMode("rutina");if(!running&&!bplay.disabled)bplay.click();}catch(e){}};
+window.autoStart=()=>{try{window.scrollTo(0,0);if(mode!=="rutina"||view!=="main")setMode("rutina");if(!running&&!bplay.disabled)bplay.click();}catch(e){}};
 window.refreshStats=()=>{try{if(!A)return;const s=JSON.parse(A.stats());
   const el=$("stats");el.hidden=false;
   const r=s.streak===1?"1 día":s.streak+" días";
@@ -929,7 +1020,7 @@ loadData().then(d=>{
   if(window.__ready) window.__ready();
 }).catch(e=>{console.error(e);$("pname").textContent="No se pudo cargar rutina.json";});
 /* Para las pruebas automáticas */
-window.__t={get steps(){return steps},get idx(){return idx},get left(){return left},get cfg(){return cfg},get fr(){return fr},get bands(){return BANDS},get bandUse(){return BUSE},get mode(){return mode},get rec(){return rec},beepLog,buildPlan,buildFree,activeModules,dayType};
+window.__t={get steps(){return steps},get idx(){return idx},get left(){return left},get cfg(){return cfg},get fr(){return fr},get bands(){return BANDS},get bandUse(){return BUSE},get mode(){return mode},get rec(){return rec},get view(){return view},renderHist,beepLog,buildPlan,buildFree,activeModules,dayType};
 </script>
 </body>
 </html>
