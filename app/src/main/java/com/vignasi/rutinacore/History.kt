@@ -61,21 +61,8 @@ object History {
         }
     }
 
-    /** Une [other] con lo que hay sin duplicar sesiones (mismo id: se queda la del móvil). Devuelve cuántas se añaden. */
-    fun merge(c: Context, other: JSONArray): Int = synchronized(lock) {
-        val a = all(c)
-        val ids = HashSet<String>()
-        for (i in 0 until a.length()) a.optJSONObject(i)?.optString("id")?.let { ids.add(it) }
-        var n = 0
-        for (i in 0 until other.length()) {
-            val o = other.optJSONObject(i) ?: continue
-            val id = o.optString("id")
-            if (id.isEmpty() || id in ids || o.optJSONArray("sets") == null) continue
-            a.put(o); ids.add(id); n++
-        }
-        if (n > 0) write(c, sorted(a))
-        n
-    }
+    /** Sustituye todo el historial (lo usa la copia de seguridad, que antes lo ha combinado). */
+    fun replaceAll(c: Context, a: JSONArray) = synchronized(lock) { write(c, sorted(a)) }
 
     private fun sorted(a: JSONArray): JSONArray {
         val l = (0 until a.length()).mapNotNull { a.optJSONObject(it) }.sortedBy { it.optLong("start") }

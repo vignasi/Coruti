@@ -9,9 +9,12 @@ object Store {
     private const val PREFS = "rutina"
     private const val DAYS = "days"
 
-    private fun prefs(c: Context) = c.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+    internal fun prefs(c: Context) = c.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
 
     private fun days(c: Context): Set<String> = prefs(c).getStringSet(DAYS, emptySet()) ?: emptySet()
+
+    /** Días hechos (fechas «2026-11-11»): para la copia de seguridad. */
+    fun allDays(c: Context): Set<String> = HashSet(days(c))
 
     fun markDone(c: Context, rounds: Int, day: String) {
         val p = prefs(c)

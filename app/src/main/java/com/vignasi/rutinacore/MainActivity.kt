@@ -21,6 +21,8 @@ class MainActivity : Activity() {
 
     companion object {
         const val EXTRA_AUTOSTART = "autostart"
+        private const val REQ_EXPORT = 11
+        private const val REQ_IMPORT = 12
     }
 
     private lateinit var web: WebView
@@ -94,6 +96,40 @@ class MainActivity : Activity() {
         super.onDestroy()
     }
 
+    /** Resultado del selector de archivos de Android: guarda la copia o la importa y avisa a la página. */
+    @Deprecated("Activity sin AndroidX: el selector de archivos devuelve aquí el resultado")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode != REQ_EXPORT && requestCode != REQ_IMPORT) return
+        val uri = data?.data
+        if (resultCode != RESULT_OK || uri == null) { backupDone("", true); return }
+        Thread {
+            var ok = true
+            val msg = try {
+                if (requestCode == REQ_EXPORT) {
+                    val s = Backup.snapshot(this)
+                    contentResolver.openOutputStream(uri, "wt")!!.use { it.write(s.toString(1).toByteArray()) }
+                    "Copia guardada: ${s.getJSONArray("history").length()} sesiones, favoritas, bandas, pesos, ajustes y racha."
+                } else {
+                    val text = contentResolver.openInputStream(uri)!!.use { it.readBytes().toString(Charsets.UTF_8) }
+                    Backup.import(this, text)
+                }
+            } catch (e: IllegalArgumentException) {
+                ok = false; e.message ?: "No se pudo leer la copia."
+            } catch (e: Exception) {
+                ok = false; if (requestCode == REQ_EXPORT) "No se pudo guardar la copia." else "No se pudo leer la copia."
+            }
+            runOnUiThread {
+                if (requestCode == REQ_IMPORT && ok) WidgetUpdater.refresh(this, force = true)
+                backupDone(msg, ok, imported = requestCode == REQ_IMPORT && ok)
+            }
+        }.start()
+    }
+
+    private fun backupDone(msg: String, ok: Boolean, imported: Boolean = false) {
+        if (pageReady) js("window.onBackup && window.onBackup(${org.json.JSONObject.quote(msg)}, $ok, $imported)")
+    }
+
     private fun js(code: String) {
         web.evaluateJavascript(code, null)
     }
@@ -164,6 +200,22 @@ class MainActivity : Activity() {
         @JavascriptInterface
         fun setSessionFeedback(id: String, json: String) {
             try { History.setFeedback(this@MainActivity, id, org.json.JSONObject(json)) } catch (e: Exception) { }
+        }
+
+        /** Copia de seguridad: abre «Guardar como» de Android (Drive, Descargas…) con todo en un archivo JSON. */
+        @JavascriptInterface
+        fun exportData() = runOnUiThread {
+            val name = "rutina-core-" + java.time.LocalDate.now() + ".json"
+            val i = Intent(Intent.ACTION_CREATE_DOCUMENT).addCategory(Intent.CATEGORY_OPENABLE)
+                .setType("application/json").putExtra(Intent.EXTRA_TITLE, name)
+            try { @Suppress("DEPRECATION") startActivityForResult(i, REQ_EXPORT) } catch (e: Exception) { backupDone("No hay ninguna app para guardar archivos.", false) }
+        }
+
+        /** Elige un archivo de copia y lo combina con lo que hay en el móvil. */
+        @JavascriptInterface
+        fun importData() = runOnUiThread {
+            val i = Intent(Intent.ACTION_OPEN_DOCUMENT).addCategory(Intent.CATEGORY_OPENABLE).setType("*/*")
+            try { @Suppress("DEPRECATION") startActivityForResult(i, REQ_IMPORT) } catch (e: Exception) { backupDone("No hay ninguna app para abrir archivos.", false) }
         }
 
         @JavascriptInterface
