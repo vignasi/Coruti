@@ -153,6 +153,19 @@ class MainActivity : Activity() {
         @JavascriptInterface
         fun sessions(): Int = Store.sessions(this@MainActivity)
 
+        /** Historial: la página manda cada sesión al terminarla (o al pararla a mitad) y lo lee para la pantalla «Historial». */
+        @JavascriptInterface
+        fun saveSession(json: String): Boolean =
+            try { History.add(this@MainActivity, org.json.JSONObject(json)) } catch (e: Exception) { false }
+
+        @JavascriptInterface
+        fun history(): String = History.text(this@MainActivity)
+
+        @JavascriptInterface
+        fun setSessionFeedback(id: String, json: String) {
+            try { History.setFeedback(this@MainActivity, id, org.json.JSONObject(json)) } catch (e: Exception) { }
+        }
+
         @JavascriptInterface
         fun stats(): String {
             val c = this@MainActivity
