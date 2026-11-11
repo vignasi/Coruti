@@ -188,6 +188,8 @@ body.hist .player,body.hist #setup,body.hist #free,body.hist .exhead,body.hist .
 .hs .hx b{display:block}
 .hs ul{margin:2px 0 0;padding-left:18px;font-size:.95rem;color:var(--soft);font-variant-numeric:tabular-nums}
 .hs .hfb{font-size:.92rem;color:var(--soft);margin:0}
+.bkp{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+#bmsg.err{color:var(--hl)}
 .hexl{display:flex;flex-direction:column;gap:8px;margin-top:6px}
 .hrow{display:flex;flex-direction:column;gap:2px;background:var(--accent-soft);border-radius:12px;padding:8px 12px;line-height:1.3}
 .hrow small{color:var(--soft);font-size:.88rem}
@@ -311,6 +313,10 @@ body.hist .player,body.hist #setup,body.hist #free,body.hist .exhead,body.hist .
     <div class="body">
       <div class="field"><span class="lbl">Por días</span><div class="hdays" id="hdays"></div><button id="hmore" hidden>Ver más</button></div>
       <details class="field mybands" id="hexd"><summary>Por ejercicio: la última vez y la mejor</summary><div class="hexl" id="hexl"></div></details>
+      <div class="field"><span class="lbl">Copia de seguridad</span>
+        <small class="hint">Todo en un archivo: historial, favoritas, bandas, pesos, ajustes y racha. Guárdalo en Drive o en el ordenador. Al importarlo se combina con lo que haya en el móvil, sin borrar nada.</small>
+        <div class="bkp"><button id="bexp">Exportar</button><button id="bimp">Importar</button></div>
+        <small class="hint" id="bmsg" role="status" aria-live="polite"></small></div>
     </div>
   </section>
 
@@ -750,6 +756,8 @@ function freeEvents(){
   $("msuel").onclick=()=>setMode("suelto");
   $("mhist").onclick=showHist;
   $("hmore").onclick=()=>{hshow+=20;renderHist();};
+  $("bexp").onclick=exportData;
+  $("bimp").onclick=()=>{if(A&&A.importData){bmsg("");A.importData();}else bmsg("Importar solo funciona en la app del móvil.",false);};
 }
 function setMode(m){
   if(locked()) return;
@@ -792,6 +800,20 @@ function sessionEl(o){
     d.appendChild(body);});
   return d;
 }
+/* ---------- Copia de seguridad: en la app la guarda Android (Backup.kt); en el navegador se descarga ---------- */
+function bmsg(t,ok=true){const e=$("bmsg");e.textContent=t;e.classList.toggle("err",!ok);}
+function exportData(){
+  if(A&&A.exportData){bmsg("");A.exportData();return;}
+  const free={};[["last","free.last"],["favs","free.favs"],["bands","free.bands"],["bandUse","free.bandUse"]].forEach(([k,f])=>{try{const v=JSON.parse(store.free(f));if(v!=null)free[k]=v;}catch(e){}});
+  const o={app:"rutina-core",v:1,exportedAt:Date.now(),history:store.history(),days:[],lastDay:store.lastDay(),lastRounds:0,sessions:store.sessions(),config:store.cfg(),weights:store.weights(),free};
+  const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(o,null,1)],{type:"application/json"}));
+  a.download="rutina-core-"+dayKey(Date.now())+".json";a.click();bmsg("Copia descargada.");
+}
+/* Android avisa al terminar de guardar o importar; al importar se recarga todo lo que se ve */
+window.onBackup=(msg,ok,imported)=>{bmsg(msg,ok);
+  if(!imported||!D||locked())return;
+  reloadState();loadBands();fr=normFree((()=>{try{return JSON.parse(store.free("free.last"))}catch(e){return null}})());
+  renderFavs();build();ui();renderHist();window.refreshStats&&window.refreshStats();};
 /* La mejor serie: con más kilos (y a igualdad, más repeticiones); sin kilos, más repeticiones o más segundos */
 const better=(a,b)=>!b||((a.kg||0)!==(b.kg||0)?(a.kg||0)>(b.kg||0):(a.reps||a.secs)>(b.reps||b.secs));
 function exSummary(h){
