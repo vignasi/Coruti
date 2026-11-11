@@ -11,6 +11,8 @@ object Workout {
     var rounds = 3
     var day = ""
     var count = true
+    /** Lo que se va apuntando para el historial. */
+    var rec: SessionRecorder? = null
 
     fun start(plan: List<Step>, cfg: Config, dayType: String) {
         rounds = cfg.rounds
@@ -25,7 +27,7 @@ object Workout {
     }
 
     fun reset() {
-        steps = emptyList(); idx = 0; leftMs = 0; running = false; active = false; done = false
+        rec = null; steps = emptyList(); idx = 0; leftMs = 0; running = false; active = false; done = false
     }
 
     fun current(): Step? = steps.getOrNull(idx)

@@ -80,8 +80,9 @@ class WorkoutService : Service() {
         if (!Workout.active) {
             val cfg = Store.config(this)
             val data = Rutina.get(this)
-            Workout.start(buildSteps(data, cfg, Store.lastDay(this), Store.sessions(this)), cfg,
-                dayType(activeModules(data, cfg, Store.lastDay(this))))
+            val mods = activeModules(data, cfg, Store.lastDay(this))
+            Workout.start(buildSteps(data, cfg, Store.lastDay(this), Store.sessions(this)), cfg, dayType(mods))
+            Workout.rec = SessionRecorder(modsLabel(mods), dayType(mods), cfg.rounds)
             resetCues()
             acquireWake()
             lastTick = SystemClock.elapsedRealtime()
@@ -100,6 +101,7 @@ class WorkoutService : Service() {
         if (!Workout.active) return
         val now = SystemClock.elapsedRealtime()
         if (Workout.running) {
+            Workout.rec?.track()
             val before = Workout.leftSec()
             Workout.leftMs -= now - lastTick
             val after = Workout.leftSec()
@@ -147,6 +149,7 @@ class WorkoutService : Service() {
 
     private fun advance() {
         resetCues()
+        Workout.rec?.close(this)
         Workout.idx++
         val st = Workout.current()
         if (st == null) {
@@ -174,6 +177,8 @@ class WorkoutService : Service() {
         Workout.running = false
         Workout.done = true
         Workout.idx = 0
+        Workout.rec?.save(this, complete = true)
+        Workout.rec = null
         Store.markDone(this, rounds, day)
         beeper?.chime()
         speak("Rutina terminada. Buen trabajo.")
@@ -187,6 +192,7 @@ class WorkoutService : Service() {
     }
 
     private fun stopWorkout() {
+        if (Workout.active) Workout.rec?.save(this, complete = false)
         Workout.reset()
         handler.removeCallbacks(ticker)
         WidgetUpdater.refresh(this, force = true)
