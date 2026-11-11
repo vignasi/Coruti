@@ -249,8 +249,8 @@ fieldset:disabled{opacity:.55}
         <div class="field"><span class="lbl">Material</span>
           <label class="tog"><input type="checkbox" id="ccorreas"><span>Tengo correas de suspensión (tipo TRX)</span></label>
           <label class="tog"><input type="checkbox" id="cmanc"><span>Tengo mancuernas</span></label>
-          <label class="tog"><input type="checkbox" id="cgomas"><span>Tengo gomas elásticas con asas<small>Las que se pisan con los pies</small></span></label>
-          <label class="tog"><input type="checkbox" id="cbanda"><span>Tengo banda de glúteo<small>La goma que va por encima de las rodillas</small></span></label></div>
+          <label class="tog"><input type="checkbox" id="cgomas"><span>Tengo bandas elásticas grandes<small>Bucles largos y cerrados, sin asas: se pisan o se pasan por la espalda</small></span></label>
+          <label class="tog"><input type="checkbox" id="cbanda"><span>Tengo mini banda<small>El bucle pequeño que va por encima de las rodillas (glúteo)</small></span></label></div>
         <div class="field"><span class="lbl">Sonido y volumen</span>
           <label class="tog"><input type="checkbox" id="ccount"><span>Contar en voz alta<small>Si no, solo suenan los tonos de cada repetición</small></span></label>
           <label class="tog"><input type="checkbox" id="ctaper"><span>Menos volumen en cada ronda<small>Opcional, para días con poco tiempo: módulos al 100 %, 80 % y 60 %</small></span></label></div>
@@ -277,7 +277,7 @@ fieldset:disabled{opacity:.55}
         <div class="field"><label class="lbl" for="ffavname">Guardar como favorita</label>
           <div class="savefav"><input id="ffavname" maxlength="40" autocomplete="off"><button id="ffavsave">Guardar</button></div>
           <small class="hint" id="ffavmsg" role="status"></small></div>
-        <details class="field mybands"><summary>Mis bandas elásticas</summary>
+        <details class="field mybands"><summary>Mis bandas grandes</summary>
           <small class="hint">Ponles un nombre que las distinga (color o dureza). Deja una vacía para quitarla.</small>
           <div class="bandsed" id="fbands"></div></details>
         <div class="field"><span class="lbl" id="lfz">Zona</span><div class="fchips" id="fzone" role="group" aria-labelledby="lfz"></div></div>
@@ -397,14 +397,14 @@ function normFree(o){o=o&&typeof o==="object"?o:{};const f={...DEF_FREE,...o};
   f.alt=f.alt!==false;
   return f;}
 const isAlt=f=>f.alt&&f.sel.length>1;
-/* Bandas elásticas: tus bandas y cuál usas en cada ejercicio (se recuerda para la próxima vez) */
+/* Bandas grandes (material «gomas» en los datos): tus bandas y cuál usas en cada ejercicio (se recuerda para la próxima vez) */
 const DEF_BANDS=["Banda 1","Banda 2","Banda 3","Banda 4"];
 let BANDS=null, BUSE=null;
 function loadBands(){
   try{const a=JSON.parse(store.free("free.bands"));BANDS=Array.isArray(a)?a.filter(x=>typeof x==="string"&&x.trim()).slice(0,8):null}catch(e){BANDS=null}
   if(!BANDS||!BANDS.length) BANDS=DEF_BANDS.slice();
   try{const u=JSON.parse(store.free("free.bandUse"));BUSE=u&&typeof u==="object"?u:{}}catch(e){BUSE={}}}
-const usesBand=k=>catOf(k).needs==="elasticas";
+const usesBand=k=>catOf(k).needs==="gomas";
 const bandOf=k=>{const b=BUSE[k];return b&&BANDS.includes(b)?b:null;};
 function setBand(k,name){if(name)BUSE[k]=name;else delete BUSE[k];store.setFree("free.bandUse",JSON.stringify(BUSE));}
 function setBands(a){
@@ -506,7 +506,7 @@ function gear(ctx,ex,p){
     else if(q.t==="towel"){ctx.strokeStyle=COL.soft;ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(...p[q.at]);ctx.lineTo(p[q.to][0]-2,p[q.to][1]+2);ctx.stroke();}
   });
 }
-/* Nombre del material junto al dibujo (BANDA, GOMA) */
+/* Nombre del material junto al dibujo (BANDA) */
 function tag(ctx,text,x,y){ctx.save();ctx.font="700 6.5px system-ui,sans-serif";ctx.textAlign="center";
   const w=ctx.measureText(text).width+6, cx=Math.min(179-w/2,Math.max(1+w/2,x));
   ctx.fillStyle=COL.surface;ctx.fillRect(cx-w/2,y-5,w,9);ctx.fillStyle=COL.accent;ctx.fillText(text,cx,y+2);ctx.restore();}
@@ -541,7 +541,7 @@ function setCap(o,st){const k=st.idx+"/"+st.n+st.phase.cap; if(o.last===k)return
   o.step.textContent=(st.idx+1)+"/"+st.n; o.txt.textContent=st.phase.cap;}
 
 /* ---------- Fichas por grupo ---------- */
-const NEEDS={correas:"Con correas",mancuernas:"Con mancuernas",gomas:"Con gomas",banda:"Con banda de glúteo",elasticas:"Con bandas elásticas"};
+const NEEDS={correas:"Con correas",mancuernas:"Con mancuernas",gomas:"Con banda grande",banda:"Con mini banda"};
 const cards=[];
 function doseText(key){
   const ex=D.exercises[key];

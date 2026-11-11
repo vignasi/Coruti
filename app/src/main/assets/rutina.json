@@ -603,18 +603,18 @@
       ]
     },
     "press_goma": {
-      "name": "Press de suelo con goma",
+      "name": "Press de suelo con banda",
       "rep": 4,
       "unit": "Repetición",
-      "vid": "press de pecho con goma elástica tumbado",
+      "vid": "press de pecho con banda elástica de resistencia tumbado",
       "cues": [
-        "Tumbado, rodillas dobladas, goma por debajo de la espalda a la altura de los omóplatos",
-        "Un asa en cada mano, codos a 45° del cuerpo",
+        "Tumbado, rodillas dobladas, banda por debajo de la espalda a la altura de los omóplatos",
+        "Una punta del bucle en cada mano, codos a 45° del cuerpo",
         "Empuja hacia el techo y baja despacio",
-        "Para más tensión, coge la goma más corta"
+        "Para más tensión, usa una banda más dura"
       ],
       "marks": {"pe":{"at":["s"],"off":[8,-5],"lab":[96,40]}},
-      "equip": [{"t":"goma","at":"w1","to":"s","label":"GOMA"},{"t":"goma","at":"w2","to":"s"}],
+      "equip": [{"t":"goma","at":"w1","to":"s","label":"BANDA"},{"t":"goma","at":"w2","to":"s"}],
       "poses": [
         {"h":[26,94],"s":[40,97],"p":[90,98],"k1":[120,74],"a1":[135,100],"k2":[118,75],"a2":[133,100],"e1":[56,100],"w1":[56,82],"e2":[58,100],"w2":[58,82]},
         {"h":[26,94],"s":[40,97],"p":[90,98],"k1":[120,74],"a1":[135,100],"k2":[118,75],"a2":[133,100],"e1":[42,80],"w1":[43,62],"e2":[44,80],"w2":[45,62]}
@@ -625,40 +625,40 @@
       ]
     },
     "curl_goma": {
-      "name": "Curl de bíceps con goma",
+      "name": "Curl de bíceps con banda",
       "rep": 4,
       "unit": "Repetición",
-      "vid": "curl de bíceps con goma elástica",
+      "vid": "curl de bíceps con banda elástica de resistencia",
       "cues": [
-        "De pie, pisando la goma con los dos pies",
-        "Codos pegados al cuerpo: no se mueven",
-        "Sube en 1,5 s y baja en 2 s, culo apretado",
-        "Para más tensión, separa los pies o coge la goma más corta"
+        "De pie, pisa la banda con los dos pies y coge la otra punta del bucle",
+        "Palmas hacia delante, codos quietos y pegados al cuerpo",
+        "Sube las manos a los hombros y baja despacio (2 s), sin balanceo",
+        "Para más tensión, separa los pies o usa una banda más dura"
       ],
       "marks": {"bi":{"at":["s","e1"],"off":[-4,0],"lab":[40,20]},"gl":{"at":["p"],"off":[5,0],"lab":[140,50]}},
-      "equip": [{"t":"goma","at":"w1","to":"a1","label":"GOMA"}],
+      "equip": [{"t":"goma","at":"w1","to":"a1","label":"BANDA"}],
       "poses": [
         {"h":[92,12],"s":[92,25],"c":[92,42],"p":[92,60],"k1":[90,80],"a1":[90,100],"k2":[94,80],"a2":[94,100],"e1":[93,43],"w1":[92,60],"e2":[95,43],"w2":[94,60]},
         {"h":[92,12],"s":[92,25],"c":[92,42],"p":[92,60],"k1":[90,80],"a1":[90,100],"k2":[94,80],"a2":[94,100],"e1":[93,43],"w1":[78,32],"e2":[95,43],"w2":[80,32]}
       ],
       "phases": [
-        {"pose":1,"move":1.5,"hold":0.5,"tone":"up","sq":["bi"],"arrow":[70,60,68,36],"cap":"Sube doblando el codo; el codo no se mueve"},
-        {"pose":0,"move":1.5,"hold":0.5,"tone":"down","sq":["gl"],"cap":"Baja despacio (2 s), culo apretado, sin balancear"}
+        {"pose":1,"move":1.5,"hold":0.5,"tone":"up","sq":["bi"],"arrow":[70,60,68,36],"cap":"Sube las manos a los hombros; los codos no se mueven"},
+        {"pose":0,"move":1.5,"hold":0.5,"tone":"down","sq":["gl"],"cap":"Baja despacio (2 s), sin balancear"}
       ]
     },
     "remo_goma": {
-      "name": "Remo sentado con goma",
+      "name": "Remo sentado con banda",
       "rep": 4,
       "unit": "Repetición",
-      "vid": "remo sentado con goma elástica",
+      "vid": "remo sentado con banda elástica de resistencia",
       "cues": [
-        "Sentado en el suelo, goma por la planta de los pies, rodillas algo dobladas",
+        "Sentado en el suelo, banda por la planta de los pies y la otra punta en las manos, rodillas algo dobladas",
         "Espalda recta y alta, sin echarte atrás",
         "Tira hacia el ombligo juntando las escápulas",
         "Vuelve despacio con los brazos estirados"
       ],
       "marks": {"esp":{"at":["s"],"off":[-6,6],"lab":[30,30]}},
-      "equip": [{"t":"goma","at":"w1","to":"a1","label":"GOMA"}],
+      "equip": [{"t":"goma","at":"w1","to":"a1","label":"BANDA"}],
       "poses": [
         {"h":[66,32],"s":[66,46],"c":[67,64],"p":[68,92],"k1":[100,82],"a1":[134,96],"k2":[102,82],"a2":[136,96],"e1":[82,52],"w1":[100,58],"e2":[84,52],"w2":[102,58]},
         {"h":[64,32],"s":[64,46],"c":[65,64],"p":[68,92],"k1":[100,82],"a1":[134,96],"k2":[102,82],"a2":[136,96],"e1":[50,58],"w1":[70,62],"e2":[52,58],"w2":[72,62]}
@@ -740,7 +740,7 @@
       "unit": "Repetición",
       "vid": "remo inclinado con banda elástica de pie",
       "cues": [
-        "Pisa la banda con los dos pies (si es corta, con uno y a un brazo)",
+        "Pisa la banda con los dos pies y coge la otra punta del bucle (si es corta, pisa con un pie y tira a un brazo)",
         "Tronco inclinado unos 45°, espalda recta y rodillas algo dobladas",
         "Tira de los codos hacia atrás, pegados al cuerpo, hasta el ombligo",
         "Junta los omóplatos arriba y baja en 2 s"
@@ -755,33 +755,11 @@
         {"pose":1,"move":1.5,"hold":0.5,"tone":"up","sq":["esc"],"arrow":[74,76,86,60],"cap":"Tira de los codos hasta el ombligo y junta los omóplatos"},
         {"pose":0,"move":1.5,"hold":0.5,"tone":"down","cap":"Baja despacio (2 s) con la espalda recta"}
       ]
-    },
-    "curl_banda": {
-      "name": "Curl de bíceps con banda",
-      "rep": 4,
-      "unit": "Repetición",
-      "vid": "curl de bíceps con banda elástica",
-      "cues": [
-        "De pie, pisando la banda, palmas hacia delante",
-        "Codos quietos y pegados al cuerpo",
-        "Sube las manos hasta los hombros",
-        "Baja despacio, sin balancear el cuerpo"
-      ],
-      "marks": {"bi":{"at":["s","e1"],"off":[-4,0],"lab":[40,20]},"gl":{"at":["p"],"off":[5,0],"lab":[140,50]}},
-      "equip": [{"t":"goma","at":"w1","to":"a1","label":"BANDA"}],
-      "poses": [
-        {"h":[92,12],"s":[92,25],"c":[92,42],"p":[92,60],"k1":[90,80],"a1":[90,100],"k2":[94,80],"a2":[94,100],"e1":[93,43],"w1":[92,60],"e2":[95,43],"w2":[94,60]},
-        {"h":[92,12],"s":[92,25],"c":[92,42],"p":[92,60],"k1":[90,80],"a1":[90,100],"k2":[94,80],"a2":[94,100],"e1":[93,43],"w1":[78,32],"e2":[95,43],"w2":[80,32]}
-      ],
-      "phases": [
-        {"pose":1,"move":1.5,"hold":0.5,"tone":"up","sq":["bi"],"arrow":[70,60,68,36],"cap":"Sube las manos a los hombros; los codos no se mueven"},
-        {"pose":0,"move":1.5,"hold":0.5,"tone":"down","sq":["gl"],"cap":"Baja despacio (2 s), sin balancear"}
-      ]
     }
   },
   "catalog": {
     "zones": ["Core","Glúteo","Espalda","Pecho","Brazos","Movilidad"],
-    "needs": {"elasticas":"Bandas elásticas","gomas":"Gomas con asas","banda":"Banda de glúteo","mancuernas":"Mancuernas","correas":"Correas"},
+    "needs": {"gomas":"Bandas grandes","banda":"Mini banda","mancuernas":"Mancuernas","correas":"Correas"},
     "ex": {
       "psoas": {"zone":"Movilidad","secs":30,"sides":["Rodilla izquierda en el suelo","Rodilla derecha en el suelo"]},
       "puente": {"zone":"Glúteo","reps":15},
@@ -801,12 +779,11 @@
       "press_goma": {"zone":"Pecho","needs":"gomas","reps":12},
       "press_trx": {"zone":"Pecho","needs":"correas","reps":10},
       "angel": {"zone":"Espalda","reps":10},
-      "remo_incl_banda": {"zone":"Espalda","needs":"elasticas","reps":12},
+      "remo_incl_banda": {"zone":"Espalda","needs":"gomas","reps":12},
       "remo_goma": {"zone":"Espalda","needs":"gomas","reps":15},
       "remo_trx": {"zone":"Espalda","needs":"correas","reps":12},
       "remo_db": {"zone":"Espalda","needs":"mancuernas","reps":10,"kg":[8,12],"sides":["Brazo derecho","Brazo izquierdo"]},
-      "curl_banda": {"zone":"Brazos","needs":"elasticas","reps":12},
-      "curl_goma": {"zone":"Brazos","needs":"gomas","reps":15},
+      "curl_goma": {"zone":"Brazos","needs":"gomas","reps":12},
       "curl_db": {"zone":"Brazos","needs":"mancuernas","reps":12,"kg":[6,8]},
       "curl_trx": {"zone":"Brazos","needs":"correas","reps":12},
       "curl_toalla": {"zone":"Brazos","secs":25},
@@ -891,7 +868,7 @@
         {
           "variants": [
             {"ex":"press_db","needs":"mancuernas","S":{"reps":10,"kg":[6,8]},"N":{"reps":10,"kg":[8,10]},"F":{"reps":10,"kg":[10,14]}},
-            {"ex":"press_goma","needs":"gomas","S":{"reps":10},"N":{"reps":12},"F":{"reps":15,"note":"Goma más corta"}},
+            {"ex":"press_goma","needs":"gomas","S":{"reps":10},"N":{"reps":12},"F":{"reps":15,"note":"Banda más dura"}},
             {"ex":"press_trx","needs":"correas","S":{"reps":8,"note":"Cuerpo más vertical"},"N":{"reps":10},"F":{"reps":12,"note":"Más inclinado"}}
           ]
         }
@@ -906,7 +883,7 @@
         {
           "variants": [
             {"ex":"remo_trx","needs":"correas","S":{"reps":10,"note":"Cuerpo vertical"},"N":{"reps":12},"F":{"reps":12,"note":"Más horizontal"}},
-            {"ex":"remo_goma","needs":"gomas","S":{"reps":12},"N":{"reps":15},"F":{"reps":15,"note":"Goma más corta"}},
+            {"ex":"remo_goma","needs":"gomas","S":{"reps":12},"N":{"reps":15},"F":{"reps":15,"note":"Banda más dura"}},
             {
               "ex": "remo_db",
               "needs": "mancuernas",
@@ -927,7 +904,7 @@
         {
           "variants": [
             {"ex":"curl_db","needs":"mancuernas","S":{"reps":10,"kg":[4,6]},"N":{"reps":12,"kg":[6,8]},"F":{"reps":12,"kg":[8,10]}},
-            {"ex":"curl_goma","needs":"gomas","S":{"reps":12},"N":{"reps":15},"F":{"reps":15,"note":"Goma más corta"}},
+            {"ex":"curl_goma","needs":"gomas","S":{"reps":12},"N":{"reps":15},"F":{"reps":15,"note":"Banda más dura"}},
             {"ex":"curl_trx","needs":"correas","S":{"reps":10,"note":"Cuerpo vertical"},"N":{"reps":12},"F":{"reps":12,"note":"Más inclinado"}},
             {"ex":"curl_toalla","S":{"secs":15},"N":{"secs":25},"F":{"secs":35}}
           ]
