@@ -156,7 +156,7 @@ object PoseRenderer {
         return bmp
     }
 
-    /** Nombre del material junto al dibujo (BANDA, GOMA). */
+    /** Nombre del material junto al dibujo (BANDA). */
     private fun tag(c: Canvas, text: String, x: Float, y: Float) {
         val tp = Paint(Paint.ANTI_ALIAS_FLAG).apply { textSize = 6.5f; typeface = Typeface.DEFAULT_BOLD; textAlign = Paint.Align.CENTER }
         val w = tp.measureText(text) + 6f

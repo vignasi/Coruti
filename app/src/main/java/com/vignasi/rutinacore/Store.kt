@@ -25,6 +25,23 @@ object Store {
             .apply()
     }
 
+    /** Sesión de ejercicios sueltos: cuenta para la racha, pero no cambia la alternancia A/B ni la rotación del abdomen. */
+    fun markDay(c: Context) {
+        val set = HashSet(days(c))
+        set.add(LocalDate.now().toString())
+        prefs(c).edit().putStringSet(DAYS, set).apply()
+    }
+
+    /** Datos de los ejercicios sueltos (última sesión, favoritas, bandas), guardados como JSON tal cual los manda la página. */
+    private val FREE_KEYS = setOf("free.last", "free.favs", "free.bands", "free.bandUse")
+
+    fun getFree(c: Context, key: String): String =
+        if (key in FREE_KEYS) prefs(c).getString(key, "") ?: "" else ""
+
+    fun setFree(c: Context, key: String, value: String) {
+        if (key in FREE_KEYS) prefs(c).edit().putString(key, value).apply()
+    }
+
     fun doneToday(c: Context): Boolean = days(c).contains(LocalDate.now().toString())
 
     /** Días seguidos hasta hoy (o hasta ayer si hoy aún no está hecha). */
