@@ -11,6 +11,9 @@ App Android personal con la rutina diaria de core y pelvis neutra y un widget pa
 - **Ejercicios sueltos:** además de la rutina completa, eliges uno o varios ejercicios del catálogo (filtrables por zona y material), con repeticiones por ejercicio, rondas y descanso (4 × 12 reps y 75 s por defecto). Con «Alternar» se hacen en superserie (A, B, descanso); con uno solo, series normales. Las combinaciones se guardan como **favoritas** y empiezan con un toque. Cuenta para la racha sin cambiar la alternancia A/B.
 - **Bandas grandes:** press de suelo, remo sentado, remo inclinado y curl de bíceps con banda. Pones nombre a tus bandas (color o dureza) y la app recuerda cuál usas en cada ejercicio; si se queda floja o dura, la cambias durante la sesión y la próxima vez sale esa.
 
+- **Historial:** cada sesión (rutina o sueltos, desde la app o el widget) se guarda con la hora de inicio y fin de cada serie, las repeticiones o segundos, los kilos y la banda. Lista por días, detalle de cada sesión y, por ejercicio, la última vez y la mejor. Las sesiones paradas a mitad salen como «Incompleta».
+- **Copia de seguridad:** en Historial, «Exportar» guarda todo (historial, favoritas, bandas, pesos, ajustes y racha) en un archivo JSON donde elijas (Drive, Descargas…); «Importar» lo combina con lo que haya en el móvil, sin duplicar ni borrar.
+
 ## Datos
 
 Todos los ejercicios (dibujo por fases, textos, tiempos, variantes y módulos) están en
