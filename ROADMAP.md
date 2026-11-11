@@ -56,7 +56,22 @@ Base de todo lo demás (Strava, nube, planes).
 - [ ] Si Polar aún no la ha subido, dejarla pendiente y reintentar al abrir la app; botón «Enviar a Strava» en el historial
 - [ ] Hecho cuando: tras una sesión real, la actividad de Polar en Strava muestra el título y el detalle de la app
 
-### Fase 4 · Pulso en directo del Polar Vantage V3
+### Fase 4 · Foto de Freeletics → título y descripción en Strava ⭐
+Lo mismo que la Fase 3, pero para sesiones que no haces con la app (Freeletics u otras).
+- Flujo: haces la captura de la sesión de Freeletics (la de hoy, antes o después de entrenar) → la app
+  la manda a la IA (Claude, a través de la Edge Function) → reconoce el nombre de la sesión, los ejercicios,
+  las repeticiones y las rondas → la revisas y corriges → se guarda en el historial → la app busca en Strava
+  la actividad que grabó el Polar ese día y le pone el título («Freeletics · Aphrodite») y la descripción
+- [ ] Captura → IA → sesión revisable (los ejercicios que no están en el catálogo se guardan como «ejercicio externo»)
+- [ ] Si la captura es de **antes** de entrenar: queda como «sesión de hoy pendiente» y se envía a Strava cuando aparece la actividad del Polar
+- [ ] Si es de **después**: se envía en el momento (o queda pendiente hasta que Polar la suba)
+- [ ] Elegir la actividad de Strava a mano si ese día hay varias (por ejemplo, carrera y fuerza)
+- [ ] Hecho cuando: con una captura real, la actividad del Polar en Strava queda con el nombre y la descripción de la sesión de Freeletics
+- Coste: unos céntimos por foto (API de IA). Necesita la Fase 2 (clave de la IA) y la Fase 3 (Strava)
+- Pendiente de aclarar: ¿Freeletics sube algo a Strava por su cuenta? Tu actividad del 9 de noviembre tiene una lista
+  de ejercicios en Strava (Cobra Stretch, Cat Cow, Push Up…) y hay que saber de dónde viene para no duplicar
+
+### Fase 5 · Pulso en directo del Polar Vantage V3
 - [ ] **Tú, antes (una sola vez):** en la app Polar Flow → perfil de deporte que uses para la app (p. ej. «Entrenamiento en circuito»)
   → activar «Compartir FC con otros dispositivos» → «visible para todos». También se puede en el reloj, en el modo pre-entreno:
   Ajustes → Compartir FC con otros dispositivos
@@ -71,19 +86,13 @@ Base de todo lo demás (Strava, nube, planes).
 - [ ] Añadir el pulso por ejercicio a la descripción de Strava
 - [ ] Hecho cuando: en una sesión real se ve el pulso en directo y queda guardado por ejercicio
 
-### Fase 5 · Traer de Strava carreras y otras actividades
+### Fase 6 · Traer de Strava carreras y otras actividades
 - [ ] Leer de Strava las actividades que no son de la app (carreras, bici…) y mostrarlas en el historial con distancia, tiempo y pulso
 - [ ] Hecho cuando: una carrera grabada con el Polar aparece sola en el historial
 
-### Fase 6 · Foto de Freeletics → sesión en el historial
-- [ ] Elegir una captura, enviarla a la IA (Claude, a través de la Edge Function) y reconocer los ejercicios, las repeticiones y las rondas
-- [ ] Revisar y corregir antes de guardar; los ejercicios desconocidos se guardan como «ejercicio externo»
-- [ ] Hecho cuando: una captura real de Freeletics queda como sesión correcta en el historial
-- Coste: unos céntimos por foto (API de IA)
-
 ### Fase 7 · Modos de cardio
 - [ ] EMOM, Tabata y AMRAP con los ejercicios del catálogo, usando el mismo reproductor
-- [ ] Con pulso (Fase 4) si está disponible
+- [ ] Con pulso (Fase 5) si está disponible
 
 ### Fase 8 · Coach por voz
 - [ ] A mitad de serie, una clave de técnica del ejercicio («codos pegados», «junta los omóplatos»)
