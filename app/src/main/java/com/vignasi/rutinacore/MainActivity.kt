@@ -116,6 +116,18 @@ class MainActivity : Activity() {
             runOnUiThread { WidgetUpdater.refresh(this@MainActivity, force = true) }
         }
 
+        @JavascriptInterface
+        fun markDay() {
+            Store.markDay(this@MainActivity)
+            runOnUiThread { WidgetUpdater.refresh(this@MainActivity, force = true) }
+        }
+
+        @JavascriptInterface
+        fun getFree(key: String): String = Store.getFree(this@MainActivity, key)
+
+        @JavascriptInterface
+        fun setFree(key: String, value: String) = Store.setFree(this@MainActivity, key, value)
+
         /** El contenido de assets/rutina.json: la página y el widget usan los mismos datos. */
         @JavascriptInterface
         fun rutina(): String = Rutina.text(this@MainActivity)
