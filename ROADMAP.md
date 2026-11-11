@@ -9,19 +9,21 @@ Cada conversación nueva parte de `main`; si no se fusiona, empieza sin los camb
 
 ## Decisiones tomadas
 
-- **Strava tiene que mostrar los ejercicios (series, repeticiones, kilos)**, no una descripción.
-  Strava solo los acepta al **subir** la actividad (archivo FIT con mensajes de series, o su formato JSON de fuerza);
-  no se pueden añadir a una actividad que ya existe, y la API no deja borrar actividades. Por eso:
-  - **Sesiones de fuerza (app o Freeletics):** el reloj va en **modo sensor de FC** (no graba; solo emite el pulso).
-    La app graba el pulso y los ejercicios y **sube ella la actividad a Strava**, con los ejercicios y el pulso.
-    Así Polar no sube nada de esa sesión y no hay duplicado.
-  - **Carreras y lo demás:** como ahora, el Polar graba y Polar Flow sube a Strava.
-  - Coste aceptado: esas sesiones de fuerza no aparecen en Polar Flow (ni en su carga de entrenamiento).
+- **Requisitos:** Strava tiene que mostrar los ejercicios (series, repeticiones, kilos), no una descripción,
+  y **Polar Flow tiene que seguir teniendo todas las sesiones** (carga semanal y avisos del reloj).
+- Lo que se sabe: Strava solo acepta los ejercicios al **subir** la actividad (archivo FIT con series o su JSON de fuerza);
+  no se pueden añadir a la que ya subió Polar, y la API no deja borrarla. Polar → Strava no envía ejercicios.
+- **Camino candidato (a comprobar al empezar la Fase 4):** el reloj graba como siempre (Polar Flow lo tiene todo),
+  pero se **desactiva la sincronización automática Polar Flow → Strava**. La app descarga de Polar (API AccessLink)
+  el archivo de cada sesión con el pulso, le añade las series si es una sesión de la app o de Freeletics, y lo sube a Strava.
+  Las carreras y lo demás se reenvían tal cual. Riesgo: si la app falla, no llega nada a Strava hasta reintentar.
+- Descartado: el modo sensor de FC (el reloj no graba) porque la sesión no llegaría a Polar Flow.
+- Freeletics no está conectado ni a Polar ni a Strava, así que no hay duplicados por su parte.
 - **Material real:** bandas elásticas grandes (bucles largos y cerrados, sin asas) y una mini banda de glúteo.
   En los datos, las grandes usan la clave interna `gomas`.
-- **Reloj:** Polar Vantage V3. Según la documentación de Polar puede emitir el pulso por Bluetooth de dos formas:
-  en **modo sensor de FC** (el reloj no graba) o mientras graba un entreno («Compartir FC con otros dispositivos»).
-  Desde el firmware 4.1.5 la emisión viene desactivada por defecto.
+- **Reloj:** Polar Vantage V3. Según la documentación de Polar puede emitir el pulso por Bluetooth **mientras graba**
+  («Compartir FC con otros dispositivos» → «visible para todos», en el pre-entreno o en el perfil de deporte de Polar Flow).
+  Desde el firmware 4.1.5 viene desactivado por defecto, y deja de emitir al parar la grabación o salir del pre-entreno.
 - **Claves secretas** (Strava, IA): nunca dentro del APK, que es público en Releases. Van en Supabase (Edge Functions).
 - Las carreras se graban con el Polar; la app las **importa** de Strava, no graba GPS.
 
@@ -50,40 +52,43 @@ Base de todo lo demás (Strava, nube, planes). Cada serie se guarda con su hora 
 - Ojo: el plan gratuito pausa el proyecto tras ~1 semana sin uso; se reactiva desde la web y no se pierden datos
 
 ### Fase 3 · Pulso en directo del Polar Vantage V3
-Va antes de Strava porque la actividad que suba la app tiene que llevar el pulso.
-- [ ] **Tú, antes (una sola vez):** comprobar que el reloj tiene el firmware al día
-- Cómo se usa: en el reloj, modo sensor de FC (el reloj no graba); la app se conecta y lee el pulso
+Para ver el pulso en directo en la app y guardar el pulso por ejercicio (el reloj sigue grabando para Polar Flow).
+- [ ] **Tú, antes (una sola vez):** en Polar Flow, en el perfil de deporte que uses (p. ej. «Entrenamiento en circuito»),
+  activar «Compartir FC con otros dispositivos» → «visible para todos»
+- Cómo se usa: en el reloj eliges el deporte y empiezas a grabar; la app se conecta y lee el pulso
 - [ ] Primer paso de la fase: pantalla «Probar pulso» para confirmar con tu reloj que el móvil lo ve y lee el pulso.
   Es lo único que no se puede comprobar sin tu reloj delante
 - [ ] Leer el pulso por Bluetooth (servicio estándar de frecuencia cardíaca, 0x180D) con los permisos de Android;
   reconectar solo si se corta y seguir la sesión sin pulso si no hay reloj
-- [ ] Guardar el pulso segundo a segundo en la sesión (para subirlo a Strava)
+- [ ] Guardar el pulso segundo a segundo en la sesión
 - [ ] Mostrar el pulso grande y la zona en el reproductor; pulso medio y máximo por ejercicio en el historial
 - [ ] Descanso inteligente (opcional): el descanso acaba al bajar de X ppm o al llegar al máximo
 - [ ] Hecho cuando: en una sesión real se ve el pulso en directo y queda guardado
 
-### Fase 4 · Strava: la app sube la sesión con ejercicios y pulso ⭐ prioridad
-- [ ] **Tú, antes:** registrar una app en strava.com/settings/api (gratis); el client secret se guarda en Supabase, no en el código
-- [ ] Conectar Strava una vez (OAuth vía Edge Function, permisos `activity:read_all` y `activity:write`)
-- [ ] Al terminar una sesión, generar un archivo FIT con el pulso y una serie por ejercicio (tipo de ejercicio FIT, repeticiones,
-  kilos y duración) y subirlo como entreno de fuerza con un título claro («Rutina core · Espalda + Brazos»)
+### Fase 4 · Strava con ejercicios, sin perder Polar Flow ⭐ prioridad
+- [ ] **Primero, investigar de verdad** (antes de escribir código): confirmar que la API AccessLink de Polar da el archivo FIT
+  de cada sesión con el pulso, que Strava muestra las series de un FIT subido por API, y si hay otra forma más sencilla
+  que cumpla los dos requisitos. Decidir el camino contigo
+- [ ] **Tú, antes:** registrar una app en strava.com/settings/api y otra en Polar AccessLink (gratis);
+  los secretos se guardan en Supabase, no en el código
+- [ ] Conectar Strava y Polar una vez (OAuth vía Edge Function)
 - [ ] Tabla que traduce cada ejercicio del catálogo a su ejercicio FIT (los que no tienen equivalente, al tipo más cercano)
-- [ ] Si no hay conexión, queda pendiente y se reintenta; botón «Enviar a Strava» en el historial
-- [ ] Si Strava responde «duplicado» (porque el reloj también grabó), avisar y explicar qué hacer
-- [ ] Hecho cuando: tras una sesión real, en Strava aparece la actividad con la lista de ejercicios y el pulso
-- Comprobado en tu Strava: ya muestra listas de ejercicios en actividades de fuerza (por ejemplo, la del 9 de noviembre)
+- [ ] Por cada sesión nueva de Polar: si coincide en hora con una sesión de la app o de Freeletics, añadir las series y un
+  título claro («Rutina core · Espalda + Brazos»); si no, reenviarla tal cual. Subir a Strava
+- [ ] Pendientes y reintentos; botón «Enviar a Strava» en el historial; aviso si Strava responde «duplicado»
+- [ ] Hecho cuando: una sesión real aparece en Polar Flow como siempre y en Strava con la lista de ejercicios y el pulso,
+  y una carrera sigue llegando a Strava
 
 ### Fase 5 · Foto de Freeletics → sesión con ejercicios en Strava ⭐
-- Flujo: antes de Freeletics, en la app pulsas «Grabar sesión externa» (graba solo el pulso del reloj en modo sensor);
-  al acabar haces la captura de la sesión → la IA (Claude, a través de la Edge Function) reconoce el nombre, los ejercicios,
-  las repeticiones y las rondas → la revisas → se sube a Strava como en la Fase 4, con ejercicios, pulso y título («Freeletics · Aphrodite»)
-- [ ] Botón «Grabar sesión externa» (cronómetro + pulso, sin reproductor)
+- Flujo: grabas Freeletics con el Polar como siempre; haces la captura de la sesión → la IA (Claude, a través de la
+  Edge Function) reconoce el nombre, los ejercicios, las repeticiones y las rondas → la revisas → cuando llega la sesión
+  de Polar de esa hora, se sube a Strava como en la Fase 4, con ejercicios, pulso y título («Freeletics · Aphrodite»)
 - [ ] Captura → IA → sesión revisable; los ejercicios que no estén en la tabla FIT van al tipo más cercano
 - [ ] También vale la captura de antes de entrenar: queda como «sesión de hoy» y se completa al terminar la grabación
 - [ ] Hecho cuando: con una sesión real de Freeletics, Strava muestra sus ejercicios y el pulso
 - Coste: unos céntimos por foto (API de IA)
 - Pendiente de aclarar: de dónde viene la lista de ejercicios de tu actividad del 9 de noviembre en Strava
-  (¿la sube Freeletics?); si Freeletics ya sube a Strava, hay que desactivarlo para no duplicar
+  (Freeletics no está conectado y Polar no envía ejercicios: ¿la apuntaste a mano en Strava?)
 
 ### Fase 6 · Traer de Strava carreras y otras actividades
 - [ ] Leer de Strava las actividades que no son de la app (carreras, bici…) y mostrarlas en el historial con distancia, tiempo y pulso
