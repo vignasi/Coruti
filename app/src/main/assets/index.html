@@ -409,11 +409,13 @@ function setCap(o,st){const k=st.idx+"/"+st.n+st.phase.cap; if(o.last===k)return
   o.step.textContent=(st.idx+1)+"/"+st.n; o.txt.textContent=st.phase.cap;}
 
 /* ---------- Fichas por grupo ---------- */
-const NEEDS={correas:"Con correas",mancuernas:"Con mancuernas",gomas:"Con gomas",banda:"Con banda de glúteo"};
+const NEEDS={correas:"Con correas",mancuernas:"Con mancuernas",gomas:"Con gomas",banda:"Con banda de glúteo",elasticas:"Con bandas elásticas"};
 const cards=[];
 function doseText(key){
   const ex=D.exercises[key];
   if(ex.info) return ex.info;
+  const ce=D.catalog&&D.catalog.ex[key];
+  if(ce&&!needsOf(key)) return ce.reps?`${ce.reps} reps · ${ex.rep} s cada una`:`${ce.secs} s`;
   for(const m of D.modules) for(const sl of m.slots) for(const v of sl.variants){
     const parts=[];let kg=[];
     for(const i of ["S","N","F"]){const d=v[i]; if(!d||(d.ex||v.ex)!==key) continue;
@@ -433,13 +435,16 @@ function buildCards(){
   D.modules.forEach(m=>{const keys=[];m.slots.forEach(sl=>sl.variants.forEach(v=>{
     [v.ex,...["S","N","F"].map(i=>v[i]&&v[i].ex)].forEach(k=>{if(k&&!keys.includes(k)&&D.exercises[k])keys.push(k);});}));
     groups.push({name:m.name,sub:`opcional · día ${m.day}`,keys});});
+  const used=new Set(groups.flatMap(g=>g.keys)), extra=Object.keys(D.exercises).filter(k=>!used.has(k));
+  if(extra.length) groups.push({name:"Más ejercicios",sub:"para ejercicios sueltos",keys:extra});
   groups.forEach(g=>{
     const h=document.createElement("h3");h.className="gh";h.innerHTML=`${g.name}<small></small>`;h.querySelector("small").textContent=g.sub;
     const grid=document.createElement("div");grid.className="grid";wrap.append(h,grid);
-    g.keys.forEach(key=>{const ex=D.exercises[key], v=needsOf(key);
+    g.keys.forEach(key=>{const ex=D.exercises[key]; let v=needsOf(key);
       const el=document.createElement("article"); el.className="card";
       el.innerHTML=`<canvas aria-hidden="true"></canvas><div class="cap"><span class="step"></span><span class="txt"></span></div><h4></h4><span class="badge"></span><div class="dose"></div><ul></ul><a class="vid" target="_blank" rel="noopener">Ver vídeos en YouTube</a>`;
       el.querySelector("h4").textContent=ex.name;
+      const ce=(D.catalog&&D.catalog.ex[key])||{}; if(!v&&ce.needs) v={needs:ce.needs};
       const b=el.querySelector(".badge"); if(g.name==="Base"&&!(v&&v.needs)) b.remove(); else b.textContent=v&&v.needs?NEEDS[v.needs]:"Sin material";
       let dt=doseText(key); if(weights[key]!=null) dt+=` · último: ${fkg(weights[key])} kg`;
       el.querySelector(".dose").textContent=dt;
