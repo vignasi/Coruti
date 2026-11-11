@@ -160,6 +160,13 @@ fieldset:disabled{opacity:.55}
 .num output{font-family:var(--display);font-weight:700;font-size:1.5rem;min-width:3.4em;text-align:center;font-variant-numeric:tabular-nums}
 .sel .num output{font-size:1.3rem;min-width:3.2em}
 .sel .rm{min-width:var(--tap);padding:0 10px;font-size:.9rem}
+.favs{display:flex;flex-direction:column;gap:8px}
+.fav{display:flex;gap:8px}
+.fav .go{flex:1;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;text-align:left;line-height:1.25;padding:8px 14px;min-height:56px;background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.fav .go small{font-weight:400;font-size:.85rem}
+.fav .del{padding:0 12px;font-size:.9rem}
+.savefav{display:flex;gap:8px}
+.savefav input{flex:1;min-width:0;min-height:var(--tap);border-radius:12px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);font:1rem var(--body);padding:0 12px}
 @media (max-width:640px){
   h1{font-size:2.2rem}
   .player{grid-template-columns:1fr;padding:14px}
@@ -247,12 +254,18 @@ fieldset:disabled{opacity:.55}
     <div class="body">
       <fieldset id="freef">
         <legend class="sr">Elige los ejercicios y cómo hacerlos</legend>
+        <div class="field" id="ffavf" hidden><span class="lbl" id="lfav">Favoritas</span><small class="hint">Un toque y empieza.</small>
+          <div class="favs" id="ffavs" role="group" aria-labelledby="lfav"></div></div>
         <div class="field"><span class="lbl" id="lfsel">Tu sesión</span>
           <ol class="sel" id="fsel" aria-labelledby="lfsel"></ol><small class="hint" id="fselhint"></small></div>
         <div class="field">
           <div class="num" role="group" aria-labelledby="lfr"><span id="lfr">Rondas</span><button id="frm" aria-label="Una ronda menos">−</button><output id="frv" aria-live="polite">4</output><button id="frp" aria-label="Una ronda más">+</button></div>
           <div class="num" role="group" aria-labelledby="lfd"><span id="lfd">Descanso entre rondas</span><button id="fdm" aria-label="15 segundos menos">−</button><output id="fdv" aria-live="polite">75 s</output><button id="fdp" aria-label="15 segundos más">+</button></div>
+          <label class="tog"><input type="checkbox" id="falt"><span>Alternar (superserie)<small id="faltinfo"></small></span></label>
         </div>
+        <div class="field"><label class="lbl" for="ffavname">Guardar como favorita</label>
+          <div class="savefav"><input id="ffavname" maxlength="40" autocomplete="off"><button id="ffavsave">Guardar</button></div>
+          <small class="hint" id="ffavmsg" role="status"></small></div>
         <div class="field"><span class="lbl" id="lfz">Zona</span><div class="fchips" id="fzone" role="group" aria-labelledby="lfz"></div></div>
         <div class="field"><span class="lbl" id="lfm">Material</span><div class="fchips" id="fneeds" role="group" aria-labelledby="lfm"></div></div>
         <div class="field"><span class="lbl" id="lfl">Elige uno o varios</span><div class="flist" id="flist" role="group" aria-labelledby="lfl"></div></div>
@@ -358,7 +371,7 @@ function expand(x,mod,f,r,out){
 const totalOf=st=>st.reduce((a,b)=>a+b.s,0);
 
 /* ---------- Ejercicios sueltos: misma forma de pasos que buildPlan, así el reproductor es el mismo ---------- */
-const DEF_FREE={sel:[],rounds:4,rest:75,zone:"",needs:""};
+const DEF_FREE={sel:[],rounds:4,rest:75,alt:true,zone:"",needs:""};
 const catOf=k=>(D.catalog&&D.catalog.ex[k])||{};
 const isHoldEx=k=>!!D.exercises[k].hold;
 const defN=k=>isHoldEx(k)?(catOf(k).secs||30):(catOf(k).reps||12);
@@ -367,7 +380,9 @@ function normFree(o){o=o&&typeof o==="object"?o:{};const f={...DEF_FREE,...o};
   f.sel=(Array.isArray(o.sel)?o.sel:[]).filter(it=>it&&D.exercises[it.k]).map(it=>({...it,k:it.k,n:clampN(it.k,+it.n||defN(it.k))}));
   f.rounds=Math.min(10,Math.max(1,Math.round(+f.rounds)||4));
   f.rest=Math.min(180,Math.max(15,Math.round((+f.rest||75)/15)*15));
+  f.alt=f.alt!==false;
   return f;}
+const isAlt=f=>f.alt&&f.sel.length>1;
 function freeExpand(it,r,out){
   const ex=D.exercises[it.k], ce=catOf(it.k), hold=isHoldEx(it.k);
   const reps=hold?0:it.n, secs=hold?it.n:0, s=reps?Math.round(reps*ex.rep):secs, dose=reps?`${reps} reps`:`${secs} s`;
@@ -385,8 +400,10 @@ function freeExpand(it,r,out){
 function buildFree(f){
   const out=[], items=f.sel;
   const rest=r=>out.push({k:"gato",name:"Descanso",sub:"Respira y bebe agua",s:f.rest,r,rest:true,say:`Descanso, ${f.rest} segundos`});
+  /* Alternado (superserie): A, B, descanso y otra ronda. Entre A y B solo el «Prepárate» para cambiar de postura. */
+  if(isAlt(f)) for(let r=1;r<=f.rounds;r++){if(r>1)rest(r);items.forEach(it=>freeExpand(it,r,out));}
   /* Series normales: todas las series de un ejercicio, con su descanso, y luego el siguiente */
-  items.forEach(it=>{for(let r=1;r<=f.rounds;r++){if(out.length)rest(r);freeExpand(it,r,out);}});
+  else items.forEach(it=>{for(let r=1;r<=f.rounds;r++){if(out.length)rest(r);freeExpand(it,r,out);}});
   return out;
 }
 
@@ -548,7 +565,7 @@ const io=window.IntersectionObserver?new IntersectionObserver(es=>es.forEach(e=>
 let cfg=normCfg(null), lastDay="", offset=0, steps=[], idx=0, left=0, running=false, done=false, last=0, actx=null, wake=null;
 let cue={ph:-1,rep:-1,half:false}, wcur=null, mode="rutina", fr=null;
 const roundsNow=()=>mode==="suelto"?fr.rounds:cfg.rounds;
-const roundWord=()=>mode==="suelto"?"Serie":"Ronda";
+const roundWord=()=>mode==="suelto"&&!isAlt(fr)?"Serie":"Ronda";
 const locked=()=>!done&&(running||idx>0||(!!steps[0]&&left<steps[0].s));
 function modsLabel(mods){return mods.length?"Base + "+mods.map(m=>m.name).join(" + "):"Solo la base";}
 function renderSetup(){
@@ -606,6 +623,10 @@ function renderFree(){
     li.append(ab,nm,n,rm);list.appendChild(li);});
   $("fselhint").textContent=fr.sel.length?"Se hacen en este orden.":"Aún no has elegido ninguno: márcalos en la lista de abajo.";
   $("frv").textContent=fr.rounds; $("fdv").textContent=fr.rest+" s";
+  $("falt").checked=fr.alt;
+  $("faltinfo").textContent=fr.sel.length>1?(fr.alt?"A, B, descanso y vuelta a empezar":"Desactivado: todas las series de A y luego las de B")
+    :"A, B, descanso y vuelta a empezar. Con un solo ejercicio son series normales";
+  $("ffavname").placeholder=fr.sel.length?autoName(fr):"Nombre (opcional)";
   $("fzone").querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.v===fr.zone));
   $("fneeds").querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.v===fr.needs));
   const fl=$("flist");fl.innerHTML="";
@@ -620,9 +641,36 @@ function renderFree(){
   if(!fl.children.length){const p=document.createElement("p");p.className="hint";p.textContent="Ningún ejercicio con esta zona y este material.";fl.appendChild(p);}
   const real=steps[0]&&!steps[0].empty;
   $("ftime").textContent=real?"≈ "+fmt(totalOf(steps)):"";
-  $("ftxt").textContent=real?`${fr.sel.length} ${fr.sel.length===1?"ejercicio":"ejercicios"} · ${fr.rounds} ${fr.rounds===1?"serie":"series"} · descanso ${fr.rest} s`:"Elige uno o varios ejercicios";
+  $("ftxt").textContent=real?`${fr.sel.length} ${fr.sel.length===1?"ejercicio":"ejercicios"} · ${fr.rounds} ${isAlt(fr)?(fr.rounds===1?"ronda alternada":"rondas alternadas"):(fr.rounds===1?"serie":"series")} · descanso ${fr.rest} s`:"Elige uno o varios ejercicios";
+}
+/* ---------- Favoritas ---------- */
+function favs(){try{const a=JSON.parse(store.free("free.favs"));return Array.isArray(a)?a:[]}catch(e){return []}}
+function saveFavs(a){store.setFree("free.favs",JSON.stringify(a));}
+const autoName=f=>f.sel.map(it=>D.exercises[it.k].name).join(" + ");
+function favSub(f){const n=normFree(f);return `${n.rounds} ${isAlt(n)?"rondas alternadas":(n.rounds===1?"serie":"series")} · ${n.sel.map(it=>isHoldEx(it.k)?it.n+" s":it.n+" reps").join(" / ")} · descanso ${n.rest} s`;}
+function renderFavs(){
+  const a=favs().filter(f=>normFree(f).sel.length), box=$("ffavs"); box.innerHTML=""; $("ffavf").hidden=!a.length;
+  a.forEach(f=>{const row=document.createElement("div");row.className="fav";
+    const go=document.createElement("button");go.className="go";go.innerHTML="<span></span><small></small>";
+    go.firstChild.textContent="▶ "+f.name;go.lastChild.textContent=favSub(f);go.setAttribute("aria-label","Empezar "+f.name);
+    go.onclick=()=>{const n=normFree(f);fr={...fr,sel:n.sel,rounds:n.rounds,rest:n.rest,alt:n.alt};applyFree();
+      $("ffavmsg").textContent="";if(!bplay.disabled)bplay.click();};
+    const del=document.createElement("button");del.className="del";del.textContent="Borrar";del.setAttribute("aria-label","Borrar la favorita "+f.name);
+    del.onclick=()=>{saveFavs(favs().filter(x=>x.name!==f.name));$("ffavmsg").textContent=`«${f.name}» borrada.`;renderFavs();};
+    row.append(go,del);box.appendChild(row);});
+}
+function saveFav(){
+  if(!fr.sel.length){$("ffavmsg").textContent="Elige primero algún ejercicio.";return;}
+  const name=($("ffavname").value.trim()||autoName(fr)).slice(0,60);
+  const a=favs().filter(x=>x.name!==name);
+  a.unshift({name,sel:fr.sel.map(it=>({k:it.k,n:it.n})),rounds:fr.rounds,rest:fr.rest,alt:fr.alt});
+  saveFavs(a.slice(0,20)); $("ffavname").value=""; $("ffavmsg").textContent=`Guardada: «${name}».`; renderFavs();
 }
 function freeEvents(){
+  $("falt").onchange=e=>{fr.alt=e.target.checked;applyFree();};
+  $("ffavsave").onclick=saveFav;
+  $("ffavname").onkeydown=e=>{if(e.key==="Enter")saveFav();};
+  renderFavs();
   const z=$("fzone");[["","Todas"],...D.catalog.zones.map(x=>[x,x])].forEach(([v,t])=>{const b=document.createElement("button");b.dataset.v=v;b.textContent=t;
     b.onclick=()=>{fr.zone=v;saveFree();renderFree();};z.appendChild(b);});
   const n=$("fneeds");[["","Todo"],["none","Sin material"],...Object.entries(D.catalog.needs)].forEach(([v,t])=>{const b=document.createElement("button");b.dataset.v=v;b.textContent=t;
