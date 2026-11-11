@@ -13,10 +13,14 @@ Cada conversación nueva parte de `main`; si no se fusiona, empieza sin los camb
   y **Polar Flow tiene que seguir teniendo todas las sesiones** (carga semanal y avisos del reloj).
 - Lo que se sabe: Strava solo acepta los ejercicios al **subir** la actividad (archivo FIT con series o su JSON de fuerza);
   no se pueden añadir a la que ya subió Polar, y la API no deja borrarla. Polar → Strava no envía ejercicios.
-- **Camino candidato (a comprobar al empezar la Fase 4):** el reloj graba como siempre (Polar Flow lo tiene todo),
+- **Camino alternativo (si la API no deja añadir ejercicios a una actividad existente):** el reloj graba como siempre (Polar Flow lo tiene todo),
   pero se **desactiva la sincronización automática Polar Flow → Strava**. La app descarga de Polar (API AccessLink)
   el archivo de cada sesión con el pulso, le añade las series si es una sesión de la app o de Freeletics, y lo sube a Strava.
   Las carreras y lo demás se reenvían tal cual. Riesgo: si la app falla, no llega nada a Strava hasta reintentar.
+- **Dato clave:** la lista de ejercicios de la actividad del 9 de noviembre la añadiste a mano en Strava sobre la actividad
+  que subió Polar. O sea, Strava **sí deja añadir ejercicios a una actividad que ya existe**, al menos desde su app.
+  Si la API también lo permite, el camino más sencillo es: Polar sigue subiendo a Strava como ahora y la app solo
+  añade los ejercicios y el título a esa actividad. Es lo primero que se investiga en la Fase 4.
 - Descartado: el modo sensor de FC (el reloj no graba) porque la sesión no llegaría a Polar Flow.
 - Freeletics no está conectado ni a Polar ni a Strava, así que no hay duplicados por su parte.
 - **Material real:** bandas elásticas grandes (bucles largos y cerrados, sin asas) y una mini banda de glúteo.
@@ -66,7 +70,8 @@ Para ver el pulso en directo en la app y guardar el pulso por ejercicio (el relo
 - [ ] Hecho cuando: en una sesión real se ve el pulso en directo y queda guardado
 
 ### Fase 4 · Strava con ejercicios, sin perder Polar Flow ⭐ prioridad
-- [ ] **Primero, investigar de verdad** (antes de escribir código): confirmar que la API AccessLink de Polar da el archivo FIT
+- [ ] **Primero, investigar de verdad** (antes de escribir código): 1) si la API de Strava deja añadir ejercicios
+  a una actividad existente, como hace su app (camino sencillo: Polar sigue subiendo); 2) si no, confirmar que la API AccessLink de Polar da el archivo FIT
   de cada sesión con el pulso, que Strava muestra las series de un FIT subido por API, y si hay otra forma más sencilla
   que cumpla los dos requisitos. Decidir el camino contigo
 - [ ] **Tú, antes:** registrar una app en strava.com/settings/api y otra en Polar AccessLink (gratis);
@@ -87,8 +92,7 @@ Para ver el pulso en directo en la app y guardar el pulso por ejercicio (el relo
 - [ ] También vale la captura de antes de entrenar: queda como «sesión de hoy» y se completa al terminar la grabación
 - [ ] Hecho cuando: con una sesión real de Freeletics, Strava muestra sus ejercicios y el pulso
 - Coste: unos céntimos por foto (API de IA)
-- Pendiente de aclarar: de dónde viene la lista de ejercicios de tu actividad del 9 de noviembre en Strava
-  (Freeletics no está conectado y Polar no envía ejercicios: ¿la apuntaste a mano en Strava?)
+- Aclarado: la lista de ejercicios del 9 de noviembre la añadiste a mano en Strava; Freeletics no sube nada
 
 ### Fase 6 · Traer de Strava carreras y otras actividades
 - [ ] Leer de Strava las actividades que no son de la app (carreras, bici…) y mostrarlas en el historial con distancia, tiempo y pulso
