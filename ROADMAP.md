@@ -14,7 +14,10 @@ Cada conversación nueva parte de `main`; si no se fusiona, empieza sin los camb
 - **Descartado:** que la app suba su propia actividad a Strava (duplicaría cada sesión).
 - **Material real:** bandas elásticas grandes (bucles largos y cerrados, sin asas) y una mini banda de glúteo.
   En los datos, las grandes usan la clave interna `gomas`.
-- **Reloj:** Polar Vantage V3. Pulso en directo por Bluetooth si tiene activado compartir la frecuencia cardíaca.
+- **Reloj:** Polar Vantage V3. Comprobado en la documentación de Polar: puede emitir el pulso por Bluetooth
+  («Compartir FC con otros dispositivos» → «Frecuencia cardíaca visible para todos») **mientras graba el entreno**,
+  así que graba y emite a la vez: encaja con A + B sin duplicados. Desde el firmware 4.1.5 viene **desactivado**
+  por defecto y la emisión se corta al salir del modo pre-entreno o al parar la grabación.
 - **Claves secretas** (Strava, IA): nunca dentro del APK, que es público en Releases. Van en Supabase (Edge Functions).
 - Las carreras se graban con el Polar; la app las **importa** de Strava, no graba GPS.
 
@@ -44,14 +47,25 @@ Base de todo lo demás (Strava, nube, planes).
 
 ### Fase 3 · Strava: completar la actividad que sube Polar ⭐ prioridad
 - [ ] **Tú, antes:** registrar una app en strava.com/settings/api (gratis); el client secret se guarda en Supabase, no en el código
+- Comprobado en tu Strava: Polar sube las sesiones de fuerza como `WeightTraining`, `Workout` o `HighIntensityIntervalTraining`,
+  con nombres genéricos («Entrenamiento fuerza nocturno»). Se buscará por hora entre esos tres tipos.
+- Strava muestra una lista de ejercicios en algunas actividades de fuerza, pero la API pública no deja escribirla [probable]:
+  el detalle irá en la descripción.
 - [ ] Conectar Strava una vez (OAuth vía Edge Function, permisos `activity:read_all` y `activity:write`)
 - [ ] Al terminar una sesión, buscar en Strava la actividad que coincide en hora y cambiarle el título («Rutina core · Espalda + Brazos») y la descripción (ejercicios, rondas, repeticiones, banda y kilos)
 - [ ] Si Polar aún no la ha subido, dejarla pendiente y reintentar al abrir la app; botón «Enviar a Strava» en el historial
 - [ ] Hecho cuando: tras una sesión real, la actividad de Polar en Strava muestra el título y el detalle de la app
 
 ### Fase 4 · Pulso en directo del Polar Vantage V3
-- [ ] **Tú, antes:** probar que el reloj comparte el pulso por Bluetooth (ajuste de compartir frecuencia cardíaca) y si lo hace también sin grabar un entreno
-- [ ] Leer el pulso por Bluetooth (servicio estándar de frecuencia cardíaca) con los permisos de Android
+- [ ] **Tú, antes (una sola vez):** en la app Polar Flow → perfil de deporte que uses para la app (p. ej. «Entrenamiento en circuito»)
+  → activar «Compartir FC con otros dispositivos» → «visible para todos». También se puede en el reloj, en el modo pre-entreno:
+  Ajustes → Compartir FC con otros dispositivos
+- Cómo se usa: en el reloj eliges el deporte (pre-entreno) y empiezas a grabar; la app se conecta y lee el pulso.
+  Si paras la grabación o sales del pre-entreno, el reloj deja de emitir
+- [ ] Primer paso de la fase: pantalla «Probar pulso» para confirmar con tu reloj que el móvil lo ve y lee el pulso.
+  Es lo único que no se puede comprobar sin tu reloj delante
+- [ ] Leer el pulso por Bluetooth (servicio estándar de frecuencia cardíaca, 0x180D) con los permisos de Android;
+  reconectar solo si se corta y seguir la sesión sin pulso si no hay reloj
 - [ ] Mostrar el pulso grande y la zona en el reproductor; pulso medio y máximo por ejercicio en el historial
 - [ ] Descanso inteligente (opcional): el descanso acaba al bajar de X ppm o al llegar al máximo
 - [ ] Añadir el pulso por ejercicio a la descripción de Strava
