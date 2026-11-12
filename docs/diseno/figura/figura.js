@@ -387,7 +387,8 @@ function labels(ctx,ex,st,gm,t,text,toScreen,sc,C,bx){
   if(ph.stretch&&ex.stretch){const sgm=ex.stretch.segs[0],tgt=toScreen(lerp(p[sgm[0]],p[sgm[1]],.5));items.push({tgt,l:at(ex.stretch.lab,tgt),txt:"AQUÍ ESTIRA",kind:"zone",seg:sgm});}
   (ex.equip||[]).forEach(q=>{if(!q.label||!(q.t==="goma"||q.t==="band"))return;
     const tgt=toScreen(q.t==="band"?lerp(gm.root["p"+q.at[1]],p[q.at],.8):lerp(anchor(gm,q.at),anchor(gm,q.to),.55));
-    items.push({tgt,l:[tgt[0]+(tgt[0]<120?30:-30),tgt[1]+(tgt[1]<70?14:-14)],txt:q.label,kind:"equip"});});
+    const cx=toScreen(lerp(p.s,p.p,.5))[0],dx=tgt[0]<cx-4?-36:36;   // hacia fuera del cuerpo, no encima
+    items.push({tgt,l:[tgt[0]+dx,tgt[1]+(tgt[1]>50?-18:16)],txt:q.label,kind:"equip"});});
   ctx.save();ctx.setTransform(sc,0,0,sc,0,0);
   // flecha del movimiento (en el encuadre de la figura)
   if(ph.arrow){const a=ph.arrow,A=toScreen([a[0],a[1]]),Bp=toScreen([a[2],a[3]]),pr=Math.min(1,st.tt/Math.max(.3,ph.move)),X=lerp(A,Bp,pr),ang=Math.atan2(Bp[1]-A[1],Bp[0]-A[0]);
@@ -398,7 +399,9 @@ function labels(ctx,ex,st,gm,t,text,toScreen,sc,C,bx){
   items.forEach(it=>{
     const w=ctx.measureText(it.txt).width+9;let [lx,ly]=it.l;
     lx=Math.min(179-w/2,Math.max(1+w/2,lx));ly=Math.min(105,Math.max(7,ly));
-    for(let k=0;k<6&&boxes.some(b=>Math.abs(b[0]-lx)<(b[2]+w)/2+2&&Math.abs(b[1]-ly)<13);k++)ly+=ly>56?-13:13;
+    // no tapar otra etiqueta ni el punto de otra zona (la etiqueta del material cede primero: va la última)
+    const hit=()=>boxes.some(b=>Math.abs(b[0]-lx)<(b[2]+w)/2+2&&Math.abs(b[1]-ly)<13)||items.some(o=>o!==it&&Math.abs(o.tgt[0]-lx)<w/2+6&&Math.abs(o.tgt[1]-ly)<12);
+    for(let k=0;k<8&&hit();k++){if(k%2===0)ly+=ly>56?-13:13;else lx=Math.min(179-w/2,Math.max(1+w/2,lx+(lx>90?-22:22)));}
     boxes.push([lx,ly,w]);it.L=[lx,ly,w];});
   items.forEach(it=>{const [x,y]=it.tgt;
     if(it.kind==="zone"){ctx.fillStyle="rgba(240,176,74,"+(.22+.25*pulse)+")";ctx.beginPath();ctx.arc(x,y,5+2.2*pulse,0,7);ctx.fill();

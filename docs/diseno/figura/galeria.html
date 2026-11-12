@@ -22,7 +22,7 @@ canvas{width:100%;aspect-ratio:180/112;display:block}
 <div id="out"></div>
 <script src="figura.js"></script>
 <script>
-/* Para revisar con capturas: ?s=palos|redondo|persona &g=m|f &size=big|mini &theme=dark &ex=a,b */
+/* Para revisar con capturas: ?s=palos|redondo|persona &g=m|f &size=big|mini &theme=dark &ex=a,b &mid (a mitad de cada movimiento) */
 const q=new URLSearchParams(location.search);
 if(q.get("theme"))document.documentElement.dataset.theme=q.get("theme");
 fetch(q.get("data")||"../../../app/src/main/assets/rutina.json").then(r=>r.json()).then(D=>{
@@ -34,7 +34,7 @@ fetch(q.get("data")||"../../../app/src/main/assets/rutina.json").then(r=>r.json(
   keys.forEach(k=>{const ex=D.exercises[k],box=document.createElement("div");box.className="ex";
     const h=document.createElement("h2");h.innerHTML=ex.name+(big?" <small>"+k+"</small>":"");
     if(big){box.append(h);const row=document.createElement("div");row.className="row";box.append(row);
-      ex.phases.forEach((ph,i)=>{const c=document.createElement("canvas");row.append(c);jobs.push(()=>Figura.draw(c,ex,Figura.phaseT(ex,i),true,{...o,key:k,labels:true,pt:.26}));});}
+      ex.phases.forEach((ph,i)=>{const c=document.createElement("canvas");row.append(c);jobs.push(()=>Figura.draw(c,ex,Figura.phaseT(ex,i)-(q.has("mid")?ph.move/2:0),true,{...o,key:k,labels:true,pt:.26}));});}
     else{const c=document.createElement("canvas");box.append(c,h);jobs.push(()=>Figura.draw(c,ex,Figura.keyT(ex),true,{...o,key:k}));}
     out.append(box);});
   requestAnimationFrame(()=>{jobs.forEach(f=>f());window.__done=true;});
