@@ -23,8 +23,9 @@ para diseñar las pantallas desde cero (Fase 1c del ROADMAP). Si algo falta o so
 4. Estado del día: si hoy ya está hecho y la racha de días seguidos.
 
 ### B. Durante la sesión (a 1–2 m del móvil)
-1. **Qué hago ahora:** nombre del ejercicio y el dibujo animado del movimiento, con el paso actual
-   («Sube las manos a los hombros; los codos no se mueven»).
+1. **Qué hago ahora: el movimiento es lo principal de la pantalla.** Se ve a una **persona** haciendo el ejercicio
+   (no un muñeco de palitos), en bucle, con el paso actual («Sube las manos a los hombros; los codos no se mueven»)
+   y el nombre del ejercicio. Tiene que entenderse a 1–2 m.
 2. **Cuánto falta:** tiempo de la serie (lo más grande de la pantalla), repetición actual de cuántas,
    ronda o serie de cuántas, barra de progreso.
 3. **Lo que viene:** «Prepárate» antes de cada ejercicio con su nombre; siguiente ejercicio y tiempo total que queda.
@@ -34,6 +35,10 @@ para diseñar las pantallas desde cero (Fase 1c del ROADMAP). Si algo falta o so
 6. Sonido: tono agudo al subir, grave al bajar, cuenta en voz alta opcional, «mitad» y pitidos finales.
    La pantalla no se apaga.
 
+### B2. Antes y después: rodillo
+Ejercicios de rodillo para calentar (antes) y recuperar (después), por zona. Se pueden añadir al principio o al final
+de una sesión o hacer solos.
+
 ### C. Al terminar
 1. Confirmación clara de que está hecho (y que cuenta para la racha).
 2. **¿Cómo te ha ido?** por módulo: fácil / justo / demasiado → el nivel sube o baja la próxima vez.
@@ -41,8 +46,9 @@ para diseñar las pantallas desde cero (Fase 1c del ROADMAP). Si algo falta o so
 4. Repetir o volver.
 
 ### D. Ejercicios (catálogo)
-1. **Cuadrícula de miniaturas con el nombre debajo**; filtrar por zona (Core, Glúteo, Espalda, Pecho, Brazos, Movilidad)
-   y por material (sin material, bandas grandes, mini banda, mancuernas, correas).
+1. **Cuadrícula de miniaturas con el nombre debajo** (la miniatura es la persona en la postura clave);
+   filtrar por zona (Core, Glúteo, Espalda, Pecho, Brazos, Movilidad, Calentar y recuperar)
+   y por material (sin material, bandas grandes, mini banda, rodillo, mancuernas).
 2. **Ficha de un ejercicio:** el movimiento entero animado, los pasos, las claves de técnica, la dosis orientativa,
    el material, vídeos en YouTube, y lo que hiciste la última vez y tu mejor marca.
 3. Añadir el ejercicio a una sesión de sueltos desde la ficha.
@@ -53,7 +59,8 @@ para diseñar las pantallas desde cero (Fase 1c del ROADMAP). Si algo falta o so
 3. Por ejercicio: la última vez y la mejor.
 
 ### F. Ajustes (se tocan una vez)
-1. **Material que tienes** (correas, mancuernas, bandas grandes, mini banda): decide qué variante sale de cada ejercicio.
+1. **Material que tienes:** bandas grandes (largas), mini banda (de muslos), rodillo de masaje y mancuernas
+   (ahora sin usar: falta una pieza). Decide qué variante sale de cada ejercicio. **Sin correas TRX**: se quitan.
 2. **Mis bandas grandes:** nombres (color o dureza).
 3. Sonido: contar en voz alta. Volumen: menos volumen en cada ronda (opcional).
 4. **Copia de seguridad:** exportar e importar.
