@@ -43,6 +43,9 @@ usa su geometría (`Figura.solve`, etiquetas) y como respaldo si un móvil no ti
 - En plancha y flexiones, los tobillos están a la altura del suelo (y = 100). La figura los sube al dibujar para ponerse de puntillas. Sería mejor guardar en los datos la postura con el tobillo unos 5 puntos más alto.
 - Quitar los 4 ejercicios con correas TRX (`press_trx`, `remo_trx`, `curl_trx`, `ext_trx`), según lo decidido en funcionalidades. Se dibujan bien, pero en la página llevan la nota «Con correas: se quita».
 - Algunas flechas pasan por encima del brazo o la pierna, por ejemplo en flexiones y en el puente con apertura. Se arregla moviendo `arrow` en los datos.
+- (D3) En el reproductor el encuadre se agranda hasta que la figura **y sus etiquetas** llenan el ancho. En el remo inclinado
+  («JUNTA ESCÁPULAS») y el ángel (flecha) las etiquetas están en la esquina del dibujo y no dejan agrandar a la persona.
+  Acercar esas etiquetas al cuerpo en `figura.js` (`labels`) haría que salieran más grandes.
 
 ## Límites conocidos (no son fallos del dibujo)
 - En miniatura, los ejercicios de pie se ven más pequeños, porque la figura alta cabe a lo alto en un hueco apaisado. Si molesta, D2 puede usar una miniatura vertical para esos ejercicios.
