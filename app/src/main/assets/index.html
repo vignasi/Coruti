@@ -191,6 +191,7 @@ body.hist .player,body.hist #setup,body.hist #free,body.hist .exhead,body.hist .
 .hs ul{margin:2px 0 0;padding-left:18px;font-size:.95rem;color:var(--soft);font-variant-numeric:tabular-nums}
 .hs .hfb{font-size:.92rem;color:var(--soft);margin:0}
 .bkp{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+#accode,#acin{margin-top:8px}
 #bmsg.err{color:var(--hl)}
 .hexl{display:flex;flex-direction:column;gap:8px;margin-top:6px}
 .hrow{display:flex;flex-direction:column;gap:2px;background:var(--accent-soft);border-radius:12px;padding:8px 12px;line-height:1.3}
@@ -315,6 +316,14 @@ body.hist .player,body.hist #setup,body.hist #free,body.hist .exhead,body.hist .
     <div class="body">
       <div class="field"><span class="lbl">Por días</span><div class="hdays" id="hdays"></div><button id="hmore" hidden>Ver más</button></div>
       <details class="field mybands" id="hexd"><summary>Por ejercicio: la última vez y la mejor</summary><div class="hexl" id="hexl"></div></details>
+      <div class="field" id="acct" hidden><span class="lbl">Cuenta</span>
+        <small class="hint" id="acinfo"></small>
+        <div id="acout">
+          <div class="savefav"><input id="acemail" type="email" inputmode="email" autocomplete="email" placeholder="tu@email.com" aria-label="Tu email"><button id="acsend">Enviar código</button></div>
+          <div class="savefav" id="accode" hidden><input id="accodev" inputmode="numeric" autocomplete="one-time-code" maxlength="10" placeholder="Código del email" aria-label="Código del email"><button id="acok">Entrar</button></div>
+        </div>
+        <div class="bkp" id="acin" hidden><button id="acsync">Sincronizar</button><button id="acexit">Salir</button></div>
+        <small class="hint" id="acmsg" role="status" aria-live="polite"></small></div>
       <div class="field"><span class="lbl">Copia de seguridad</span>
         <small class="hint">Todo en un archivo: historial, favoritas, bandas, pesos, ajustes y racha. Guárdalo en Drive o en el ordenador. Al importarlo se combina con lo que haya en el móvil, sin borrar nada.</small>
         <div class="bkp"><button id="bexp">Exportar</button><button id="bimp">Importar</button></div>
@@ -766,6 +775,12 @@ function freeEvents(){
   $("hmore").onclick=()=>{hshow+=20;renderHist();};
   $("bexp").onclick=exportData;
   $("bimp").onclick=()=>{if(A&&A.importData){bmsg("");A.importData();}else bmsg("Importar solo funciona en la app del móvil.",false);};
+  $("acsend").onclick=sendCode;
+  $("acemail").onkeydown=e=>{if(e.key==="Enter")sendCode();};
+  $("acok").onclick=verifyCode;
+  $("accodev").onkeydown=e=>{if(e.key==="Enter")verifyCode();};
+  $("acsync").onclick=()=>{acmsg("Sincronizando…");$("acsync").disabled=true;A.cloudSync();};
+  $("acexit").onclick=()=>A.cloudSignOut();
 }
 function setMode(m){
   if(locked()) return;
@@ -778,7 +793,7 @@ function setMode(m){
 }
 function paintModes(){$("mrut").setAttribute("aria-pressed",view==="main"&&mode==="rutina");$("msuel").setAttribute("aria-pressed",view==="main"&&mode==="suelto");
   $("mhist").setAttribute("aria-pressed",view==="hist");}
-function showHist(){if(locked())return;view="hist";document.body.classList.add("hist");$("hist").hidden=false;paintModes();hshow=20;renderHist();window.scrollTo(0,0);}
+function showHist(){if(locked())return;view="hist";document.body.classList.add("hist");$("hist").hidden=false;paintModes();hshow=20;renderHist();renderCloud();window.scrollTo(0,0);}
 
 /* ---------- Historial: pantalla ---------- */
 let view="main", hshow=20;
@@ -819,9 +834,48 @@ function exportData(){
 }
 /* Android avisa al terminar de guardar o importar; al importar se recarga todo lo que se ve */
 window.onBackup=(msg,ok,imported)=>{bmsg(msg,ok);
-  if(!imported||!D||locked())return;
+  if(imported)reloadAll();};
+/* Vuelve a leer todo lo guardado en el móvil (tras importar una copia o bajar datos de la nube) */
+function reloadAll(){
+  if(!D||locked())return;
   reloadState();loadBands();fr=normFree((()=>{try{return JSON.parse(store.free("free.last"))}catch(e){return null}})());
   renderFavs();build();ui();renderHist();window.refreshStats&&window.refreshStats();};
+/* ---------- Cuenta y nube: pantalla provisional (la buena llega con el diseño nuevo, C1) ---------- */
+function cloudSt(){try{return A&&A.cloudState?JSON.parse(A.cloudState()):null;}catch(e){return null;}}
+function acmsg(t,ok=true){const e=$("acmsg");e.textContent=t;e.classList.toggle("err",!ok);}
+function renderCloud(st){
+  st=st||cloudSt();
+  if(!st){$("acct").hidden=true;return;}  // en el navegador no hay nube
+  $("acct").hidden=false;$("acout").hidden=st.signedIn;$("acin").hidden=!st.signedIn;
+  if(st.signedIn){
+    $("acinfo").textContent="Has entrado como "+st.email+". Se sincroniza sola al terminar cada sesión y al abrir la app.";
+    const info=[];
+    if(st.busy)info.push("Sincronizando…");
+    else if(st.lastSync)info.push("Sincronizado "+dayShort(st.lastSync)+" a las "+hhmm(st.lastSync));
+    if(st.pending)info.push(st.pending+(st.pending===1?" sesión sin subir":" sesiones sin subir"));
+    acmsg([st.msg,...info].filter(Boolean).join(" · "),st.ok);
+    $("acsync").disabled=st.busy;
+  }else{
+    $("acinfo").textContent="Entra con tu email para guardarlo todo en la nube y tenerlo también en otro móvil. Te llega un código, sin contraseña. Sin cuenta, todo sigue solo en este móvil.";
+    acmsg(st.msg||"",st.ok);
+  }
+}
+function sendCode(){
+  const em=$("acemail").value.trim();
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)){acmsg("Escribe un email válido.",false);return;}
+  $("acsend").disabled=true;acmsg("Enviando el código…");A.cloudSendCode(em);
+}
+function verifyCode(){
+  const c=$("accodev").value.replace(/\s/g,"");
+  if(!/^\d{6,10}$/.test(c)){acmsg("El código son las cifras que te han llegado por email.",false);return;}
+  $("acok").disabled=true;acmsg("Comprobando…");A.cloudVerify($("acemail").value.trim(),c);
+}
+window.onCloudMsg=(msg,ok,kind)=>{
+  $("acsend").disabled=false;$("acok").disabled=false;acmsg(msg,ok);
+  if(kind==="code"&&ok){$("accode").hidden=false;$("accodev").value="";$("accodev").focus();}
+  if(kind==="verify"&&ok){$("accode").hidden=true;renderCloud();}
+};
+window.onCloud=(st,changed)=>{try{renderCloud(JSON.parse(st));}catch(e){} if(changed)reloadAll();};
 /* La mejor serie: con más kilos (y a igualdad, más repeticiones); sin kilos, más repeticiones o más segundos */
 const better=(a,b)=>!b||((a.kg||0)!==(b.kg||0)?(a.kg||0)>(b.kg||0):(a.reps||a.secs)>(b.reps||b.secs));
 function exSummary(h){
