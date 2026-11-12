@@ -14,8 +14,10 @@ para diseñar las pantallas desde cero (Fase 1c del ROADMAP). Si algo falta o so
 ## Momentos y lo que necesitas en cada uno
 
 ### A. Empezar a entrenar (lo más frecuente: tiene que ser 1 toque)
-1. **Tus favoritas** (combinaciones guardadas de ejercicios sueltos): verlas y empezar una con un toque.
-2. **Rutina completa de hoy:** base de core + módulos de fuerza (Abdomen, Pecho, Espalda, Brazos, Glúteo),
+1. **Tus favoritas:** combinaciones guardadas de ejercicios sueltos **y también la rutina completa de core**, si la marcas.
+   Verlas y empezar una con un toque. Las que marques son las que salen primero (y en el widget).
+2. **Rutina completa de core** (pensada también para alguien de nivel sencillo; tú no la usas a diario,
+   así que no ocupa el centro salvo que la marques como favorita): base de core + módulos de fuerza (Abdomen, Pecho, Espalda, Brazos, Glúteo),
    con alternancia automática día A / día B, nivel por módulo (Suave / Normal / Fuerte) y de 1 a 6 rondas.
    Ver de un vistazo qué toca hoy y cuánto dura; cambiarlo solo si quieres.
 3. **Sesión nueva de ejercicios sueltos:** elegir uno o varios del catálogo, repeticiones (o segundos) de cada uno,
@@ -36,7 +38,7 @@ para diseñar las pantallas desde cero (Fase 1c del ROADMAP). Si algo falta o so
    La pantalla no se apaga.
 
 ### B2. Antes y después: rodillo
-Ejercicios de rodillo para calentar (antes) y recuperar (después), por zona. Se pueden añadir al principio o al final
+Ejercicios con **rodillo de espuma** (sin motor) para calentar (antes) y recuperar (después), por zona. Se pueden añadir al principio o al final
 de una sesión o hacer solos.
 
 ### C. Al terminar
@@ -79,6 +81,12 @@ de una sesión o hacer solos.
 - Carreras y otras actividades traídas de Strava (Fase 6) → aparecen en el historial.
 - Modos de cardio EMOM, Tabata, AMRAP (Fase 7) → otro tipo de sesión en Entrenar.
 - Coach por voz y planes por objetivo (Fases 8 y 9).
+
+## Decisiones tomadas
+- **Personas, no muñecos:** figura humana dibujada con volumen (cuerpo, ropa de deporte, cara sin detalles),
+  animada por la propia app. Sin conexión, mismo estilo en todos los ejercicios y sin coste. Se valida el estilo
+  con unos pocos ejercicios antes de hacer el resto.
+- Material real: bandas grandes, mini banda, rodillo de espuma; mancuernas más adelante; sin correas TRX.
 
 ## Requisitos que el diseño tiene que respetar
 - Funciona sin conexión; todo va dentro del APK.
