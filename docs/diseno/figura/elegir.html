@@ -85,7 +85,9 @@ catch(e){$("name").textContent="No se han podido cargar los ejercicios";throw e;
 const keys=Object.keys(D.exercises);let cur=q.get("ex")&&D.exercises[q.get("ex")]?q.get("ex"):"puente",t0=performance.now();
 const models={},loading={};
 function model(g){if(models[g])return Promise.resolve(models[g]);
-  return loading[g]||(loading[g]=crear({modelo:"modelos/persona_"+g+".glb",gender:g}).then(m=>{models[g]=m;return m;}));}
+  // .glb en el repo; en la página publicada, el mismo modelo como glTF en JSON (allí no se sirven .glb)
+  const one=ext=>crear({modelo:"modelos/persona_"+g+ext,gender:g});
+  return loading[g]||(loading[g]=one(".glb").catch(()=>one(".gltf.json")).then(m=>{models[g]=m;return m;}));}
 const opts=()=>{const cs=getComputedStyle(document.documentElement);
   return {style:"persona",gender,bg:cs.getPropertyValue("--surface").trim(),dark:cs.getPropertyValue("color-scheme").trim()==="dark",text:D.marks};};
 const show2d=()=>fig!=="3d",show3d=()=>fig!=="dibujada";
