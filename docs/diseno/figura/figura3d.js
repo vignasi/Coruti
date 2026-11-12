@@ -43,6 +43,7 @@ export async function crear({modelo,gender='m',loader}){
   const hemi=new THREE.HemisphereLight(0xffffff,0x8a9a96,1.6);scene.add(hemi);
   const sun=new THREE.DirectionalLight(0xffffff,2.2);sun.position.set(-1.5,3,2.5);sun.castShadow=true;
   sun.shadow.mapSize.set(1024,1024);Object.assign(sun.shadow.camera,{left:-2.2,right:2.2,top:2.2,bottom:-2.2});scene.add(sun,sun.target);
+  const rim=new THREE.DirectionalLight(0xcfe3e0,0);scene.add(rim,rim.target);   // luz de contorno, solo en oscuro: la ropa oscura no se pierde en el fondo
   const floor=new THREE.Mesh(new THREE.PlaneGeometry(20,20),new THREE.ShadowMaterial({opacity:.18}));floor.rotation.x=-Math.PI/2;floor.receiveShadow=true;scene.add(floor);
   const lineMat=new THREE.MeshBasicMaterial({color:0xC3CFCB});
   const line=new THREE.Mesh(new THREE.PlaneGeometry(20,.006),lineMat);line.position.set(0,0.003,0);scene.add(line);
@@ -224,7 +225,8 @@ export async function crear({modelo,gender='m',loader}){
     const b=box.clone().expandByScalar(big?.06:.03);b.min.y=Math.min(b.min.y,0);const c=b.getCenter(new THREE.Vector3()),s=b.getSize(new THREE.Vector3());
     const th=Math.tan(THREE.MathUtils.degToRad(12));const dist=Math.max(s.x/(2*th*180/112),s.y/(2*th))*1.02+s.z*.5;
     cam.position.set(c.x,c.y+dist*.1,c.z+dist);cam.lookAt(c.x,c.y,c.z);cam.updateMatrixWorld(true);
-    sun.position.set(c.x-1.5,3,c.z+2.5);sun.target.position.set(c.x,0,c.z);sun.target.updateMatrixWorld();}
+    sun.position.set(c.x-1.5,3,c.z+2.5);sun.target.position.set(c.x,0,c.z);sun.target.updateMatrixWorld();
+    rim.position.set(c.x+1.2,c.y+1.5,c.z-2.5);rim.target.position.copy(c);rim.target.updateMatrixWorld();}
 
   let R3=null;
   function renderer(){if(R3)return R3;R3=new THREE.WebGLRenderer({antialias:true,alpha:true,preserveDrawingBuffer:true});
@@ -237,7 +239,7 @@ export async function crear({modelo,gender='m',loader}){
     const k=o.key,big=!!o.labels,dk=!!o.dark;
     const box=frameOf(ex,k,big);const R=pose(ex,k,t,clamp);drawProps(ex,k);drawGear(ex,R);place(box,big);
     M.prop.color.set(dk?0x2B3734:0xDDE5E3);lineMat.color.set(dk?0x3A4744:0xC3CFCB);floor.material.opacity=dk?.35:.18;
-    hemi.intensity=dk?1.35:1.6;
+    hemi.intensity=dk?1.35:1.6;rim.intensity=dk?2.6:0;M.db.color.set(dk?0x8E9C99:COL.db);
     const r=renderer();if(r.getSize(new THREE.Vector2()).x!==cv.width){r.setPixelRatio(1);r.setSize(cv.width,cv.height,false);}
     r.render(scene,cam);
     const ctx=cv.getContext('2d');ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,cv.width,cv.height);ctx.drawImage(r.domElement,0,0,cv.width,cv.height);
