@@ -156,7 +156,8 @@ Después: P1 Pulso · P2 Planes por objetivo · P3 Peso y medidas · P4 Carreras
 - [x] Rendimiento: aquí no hay GPU (todo va lento, también D2), así que se añadió **«Rendimiento en este móvil»** al prototipo
   para medirlo en el tuyo. Las miniaturas se dibujan una a una sin bloquear y se guardan
 - [x] Widget con el fondo A: hombre y mujer se ven en claro y oscuro; para C2, la persona de pie sale pequeña (recortar la imagen)
-- [x] Prototipo republicado en el mismo enlace
+- [x] Prototipo republicado en el mismo enlace. **Ojo:** la copia publicada de D2 enseñaba la figura dibujada, no la 3D (fallo de ruta,
+  arreglado): esta es la primera vez que la 3D se ve en el enlace
 - [ ] **Tú:** visto bueno en el móvil (lista en `3-validacion.md` → «Lo que falta»), con las cifras de «Rendimiento».
   Hecho cuando: das el diseño por cerrado
 

@@ -97,6 +97,7 @@ pasos, arquitectura de la información). Lo de la rama anterior que seguía vali
 
 | # | Fallo | Principio | Sev. | Arreglo |
 |---|---|---|---|---|
+| 0 | **La copia publicada de D2 nunca cargaba la figura 3D**: enseñaba siempre la dibujada (la ruta del módulo `figura/figura3d.js` no valía para `import()`). Lo que viste en el móvil en D2 no era la 3D | Visibilidad (H1) | 4 | Ruta completa; comprobado sirviendo la copia publicable: carga los modelos glTF y dibuja en 3D |
 | 1 | El recorte fijo de los de pie cortaba la etiqueta de la zona que trabaja (ver 1.2) | Visibilidad (H1) | 4 | Encuadre medido por ejercicio |
 | 2 | Descanso y «Prepárate» iguales que la serie vistos a 2 m (ver 1.1) | Visibilidad (H1), Von Restorff | 3 | Fondo `accion-suave` en toda la pantalla |
 | 3 | Cantidad por debajo de 16′ a 2 m en móviles de 360 dp | Fitts / distancia de uso | 2 | `p2` 72–120 |
