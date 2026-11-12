@@ -92,7 +92,7 @@ Elegir objetivo (fuerza, músculo, cardio, movilidad), semanas y días; el plan 
 «fácil / justo / demasiado». Cada vez que repites, una sesión distinta.
 
 ### J. Perfil y cuentas
-1. Entrar con email (enlace mágico) o seguir sin cuenta, solo en el móvil.
+1. Entrar con email y un código de 6 cifras (decidido en B1) o seguir sin cuenta, solo en el móvil.
 2. Perfil: nombre, objetivo, peso y medidas (a mano, archivo de la báscula o desde Claude) con su gráfica.
 3. Varias personas (tú, tu mujer…), cada una con sus datos.
 

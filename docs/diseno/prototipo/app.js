@@ -479,10 +479,15 @@ P.peso = { titulo: 'Peso y medidas', render: () => `${cab('Peso y medidas', 'tu'
 P.entrar = { sinPestanas: true, titulo: 'Entrar', render: () => `${cab('Entrar', 'tu')}
   <div class="pantalla">
     <div class="pila" style="gap:var(--e3)"><h1 class="titulo-pantalla">Rutina core</h1><p>Entra con tu email para guardar tus sesiones en la nube y usarlas en otro móvil.</p></div>
-    ${S.hoja === 'enviado' ? `<div class="tarjeta"><span class="item-icono">${ico('correo')}</span><h2 class="h2">Revisa tu correo</h2><p>Enlace enviado a <strong>alex@ejemplo.com</strong>. Ábrelo en este móvil para entrar. Si no llega en 2 minutos, mira en spam.</p><button class="btn btn-texto" style="align-self:flex-start;padding:0" data-act="reenviar">Enviar otro enlace</button></div>` : `
+    ${S.hoja === 'enviado' ? `<form class="pila" style="gap:var(--e4)" data-form="codigo">
+      <p>Código enviado a <strong>alex@ejemplo.com</strong>. Si no llega en 2 minutos, mira en spam.</p>
+      <div class="campo"><label for="codigo">Código de 6 cifras</label><input id="codigo" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" value="482915" required style="font-size:var(--t4);letter-spacing:.3em;text-align:center"></div>
+      <button class="btn btn-principal btn-grande" type="submit">Entrar</button>
+      <button class="btn btn-texto" type="button" data-act="reenviar">Enviar otro código</button>
+    </form>` : `
     <form class="pila" style="gap:var(--e4)" data-form="entrar">
       <div class="campo"><label for="email">Email</label><input id="email" type="email" autocomplete="email" inputmode="email" value="alex@ejemplo.com" required></div>
-      <button class="btn btn-principal btn-grande" type="submit">Enviarme el enlace</button>
+      <button class="btn btn-principal btn-grande" type="submit">Enviarme un código</button>
     </form>`}
     <button class="btn btn-texto" data-go="entrenar">Seguir sin cuenta</button>
     <p class="meta">Sin cuenta, todo se queda solo en este móvil. Puedes entrar más tarde desde Tú.</p>
@@ -687,7 +692,7 @@ const A = {
   det: b => { S.det = b.dataset.id; location.hash = 'detalle'; return 'nav'; },
   desc: b => { S.conectado[b.dataset.v] = false; }, con: b => { S.conectado[b.dataset.v] = true; toast('Conectado'); return 'nada'; },
   salir: () => { S.cuenta = false; toast('Has salido. Tus datos siguen en este móvil'); return 'nada'; },
-  reenviar: () => toast('Enlace enviado otra vez'),
+  reenviar: () => toast('Código enviado otra vez'),
 };
 document.addEventListener('click', ev => {
   const t = ev.target.closest('[data-go],[data-act],[data-tema]'); if (!t) return;
@@ -699,7 +704,7 @@ document.addEventListener('click', ev => {
   const r = f(t, ev); if (r !== 'nav' && r !== 'nada') pintar(false);
 });
 document.addEventListener('change', ev => { const t = ev.target; if (t.dataset && t.dataset.act === 'sw') { A.sw(t); pintar(false); } });
-document.addEventListener('submit', ev => { ev.preventDefault(); if (ev.target.dataset.form === 'entrar') { S.hoja = 'enviado'; pintar(false); } });
+document.addEventListener('submit', ev => { ev.preventDefault(); if (ev.target.dataset.form === 'entrar') { S.hoja = 'enviado'; pintar(false); } else if (ev.target.dataset.form === 'codigo') { S.hoja = null; S.cuenta = true; location.hash = 'tu'; setTimeout(() => toast('Has entrado. Subiendo lo de este móvil…'), 50); } });
 window.addEventListener('hashchange', () => { if (rutaActual() !== 'entrar' && S.hoja === 'enviado') S.hoja = null; pintar(); });
 document.addEventListener('keydown', ev => {
   if (ev.key === 'Tab' && S.hoja) { const h = document.querySelector('.hoja'); const f = h ? [...h.querySelectorAll('button,a,input')] : []; if (f.length) { const i = f.indexOf(document.activeElement); if (ev.shiftKey && i <= 0) { ev.preventDefault(); f[f.length - 1].focus(); } else if (!ev.shiftKey && i === f.length - 1) { ev.preventDefault(); f[0].focus(); } } } if (ev.key === 'Escape' && S.hoja) { if (S.hoja === 'parar' || S.hoja === 'pausa') R.pausa = false; S.hoja = null; pintar(false); } });

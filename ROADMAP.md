@@ -92,8 +92,8 @@ B1 Cuentas y nube ────────────────────�
 Después: P1 Pulso · P2 Planes por objetivo · P3 Peso y medidas · P4 Carreras de Strava · P5 Cardio · P6 Coach por voz
 ```
 
-**Ahora mismo, a la vez:** D1, D2 y B1 (solo tocan `docs/diseno/` o el almacenamiento y el servidor, no la interfaz).
-**Después, a la vez:** C1, B2 y S1.
+**Ahora mismo, a la vez:** D1 (figura) y D3 (tu visto bueno al diseño); B2 y S1 ya pueden empezar porque B1 está en `main`.
+**Después:** C1 cuando D3 esté cerrado.
 
 ### Bloque D · Diseño (antes de construir nada de interfaz)
 
