@@ -1,9 +1,9 @@
 <!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Figura 3D · prueba</title>
 <!-- Prueba (D1): la misma postura de rutina.json moviendo los huesos de un modelo 3D de persona.
-     Modelos de prueba: Xbot (maniquí) y Michelle (mujer), de los ejemplos de three.js (personajes de Mixamo).
-     No se guardan en este repo: se cargan de GitHub. Para la app harían falta modelos propios (ver NOTAS.md).
-     ?m=Xbot|Michelle &ex=a,b &all (todas las posturas) &c=columnas &three=URL de three (por defecto, jsDelivr) -->
+     Modelos: modelos/persona_m.glb y persona_f.glb (MakeHuman, CC0, hechos con modelos/crear_modelos.py).
+     Para comparar, Xbot y Michelle de los ejemplos de three.js (Mixamo; no están en el repo, se cargan de GitHub).
+     ?m=persona_m|persona_f|Xbot|Michelle &ex=a,b &all (todas las posturas) &c=columnas &three=URL de three (por defecto, jsDelivr) -->
 <style>body{margin:0;background:#EDF1F0;font:14px system-ui}#g{display:grid;grid-template-columns:repeat(var(--c,2),1fr);gap:6px;padding:6px}
 .t{background:#fff;border-radius:12px;padding:4px}.t canvas{width:100%;aspect-ratio:180/112;display:block}.t span{font-size:12px;padding:0 4px}</style>
 <div id="g"></div>
@@ -12,16 +12,20 @@
 const s=document.createElement("script");s.type="importmap";s.textContent=JSON.stringify({imports:{three:T+"build/three.module.js","three/addons/":T+"examples/jsm/"}});document.currentScript.after(s);}</script>
 <script type="module">
 import * as THREE from 'three';import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
-const q=new URLSearchParams(location.search),model=q.get('m')||'Xbot',gender=model==='Michelle'?'f':'m';
+const q=new URLSearchParams(location.search),model=q.get('m')||'persona_m',gender=/Michelle|_f$/.test(model)?'f':'m';
 document.getElementById('g').style.setProperty('--c',q.get('c')||2);
 const D=await (await fetch(q.get('data')||'../../../app/src/main/assets/rutina.json')).json();
 const keys=(q.get('ex')||'puente,plancha_lat,curl_goma,flex').split(',');
-const gl=await new GLTFLoader().loadAsync((q.get('models')||'https://raw.githubusercontent.com/mrdoob/three.js/r160/examples/models/gltf/')+model+'.glb');const root=gl.scene;
+const gl=await new GLTFLoader().loadAsync((q.get('models')||(/^persona_/.test(model)?'modelos/':'https://raw.githubusercontent.com/mrdoob/three.js/r160/examples/models/gltf/'))+model+'.glb');const root=gl.scene;
 root.traverse(o=>{if(o.isMesh){o.castShadow=true;o.frustumCulled=false;if(model==='Xbot'){o.material=new THREE.MeshStandardMaterial({color:/Joints/.test(o.name)?0x1E6B74:0xCBD6D3,roughness:.55,metalness:0});}}});
+// Personalización (P8, prueba): &morph=complexion_mas:1,musculo_mas:.5 &piel=%238D5524 &pelo=%23C9A15A
+root.traverse(o=>{if(!o.isMesh)return;const d=o.morphTargetDictionary;
+  (q.get('morph')||'').split(',').filter(Boolean).forEach(kv=>{const [k,v]=kv.split(':');if(d&&d[k]!==undefined)o.morphTargetInfluences[d[k]]=+v;});
+  [].concat(o.material).forEach(m=>{if(m.name==='piel'&&q.get('piel'))m.color.set(q.get('piel'));if(m.name==='pelo'&&q.get('pelo'))m.color.set(q.get('pelo'));});});
 root.updateMatrixWorld(true);
 const B={};root.traverse(o=>{if(o.isBone)B[o.name.replace('mixamorig','')]=o;});
 const rest={};for(const n in B){const b=B[n];rest[n]={local:b.quaternion.clone(),world:b.getWorldQuaternion(new THREE.Quaternion()),pos:b.getWorldPosition(new THREE.Vector3())};}
-const restDir=(a,c)=>rest[c].pos.clone().sub(rest[a].pos).normalize();
+const restDir=(a,c)=>rest[c]?rest[c].pos.clone().sub(rest[a].pos).normalize():rest[a].pos.clone().sub(rest[B[a].parent.name.replace('mixamorig','')].pos).normalize();
 const thigh=rest.LeftLeg.pos.distanceTo(rest.LeftUpLeg.pos);
 // escena
 const scene=new THREE.Scene();scene.add(root);
@@ -62,14 +66,38 @@ function pose(k,t){
   // colocar: escala del dibujo a metros por el muslo; luego apoyar lo más bajo en el suelo
   const dt=Math.hypot(p.k1[0]-p.p[0],p.k1[1]-p.p[1])||30,kk=thigh/dt;
   const hp=B.Hips.getWorldPosition(new THREE.Vector3());root.position.set((p.p[0]-90)*kk-hp.x,0,-hp.z);root.updateMatrixWorld(true);
-  const bb=()=>{const b=new THREE.Box3();for(const n in B){if(/Index|Middle|Ring|Pinky|Thumb|Eye/.test(n))continue;b.expandByPoint(B[n].getWorldPosition(new THREE.Vector3()));}return b;};
-  let box=bb();root.position.y-=box.min.y-0.07;root.updateMatrixWorld(true);box=bb();box.expandByScalar(0.14);box.min.y=0;return box;
+  const bb=()=>{const b=new THREE.Box3();for(const n in B){if(/Index|Middle|Ring|Pinky|Thumb|Eye/.test(n))continue;b.expandByPoint(B[n].getWorldPosition(new THREE.Vector3()));}
+    const hd=B.Head.getWorldPosition(new THREE.Vector3()),nk=B.Neck.getWorldPosition(new THREE.Vector3());b.expandByPoint(hd.clone().add(hd.clone().sub(nk).normalize().multiplyScalar(.2)));return b;};
+  let box=bb();root.position.y-=box.min.y-0.07;root.updateMatrixWorld(true);
+  // Contacto: si en el dibujo la mano o el pie se apoyan (suelo, silla, sofá), el brazo o la pierna se doblan lo justo para llegar
+  const GD=103.2,sup=pt=>{let y=GD;(ex.equip||[]).forEach(e=>{if(e.t!=='box')return;const [x,yy,w,h]=e.r;if(h<90&&pt[0]>=x-2&&pt[0]<=x+w+2&&yy>=pt[1]-1.5&&yy<y)y=yy;});return y;};
+  const toW=(pt,lift,from,ref)=>new THREE.Vector3(B[from].getWorldPosition(new THREE.Vector3()).x+(pt[0]-ref[0])*kk,(GD-sup(pt))*kk+lift,0); // x desde el hombro o la cadera del modelo
+  const wp=n=>B[n].getWorldPosition(new THREE.Vector3());
+  function ik(a,b,c,T,bend,secA,restA){const R=wp(a),L1=rest[a].pos.distanceTo(rest[b].pos),L2=rest[b].pos.distanceTo(rest[c].pos);
+    T=T.clone();T.z=R.z;let d=Math.min(R.distanceTo(T),L1+L2-1e-4);const u=T.clone().sub(R).normalize();T=R.clone().add(u.clone().multiplyScalar(d));
+    const x=(L1*L1-L2*L2+d*d)/(2*d),hh=Math.sqrt(Math.max(0,L1*L1-x*x));let n=bend.clone().sub(u.clone().multiplyScalar(bend.dot(u)));if(n.lengthSq()<1e-6)n.set(0,1,0);n.normalize();
+    const E=R.clone().add(u.multiplyScalar(x)).add(n.multiplyScalar(hh));aim(a,b,E.clone().sub(R).normalize(),secA,restA);aim(b,c,T.clone().sub(E).normalize(),secA,restA);}
+  for(const i of ['1','2']){const S=side[i],lat=S==='Left'?left:left.clone().negate(),secA=frente?F:lat,restA=frente?Z:Y,secL=frente?F:left,restL=frente?Z:X;
+    const W=p['w'+i],E=p['e'+i],A=gm.feet[i].A,K=p['k'+i];
+    const bendOf=(r,m,e)=>{const mid=[(r[0]+e[0])/2,(r[1]+e[1])/2];return v3([m[0]-mid[0],m[1]-mid[1]]);};
+    if(W[1]>sup(W)-4.5)ik(S+'Arm',S+'ForeArm',S+'Hand',toW(W,.035,S+'Arm',p.s),bendOf(p.s,E,W),secA,restA);
+    if(!frente&&A[1]>sup(A)-6)ik(S+'UpLeg',S+'Leg',S+'Foot',toW(A,.075,S+'UpLeg',p.p),bendOf(p.p,K,A).add(F.clone().multiplyScalar(.01)),secL,restL);
+    const ft=gm.feet[i];if(!ft.front){aim(S+'Foot',S+'ToeBase',v3(ft.f).normalize(),secL,restL);}
+    // mano: después del ajuste del brazo; apoyada, plana con los dedos estirados
+    const h=gm.hands[i],hd=v3(h.mode==='flat'?[h.dir[0],.12]:h.dir).normalize();aim(S+'Hand',S+'HandMiddle1',hd,secA,restA);
+    if(h.mode==='flat')for(const f of ['Index','Middle','Ring','Pinky'])for(const j of [1,2,3]){const n=S+'Hand'+f+j,c=S+'Hand'+f+(j+1);if(B[n])aim(n,B[c]?c:n,hd,secA,restA);}}
+  root.updateMatrixWorld(true);box=bb();box.expandByScalar(0.14);box.min.y=0;return box;
 }
+const props=new THREE.Group();scene.add(props);const propMat=new THREE.MeshStandardMaterial({color:0xDDE5E3,roughness:.9});
+function drawProps(ex,k){props.clear();const p0=ex.poses[0],dt=Math.hypot(p0.k1[0]-p0.p[0],p0.k1[1]-p0.p[1])||30,kk=thigh/dt,hx=B.Hips.getWorldPosition(new THREE.Vector3()).x;
+  const st=Figura.solve(ex,0,true,{key:k,gender}).gm.p;
+  (ex.equip||[]).forEach(e=>{if(e.t!=='box')return;const [x,y,w,h]=e.r,H=Math.min(h,103.2-y)*kk,W=w*kk,wall=h>=90;
+    const m=new THREE.Mesh(new THREE.BoxGeometry(W,H,wall?.04:.5),propMat);m.position.set(hx+(x+w/2-st.p[0])*kk,H/2,wall?-.3:0);m.receiveShadow=true;m.castShadow=true;props.add(m);});}
 const out=document.getElementById('g');
 for(const k of keys){const ex=D.exercises[k];
   const phases=q.has('all')?ex.phases.map((_,i)=>i):[ex.phases.findIndex(x=>x.tone==='up')>=0?ex.phases.findIndex(x=>x.tone==='up'):ex.phases.length-1];
   for(const ph of phases){
-  const box=pose(k,Figura.phaseT(ex,ph));const c=box.getCenter(new THREE.Vector3()),s=box.getSize(new THREE.Vector3());
+  const box=pose(k,Figura.phaseT(ex,ph));drawProps(ex,k);const c=box.getCenter(new THREE.Vector3()),s=box.getSize(new THREE.Vector3());
   const dist=Math.max(s.x/ (2*Math.tan(THREE.MathUtils.degToRad(12))*180/112),s.y/(2*Math.tan(THREE.MathUtils.degToRad(12))))*1.02+s.z*.5;
   cam.position.set(c.x,c.y+dist*.1,c.z+dist);cam.lookAt(c.x,c.y,c.z);
   R.render(scene,cam);const t=document.createElement('div');t.className='t';const cv=document.createElement('canvas');cv.width=720;cv.height=448;
