@@ -1,53 +1,101 @@
-<!doctype html>
-<html lang="es">
-<head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Figura humana · prueba de estilo</title>
+<title>Figura del ejercicio</title>
+<meta name="claude:viewport-fit-sides" content="cover">
 <style>
-:root{--bg:#EDF1F0;--surface:#FFFFFF;--ink:#17201E;--soft:#55625F;--line:#CFD9D6;--accent:#1E6B74;--hl:#D98E1F}
-@media (prefers-color-scheme: dark){:root{--bg:#0F1513;--surface:#171F1D;--ink:#E4EBE8;--soft:#9AA9A5;--line:#2B3633;--accent:#62B8C1;--hl:#F0B04A}}
+/* Layout: una columna de móvil; arriba el selector y el movimiento en grande, debajo todas las miniaturas del catálogo. */
+:root{
+  --bg:#EDF1F0;--surface:#FFFFFF;--ink:#17201E;--soft:#55625F;--line:#CFD9D6;
+  --accent:#1E6B74;--accent-ink:#FFFFFF;--hl:#D98E1F;
+  --font:"Inter",system-ui,"Roboto",sans-serif;--display:"Space Grotesk","Inter",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#0F1513;--surface:#171F1D;--ink:#E4EBE8;--soft:#9AA9A5;--line:#2B3633;--accent:#62B8C1;--accent-ink:#0B1513;--hl:#F0B04A;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0F1513;--surface:#171F1D;--ink:#E4EBE8;--soft:#9AA9A5;--line:#2B3633;--accent:#62B8C1;--accent-ink:#0B1513;--hl:#F0B04A;color-scheme:dark}
 *{box-sizing:border-box}
-body{margin:0;padding:16px;background:var(--bg);color:var(--ink);font:15px/1.4 system-ui,"Roboto",sans-serif}
-h1{font-size:22px;margin:0 0 4px}
-p{margin:0 0 16px;color:var(--soft)}
-.big{background:var(--surface);border-radius:20px;padding:12px;margin-bottom:16px}
-.big canvas{width:100%;aspect-ratio:180/112;display:block}
-.big b{display:block;font-size:17px;margin-top:6px}
-.seg{display:inline-flex;border:1.5px solid var(--line);border-radius:999px;overflow:hidden;margin-bottom:12px}
-.seg button{border:0;background:transparent;color:var(--ink);font:600 15px system-ui;padding:10px 18px;min-height:44px}
-.seg button[aria-pressed="true"]{background:var(--accent);color:#fff}
-.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.tile{background:var(--surface);border-radius:14px;padding:6px 6px 8px}
-.tile canvas{width:100%;aspect-ratio:180/112;display:block}
-.tile span{display:block;font-size:13px;line-height:1.25;margin-top:4px}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 var(--font);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px 32px}
+main{max-width:560px;margin:0 auto;display:grid;gap:14px}
+h1{font:700 1.45rem/1.15 var(--display);margin:0;text-wrap:balance}
+.sub{margin:4px 0 0;color:var(--soft);font-size:.92rem}
+.controls{display:flex;flex-wrap:wrap;gap:10px}
+.seg{display:inline-flex;border:1.5px solid var(--line);border-radius:999px;overflow:hidden;background:var(--surface)}
+.seg button{border:0;background:transparent;color:var(--ink);font:600 .95rem var(--font);padding:0 16px;min-height:48px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+button:focus-visible{outline:3px solid var(--hl);outline-offset:2px}
+.stage{background:var(--surface);border-radius:20px;padding:10px 12px 14px;display:grid;gap:6px}
+.stage canvas{width:100%;max-width:100%;aspect-ratio:180/112;display:block}
+.stage .top{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.stage b{font:700 1.08rem/1.25 var(--display);min-width:0}
+.step{font-variant-numeric:tabular-nums;color:var(--soft);font-size:.85rem;white-space:nowrap}
+.cap{margin:0;color:var(--ink);font-size:.95rem;min-height:2.9em}
+.play{justify-self:start;border:1.5px solid var(--line);background:transparent;color:var(--ink);border-radius:999px;font:600 .9rem var(--font);padding:0 14px;min-height:44px;cursor:pointer}
+h2{font:600 .8rem var(--font);letter-spacing:.06em;text-transform:uppercase;color:var(--soft);margin:8px 0 0}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.tile{background:var(--surface);border:2px solid transparent;border-radius:14px;padding:5px 5px 8px;text-align:left;color:var(--ink);font:inherit;cursor:pointer;display:grid;gap:2px;min-width:0}
+.tile[aria-current="true"]{border-color:var(--accent)}
+.tile canvas{width:100%;max-width:100%;aspect-ratio:180/112;display:block}
+.tile span{font-size:.8rem;line-height:1.25;overflow-wrap:anywhere}
+.tile i{font-style:normal;font-size:.7rem;color:var(--soft)}
 </style>
-</head>
-<body>
-<h1>Figura humana · prueba de estilo</h1>
-<p>Arriba, el movimiento entero con lo que trabaja señalado. Abajo, las miniaturas del catálogo, sin marcas: tócalas para verlas en grande.</p>
-<div class="seg" role="group" aria-label="Figura"><button id="gm" aria-pressed="true">Hombre</button><button id="gf" aria-pressed="false">Mujer</button></div>
-<div class="big"><canvas id="big"></canvas><b id="bigname"></b></div>
-<div class="grid" id="grid"></div>
+<main>
+  <header>
+    <h1>Figura del ejercicio</h1>
+    <p class="sub">Elige estilo y figura. Toca un ejercicio para verlo en grande, con lo que trabaja señalado.</p>
+  </header>
+  <div class="controls">
+    <div class="seg" role="group" aria-label="Estilo">
+      <button id="s-palos" data-s="palos">Palos</button><button id="s-redondo" data-s="redondo">Redondo</button><button id="s-persona" data-s="persona">Persona</button>
+    </div>
+    <div class="seg" role="group" aria-label="Figura">
+      <button id="g-m" data-g="m">Hombre</button><button id="g-f" data-g="f">Mujer</button>
+    </div>
+  </div>
+  <section class="stage" aria-live="polite">
+    <div class="top"><b id="name">Cargando…</b><span class="step" id="step"></span></div>
+    <canvas id="big" aria-label="Movimiento del ejercicio"></canvas>
+    <p class="cap" id="cap"></p>
+    <button class="play" id="play">Pausa</button>
+  </section>
+  <h2 id="count">Ejercicios</h2>
+  <div class="grid" id="grid"></div>
+</main>
 <script src="figura.js"></script>
 <script>
-fetch(new URLSearchParams(location.search).get("data")||"../../../app/src/main/assets/rutina.json").then(r=>r.json()).then(D=>{
-  const keys=(new URLSearchParams(location.search).get("ex")||"curl_goma,puente,deadbug,plancha,remo_goma,psoas,almeja,press_goma,plancha_lat").split(",").filter(k=>D.exercises[k]);
-  const big=document.getElementById("big"); let cur=keys[0];
-  document.getElementById("bigname").textContent=D.exercises[cur].name;
-  const tiles=keys.map(k=>{const t=document.createElement("div");t.className="tile";const c=document.createElement("canvas");const s=document.createElement("span");s.textContent=D.exercises[k].name;t.append(c,s);
-    t.onclick=()=>{cur=k;document.getElementById("bigname").textContent=D.exercises[k].name;};document.getElementById("grid").appendChild(t);return [k,c];});
-  const t0=performance.now();
-  const q=new URLSearchParams(location.search),still=q.has("still");let gender=q.get("g")==="f"?"f":"m";
-  const setG=v=>{gender=v;document.getElementById("gm").setAttribute("aria-pressed",v==="m");document.getElementById("gf").setAttribute("aria-pressed",v==="f");};
-  setG(gender);document.getElementById("gm").onclick=()=>setG("m");document.getElementById("gf").onclick=()=>setG("f");
-  if(q.get("big"))cur=q.get("big"),document.getElementById("bigname").textContent=D.exercises[cur].name;
-  function loop(now){const t=still?Figura.keyT(D.exercises[cur]):(now-t0)/1000;
-    Figura.draw(big,D.exercises[cur],t,!!D.exercises[cur].hold,{gender,labels:true,text:D.marks});
-    tiles.forEach(([k,c])=>Figura.draw(c,D.exercises[k],Figura.keyT(D.exercises[k]),true,{gender}));
-    if(!still)requestAnimationFrame(loop); else window.__done=true;}
-  requestAnimationFrame(loop);
-});
+(function(){
+const q=new URLSearchParams(location.search);
+const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+let style=q.get("s")||store.get("fig-style")||"persona",gender=q.get("g")||store.get("fig-gender")||"m";
+const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;let playing=!reduce&&!q.has("still");
+const TRX=["press_trx","remo_trx","curl_trx","ext_trx"];
+function load(urls){return fetch(urls[0]).then(r=>{if(!r.ok)throw 0;return r.json();}).catch(()=>urls.length>1?load(urls.slice(1)):Promise.reject());}
+load([q.get("data")||"../../../app/src/main/assets/rutina.json","rutina.json"]).then(D=>{
+  const keys=Object.keys(D.exercises),big=document.getElementById("big");let cur=q.get("ex")&&D.exercises[q.get("ex")]?q.get("ex"):"puente",t0=performance.now(),tFrozen=0;
+  const opts=()=>{const cs=getComputedStyle(document.documentElement);
+    return {style,gender,bg:cs.getPropertyValue("--surface").trim(),dark:cs.getPropertyValue("color-scheme").trim()==="dark"};};
+  document.getElementById("count").textContent=keys.length+" ejercicios";
+  const tiles=keys.map(k=>{const b=document.createElement("button");b.className="tile";b.id="t-"+k;
+    const c=document.createElement("canvas"),s=document.createElement("span");s.textContent=D.exercises[k].name;b.append(c,s);
+    if(TRX.includes(k)){const i=document.createElement("i");i.textContent="Con correas: se quita";b.append(i);}
+    b.onclick=()=>{select(k);document.querySelector(".stage").scrollIntoView({behavior:reduce?"auto":"smooth",block:"start"});};
+    document.getElementById("grid").append(b);return [k,c,b];});
+  function drawTiles(){const o=opts();tiles.forEach(([k,c])=>Figura.draw(c,D.exercises[k],Figura.keyT(D.exercises[k]),true,{...o,key:k}));}
+  function select(k){cur=k;document.getElementById("name").textContent=D.exercises[k].name;
+    tiles.forEach(([kk,,b])=>b.setAttribute("aria-current",kk===k));t0=performance.now();tFrozen=Figura.keyT(D.exercises[k]);last="";}
+  let last="";
+  function frame(now){const ex=D.exercises[cur],t=playing?(now-t0)/1000:tFrozen;
+    const st=Figura.draw(big,ex,t,!playing,{...opts(),key:cur,labels:true,text:D.marks,pt:playing?t:.26});
+    const k=cur+st.idx;if(k!==last){last=k;document.getElementById("cap").textContent=st.phase.cap||"";document.getElementById("step").textContent=(st.idx+1)+" de "+st.n;}
+    if(playing)requestAnimationFrame(frame);}
+  function setUI(){document.querySelectorAll("[data-s]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.s===style));
+    document.querySelectorAll("[data-g]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.g===gender));
+    document.getElementById("play").textContent=playing?"Pausa":"Ver el movimiento";}
+  document.querySelectorAll("[data-s]").forEach(b=>b.onclick=()=>{style=b.dataset.s;store.set("fig-style",style);setUI();drawTiles();if(!playing)frame(0);});
+  document.querySelectorAll("[data-g]").forEach(b=>b.onclick=()=>{gender=b.dataset.g;store.set("fig-gender",gender);setUI();drawTiles();if(!playing)frame(0);});
+  document.getElementById("play").onclick=()=>{playing=!playing;if(playing){t0=performance.now();requestAnimationFrame(frame);}else{tFrozen=Figura.keyT(D.exercises[cur]);frame(0);}setUI();};
+  matchMedia("(prefers-color-scheme: dark)").addEventListener("change",()=>{drawTiles();if(!playing)frame(0);});
+  addEventListener("resize",()=>{drawTiles();if(!playing)frame(0);});
+  setUI();select(cur);drawTiles();
+  if(playing)requestAnimationFrame(frame);else frame(0);
+  window.__done=true;
+}).catch(()=>{document.getElementById("name").textContent="No se han podido cargar los ejercicios";});
+})();
 </script>
-</body>
-</html>
