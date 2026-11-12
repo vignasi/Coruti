@@ -4,6 +4,7 @@ Qué sale: docs/diseno/figura/modelos/persona_m.glb y persona_f.glb
   - cuerpo de MakeHuman con esqueleto de nombres Mixamo (mixamorig:Hips, ...), el que mueve 3d.html
   - ropa de deporte PINTADA sobre el propio cuerpo (camiseta o tirantes, pantalón corto o mallas, zapatillas):
     así sigue cualquier deformación del cuerpo y nunca lo atraviesa
+  - bordes de la ropa y del pelo pulidos con pulir_ropa.py (que también sirve sobre los .glb ya hechos)
   - pelo: el cuero cabelludo con volumen y, en ella, una coleta unida al hueso de la cabeza
   - deformaciones (morph targets) para personalizar más adelante (P8 del ROADMAP), sin usar todavía:
       complexion_mas / complexion_menos (más rellenito / más delgado)
@@ -19,6 +20,9 @@ Cómo se ejecuta (Blender como módulo de Python, sin pantalla):
 import sys, os, math, importlib
 import bpy, bmesh, addon_utils
 from mathutils import Vector
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import pulir_ropa  # noqa: E402
 
 OUT = os.path.dirname(os.path.abspath(__file__))
 addon_utils.enable("bl_ext.user_default.mpfb", default_set=True)
@@ -267,6 +271,9 @@ def build(g):
     # Grupos de vértices que no son huesos: fuera (no hacen falta en el GLB)
     for gr in [gr for gr in h.vertex_groups if gr.name not in bone_names]:
         h.vertex_groups.remove(gr)
+
+    # Bordes de la ropa y del pelo rectos: cortes por superficies suaves en vez de seguir las aristas (pulir_ropa.py)
+    pulir_ropa.pulir(h, rig, g)
 
     objs = [h, rig]
     if g == "f":
