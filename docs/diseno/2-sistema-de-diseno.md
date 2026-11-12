@@ -41,7 +41,7 @@ Contrastes comprobados (WCAG AA): texto ≥ 4,5:1 en los dos temas (acción sobr
 | `t2` | 16 sp | 400 / 700 | Texto y botones |
 | `t3` | 20 sp | 700 | Títulos de sección y tarjeta; botón grande |
 | `t4` | 28 sp | 700 | Título de pantalla, cifras (peso, pulso), nombre del ejercicio en la sesión |
-| `p2` | 64–104 sp | 700 | Solo reproductor: cuántas (reps o segundos), según el alto de la pantalla |
+| `p2` | 72–120 sp | 700 | Solo reproductor: cuántas (reps o segundos), según el ancho y el alto de la pantalla (`min(26vw, 12,5vh)`). Se lee a 2 m (D3) |
 
 Cinco tamaños en total; no se inventan otros. Interlineado 1,4 en texto y 1,1–1,15 en títulos.
 
@@ -78,14 +78,17 @@ El reproductor, el final de sesión y la pantalla de entrar van sin pestañas. L
 ### Reproductor
 Inspirado en lo que te gusta de Freeletics: pantalla limpia, la persona enorme y la información pequeña abajo.
 - **La figura ocupa toda la pantalla**, sin caja ni marco, sobre fondo `capa` (blanco en claro), por debajo de la fila de arriba.
-  En los ejercicios de pie (la figura es más alta que ancha) se recortan los lados del encuadre para que la persona salga más grande;
-  los tumbados se ven enteros a lo ancho. Las etiquetas (zona en ámbar, flecha, BANDA) las pone la propia figura.
+  **Encuadre por ejercicio (D3):** se mide una vez qué parte del ancho ocupan la figura, el material y las etiquetas durante el bucle
+  y se agranda hasta que eso llena el ancho (sin pasar del alto). En los de pie la persona sale más grande y **nunca se corta
+  una etiqueta** (con el recorte fijo de D2 se perdían «JUNTA ESCÁPULAS» o «GLÚTEO DE LADO»). Los tumbados se ven enteros a lo ancho.
+  Las etiquetas (zona en ámbar, flecha, BANDA) las pone la propia figura.
+- **Descanso y «Prepárate»: toda la pantalla pasa a `accion-suave`.** Es lo único que distingue la fase a 2 m (el texto no se lee de lejos).
 - En el descanso, el siguiente ejercicio en pequeño, en bucle y sin etiquetas.
 - **Arriba, encima de la figura y pequeño:** pausa (48 dp), «Ronda x de y · ejercicio x de y» y el pulso (o «Sin señal»).
 - **Abajo, donde no se pisa**, de arriba abajo: la clave corta («Manos debajo de los hombros»), el nombre y **la cantidad en grande**
   (`12 reps` o `0:30`), una línea pequeña (ritmo y tiempo que llevas, o «Prepárate»), banda o kilos si el ejercicio los usa,
   las **rayas de progreso** y «Luego: …» con el ejercicio siguiente.
-- **Rayas:** un paquete por ronda, una raya por ejercicio y una más corta y hueca para el descanso. Hecho en `accion`, el actual en `trabajo`.
+- **Rayas** (8 dp de alto): un paquete por ronda, una raya por ejercicio y una más corta y hueca para el descanso. Hecho en `accion`, el actual en `trabajo`.
 - **Repeticiones: no pasan solas.** La app marca el ritmo como guía («Ritmo 7 de 12», tonos y voz) y cuenta el tiempo hacia arriba,
   pero espera a que toques la pantalla: si paras 2 s a mitad, no pasa nada. Lo que se guarda es el tiempo real de la serie.
 - **Segundos y descansos:** cuenta atrás y pasan solos («Prepárate» de 5 s antes de los de segundos). Tocar adelanta.
@@ -96,12 +99,12 @@ Inspirado en lo que te gusta de Freeletics: pantalla limpia, la persona enorme y
 
 ## Widget
 Mismos tokens; Android limita lo que se puede dibujar, así que:
-- **Fondo: `capa` de la app, claro (`#FFFFFF`) u oscuro (`#16262A`), siguiendo al tema del móvil** (opción A, propuesta).
+- **Fondo: `capa` de la app, claro (`#FFFFFF`) u oscuro (`#16262A`), siguiendo al tema del móvil** (**opción A, elegida** en D3).
   El fondo de hoy (`#1E6B74`) es el color de la camiseta de la figura y ella desaparece. Las dos opciones, con las imágenes reales,
-  en el prototipo («Fondo: dos opciones»):
-  - **A · Fondo de la app** (propuesta): la figura se ve en los dos temas, la camiseta sigue siendo del color de la marca como en la app,
+  en el prototipo («Fondo del widget»):
+  - **A · Fondo de la app** (elegida): la figura se ve en los dos temas, la camiseta sigue siendo del color de la marca como en la app,
     y las imágenes de claro y oscuro ya están hechas (`figura/widget/`). Se pierde el verde del widget de hoy.
-  - **B · Fondo `#1E6B74` y camiseta coral (`#D9634C`)**: conserva el aspecto de hoy, pero la ropa tendría que cambiar en toda la app
+  - **B · Fondo `#1E6B74` y camiseta coral (`#D9634C`)** (descartada): conserva el aspecto de hoy, pero la ropa tendría que cambiar en toda la app
     (si no, la persona cambia de ropa entre la app y el widget), el coral compite con el ámbar de la zona que trabaja y hay que rehacer las 284 imágenes.
     Imágenes de prueba en `prototipo/widget-ropa-coral/` (`figura/widget/hacer.html?top=%23D9634C`).
 - Radio del sistema (Android 12+), padding 16 dp (12 en el pequeño).
