@@ -74,6 +74,8 @@ class MainActivity : Activity() {
         }
 
         pendingAutostart = intent?.getBooleanExtra(EXTRA_AUTOSTART, false) == true
+        // La nube avisa al terminar de sincronizar; si han llegado datos, la página los vuelve a leer
+        Cloud.listener = { changed -> cloudChanged(changed) }
         web.loadUrl("file:///android_asset/index.html")
     }
 
@@ -88,9 +90,11 @@ class MainActivity : Activity() {
         super.onResume()
         WidgetUpdater.refresh(this, force = true)
         if (pageReady) js("window.reloadConfig && window.reloadConfig(); window.refreshStats && window.refreshStats()")
+        Cloud.syncSoon(this, 1)
     }
 
     override fun onDestroy() {
+        Cloud.listener = null
         tts?.shutdown()
         web.destroy()
         super.onDestroy()
@@ -120,7 +124,7 @@ class MainActivity : Activity() {
                 ok = false; if (requestCode == REQ_EXPORT) "No se pudo guardar la copia." else "No se pudo leer la copia."
             }
             runOnUiThread {
-                if (requestCode == REQ_IMPORT && ok) WidgetUpdater.refresh(this, force = true)
+                if (requestCode == REQ_IMPORT && ok) { WidgetUpdater.refresh(this, force = true); Cloud.syncSoon(this) }
                 backupDone(msg, ok, imported = requestCode == REQ_IMPORT && ok)
             }
         }.start()
@@ -128,6 +132,10 @@ class MainActivity : Activity() {
 
     private fun backupDone(msg: String, ok: Boolean, imported: Boolean = false) {
         if (pageReady) js("window.onBackup && window.onBackup(${org.json.JSONObject.quote(msg)}, $ok, $imported)")
+    }
+
+    private fun cloudChanged(changed: Boolean) {
+        if (pageReady) js("window.onCloud && window.onCloud(${org.json.JSONObject.quote(Cloud.stateJson(this))}, $changed)")
     }
 
     private fun js(code: String) {
@@ -221,6 +229,26 @@ class MainActivity : Activity() {
             val i = Intent(Intent.ACTION_OPEN_DOCUMENT).addCategory(Intent.CATEGORY_OPENABLE).setType("*/*")
             try { @Suppress("DEPRECATION") startActivityForResult(i, REQ_IMPORT) } catch (e: Exception) { backupDone("No hay ninguna app para abrir archivos.", false) }
         }
+
+        /* ---------- Cuenta y nube (pantalla provisional en Historial) ---------- */
+        @JavascriptInterface
+        fun cloudState(): String = Cloud.stateJson(this@MainActivity)
+
+        @JavascriptInterface
+        fun cloudSendCode(email: String) = Cloud.sendCode(this@MainActivity, email) { msg, ok ->
+            if (pageReady) js("window.onCloudMsg && window.onCloudMsg(${org.json.JSONObject.quote(msg)}, $ok, 'code')")
+        }
+
+        @JavascriptInterface
+        fun cloudVerify(email: String, code: String) = Cloud.verify(this@MainActivity, email, code) { msg, ok ->
+            if (pageReady) js("window.onCloudMsg && window.onCloudMsg(${org.json.JSONObject.quote(msg)}, $ok, 'verify')")
+        }
+
+        @JavascriptInterface
+        fun cloudSync() = Cloud.syncNow(this@MainActivity)
+
+        @JavascriptInterface
+        fun cloudSignOut() = Cloud.signOut(this@MainActivity) { cloudChanged(false) }
 
         @JavascriptInterface
         fun stats(): String {

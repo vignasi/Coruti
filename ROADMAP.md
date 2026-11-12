@@ -129,16 +129,29 @@ Después: P1 Pulso · P2 Planes por objetivo · P3 Peso y medidas · P4 Carreras
 
 ### Bloque B · Base técnica
 
-#### B1 · Cuentas y datos en la nube (Supabase) — en paralelo con D1 y D2
-- [ ] **Tú, antes:** crear el proyecto en supabase.com (gratis) y pasar la URL y la clave pública (`anon`)
-- [ ] Modelo de datos pensado para todo el plan: personas (perfil, objetivo, peso y medidas), ejercicios, sesiones y series,
-  favoritas, planes y días del plan, conexiones (Strava, Polar, Claude), con seguridad por persona (RLS)
-- [ ] Inicio de sesión con email (enlace mágico); sin cuenta se sigue usando solo en el móvil
-- [ ] Al entrar por primera vez se sube lo que hay en el móvil; después se sincroniza al terminar cada sesión y al abrir la app
-- [ ] Edge Function base para guardar secretos (Strava, Polar, IA). Ninguna clave dentro del APK
-- [ ] La pantalla de entrar es provisional y sencilla; la buena llega con C1
-- [ ] Hecho cuando: con otro móvil, o tras reinstalar, entras y aparece todo; y tu mujer con su cuenta ve solo lo suyo
-- Ojo: el plan gratuito pausa el proyecto tras ~1 semana sin uso; se reactiva desde la web y no se pierden datos
+#### B1 · Cuentas y datos en la nube (Supabase) ✅ (en la rama `claude/stoic-sagan-h759u8`; falta probar en el móvil)
+- [x] **Tú, antes:** crear el proyecto en supabase.com (gratis) y pasar la URL y la clave pública
+- [x] Modelo de datos pensado para todo el plan (`supabase/migrations/`): personas (perfil, objetivo), peso y medidas,
+  ejercicios propios, sesiones y series, favoritas, planes y días del plan, conexiones (Strava, Polar, Claude) y sus tokens
+  aparte (solo para Edge Functions), con seguridad por persona (RLS). Probado en un Postgres local (ver `docs/supabase.md`)
+- [x] Inicio de sesión con email y **código de 6 cifras** (decidido en vez del enlace mágico: funciona aunque leas el correo
+  en el ordenador y no necesita enlaces de vuelta a la app); registro abierto; sin cuenta se sigue usando solo en el móvil
+- [x] Al entrar por primera vez se sube lo que hay en el móvil (en un móvil nuevo, se baja todo); después se sincroniza
+  al terminar cada sesión (app y widget), al poner «cómo te ha ido», al importar una copia y al abrir la app.
+  Sin librerías nuevas en el APK (`Cloud.kt`, lógica con pruebas en `SyncLogic.kt` / `SyncLogicTest`)
+- [x] Salir deja los datos en el móvil. Si entra otra cuenta, lo del móvil se cambia por lo de esa cuenta,
+  y no deja hacerlo si queda algo de la anterior sin subir
+- [x] La pantalla de entrar es provisional: bloque «Cuenta» en Historial; la buena llega con C1
+- [x] GitHub Actions: con el repo privado, el APK de `main` sigue en Releases (solo con acceso); las ramas `claude/…`
+  compilan, pasan las pruebas y dejan el APK como artefacto del run
+- Decidido: la Edge Function para secretos pasa a S1, cuando haya un secreto real (Strava) y algo que la use.
+  La tabla `connection_secrets` ya está lista y la app no puede leerla
+- [ ] **Tú:** en Supabase, pegar la migración en SQL Editor y cambiar las plantillas de email para que traigan el código
+  (pasos en `docs/supabase.md`)
+- [ ] **Tú:** probar el APK de la rama (ver «Cómo probarlo»), fusionar la rama en `main` y comprobar que «Compilar APK» acaba en verde
+- [ ] **Tú:** Hecho cuando: con otro móvil, o tras reinstalar, entras y aparece todo; y tu mujer con su cuenta ve solo lo suyo
+- Ojo: el plan gratuito pausa el proyecto tras ~1 semana sin uso; se reactiva desde la web y no se pierden datos.
+  El email de Supabase manda pocos códigos por hora: si pides varios seguidos, espera unos minutos
 
 #### B2 · Conector de Claude ⭐ — después de B1, en paralelo con C1 y S1
 - [ ] Servidor MCP propio (en Supabase) que se añade en Claude como conector personalizado, con inicio de sesión de tu cuenta de la app
@@ -148,6 +161,9 @@ Después: P1 Pulso · P2 Planes por objetivo · P3 Peso y medidas · P4 Carreras
   el plan de la semana («lunes fuerza de cuerpo entero, martes descanso…»), favoritas, y apuntar peso o medidas
 - [ ] En la app: «Plan de Claude» en Entrenar, y cada sesión que crea Claude lista para empezar con un toque
 - [ ] Hecho cuando: en una conversación le pides a Claude la sesión de hoy y aparece en la app sin tocar nada más
+- Ya preparado en B1: tablas `plans` y `plan_days` (con la sesión lista para empezar en `workout`), `body_measurements`,
+  `profiles` y `connections`. Lo que Claude cambie en la nube llega a la app en la siguiente sincronización
+  (favoritas y sesiones ya se bajan; los planes, cuando la app sepa mostrarlos)
 - Necesita una suscripción de Claude que permita conectores personalizados. Sin ella, la app funciona igual con sus propios planes (P2)
 
 ### Bloque C · La app nueva
@@ -167,6 +183,7 @@ Después: P1 Pulso · P2 Planes por objetivo · P3 Peso y medidas · P4 Carreras
   3) si no, confirmar que la API AccessLink de Polar da el archivo FIT con el pulso y que Strava muestra las series de un FIT subido por API.
   Decidir el camino contigo
 - [ ] **Tú, antes:** registrar una app en strava.com/settings/api y otra en Polar AccessLink (gratis); los secretos, en Supabase
+- [ ] Edge Function base para guardar secretos (pasada desde B1): tokens en `connection_secrets`, ninguna clave en el APK
 - [ ] Conectar Strava y Polar una vez; tabla de cada ejercicio del catálogo a su ejercicio FIT
 - [ ] Subir cada sesión con ejercicios, pulso, esfuerzo y cómo te has sentido, y un título claro; botón «Enviar a Strava»
   en las que no se hayan subido; pendientes, reintentos y aviso de duplicado

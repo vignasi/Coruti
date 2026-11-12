@@ -14,6 +14,7 @@ App Android personal con la rutina diaria de core y pelvis neutra y un widget pa
 
 - **Historial:** cada sesión (rutina o sueltos, desde la app o el widget) se guarda con la hora de inicio y fin de cada serie, las repeticiones o segundos, los kilos y la banda. Lista por días, detalle de cada sesión y, por ejercicio, la última vez y la mejor. Las sesiones paradas a mitad salen como «Incompleta».
 - **Copia de seguridad:** en Historial, «Exportar» guarda todo (historial, favoritas, bandas, pesos, ajustes y racha) en un archivo JSON donde elijas (Drive, Descargas…); «Importar» lo combina con lo que haya en el móvil, sin duplicar ni borrar.
+- **Cuenta y nube (opcional):** en Historial → Cuenta entras con tu email (te llega un código, sin contraseña). Se guarda todo en Supabase (historial, favoritas, bandas, pesos, ajustes y racha) y se sincroniza al terminar cada sesión y al abrir la app; en otro móvil o tras reinstalar, entras y aparece todo. Cada persona ve solo lo suyo. Sin cuenta, todo sigue solo en el móvil. Puesta en marcha: [`docs/supabase.md`](docs/supabase.md).
 
 ## Datos
 
@@ -25,6 +26,9 @@ ejercicio; lo usa solo la pantalla de ejercicios sueltos (`buildFree` en `index.
 
 ## Descargar
 
+El repositorio es privado: el APK solo se descarga entrando en GitHub con una cuenta con acceso.
+
 Última versión: [rutina-core.apk](../../releases/latest/download/rutina-core.apk)
 
-Cada cambio que se sube a `main` compila un APK nuevo y lo publica en *Releases*. Se instala encima del anterior sin perder la racha.
+Cada cambio que se sube a `main` compila un APK nuevo con GitHub Actions y lo publica en *Releases*. Se instala encima del anterior sin perder la racha.
+Las ramas de trabajo (`claude/…`) también compilan y pasan las pruebas, y dejan el APK en el run de *Actions* (apartado *Artifacts*, dentro de un .zip) para probarlo antes de fusionar.
