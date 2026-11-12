@@ -41,3 +41,9 @@ android {
     }
     kotlinOptions { jvmTarget = "17" }
 }
+
+dependencies {
+    // Solo para las pruebas en el ordenador (gradle testReleaseUnitTest); no entran en el APK
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("org.json:json:20240303")
+}

@@ -11,9 +11,17 @@ object Workout {
     var rounds = 3
     var day = ""
     var count = true
+    /** Sesión de ejercicios sueltos (la favorita del widget): cuenta para la racha sin tocar la alternancia A/B. */
+    var free = false
+    /** «Serie» en las series normales de ejercicios sueltos; «Ronda» en el resto. */
+    var roundWord = "Ronda"
+    /** Lo que se va apuntando para el historial. */
+    var rec: SessionRecorder? = null
 
-    fun start(plan: List<Step>, cfg: Config, dayType: String) {
-        rounds = cfg.rounds
+    fun start(plan: List<Step>, cfg: Config, dayType: String, freeRounds: Int = 0, series: Boolean = false) {
+        free = freeRounds > 0
+        roundWord = if (series) "Serie" else "Ronda"
+        rounds = if (free) freeRounds else cfg.rounds
         count = cfg.count
         day = dayType
         steps = plan
@@ -25,7 +33,7 @@ object Workout {
     }
 
     fun reset() {
-        steps = emptyList(); idx = 0; leftMs = 0; running = false; active = false; done = false
+        rec = null; steps = emptyList(); idx = 0; leftMs = 0; running = false; active = false; done = false
     }
 
     fun current(): Step? = steps.getOrNull(idx)

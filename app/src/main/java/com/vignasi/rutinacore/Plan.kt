@@ -90,7 +90,9 @@ class Step(
     val reps: Int = 0,
     val hold: Boolean = false,
     val kg: DoubleArray? = null,
-    val mod: String? = null
+    val mod: String? = null,
+    /** Lado del cuerpo («Lado derecho»…) o "" si no va por lados. */
+    val side: String = ""
 )
 
 class Resolved(val v: Variant, val d: Dose, val ex: String)
@@ -165,7 +167,7 @@ private fun expand(data: Rutina, x: Resolved, mod: Module?, f: Double, r: Int, o
         out.add(Step(x.ex, "Prepárate", ex.name + (if (sub.isNotEmpty()) " · $sub" else ""), data.prep, r,
             prep = true, rest = false, say = "Prepárate. $say", kg = d.kg, mod = mod?.key))
         out.add(Step(x.ex, ex.name, sub, s, r, prep = false, rest = false, say = say,
-            reps = reps, hold = ex.hold, kg = d.kg, mod = mod?.key))
+            reps = reps, hold = ex.hold, kg = d.kg, mod = mod?.key, side = side))
     }
 }
 

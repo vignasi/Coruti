@@ -33,19 +33,42 @@ Cada conversación nueva parte de `main`; si no se fusiona, empieza sin los camb
 
 ## Fases
 
-### Fase 0 · Ejercicios sueltos, favoritas y bandas ✅ (hecho, falta fusionar)
+### Fase 0 · Ejercicios sueltos, favoritas y bandas ✅
 - [x] Remo inclinado y curl de bíceps con banda; catálogo con zona, material y repeticiones
 - [x] Pantalla «Ejercicios sueltos», modo alternado (superserie) y favoritas
 - [x] Nombre de cada banda y banda recordada por ejercicio
 - [x] Solo dos materiales de banda: bandas grandes y mini banda
-- [ ] **Tú:** fusionar la rama `ccr-ca344ef2-pok0db` en `main` y comprobar que «Compilar APK» acaba en verde
+- [x] **Tú:** fusionar la rama `ccr-ca344ef2-pok0db` en `main` y comprobar que «Compilar APK» acaba en verde (versión 1.0.8)
 
-### Fase 1 · Historial de sesiones y copia de seguridad
+### Fase 1 · Historial de sesiones y copia de seguridad ✅ (hecho, falta fusionar y probar en el móvil)
 Base de todo lo demás (Strava, nube, planes). Cada serie se guarda con su hora de inicio y fin, para poder subirla a Strava.
-- [ ] Guardar cada sesión terminada (rutina o sueltos): fecha y hora de inicio y fin, tipo, y por cada serie el ejercicio, las repeticiones o segundos, la banda y los kilos
-- [ ] Pantalla «Historial»: lista por días y detalle de cada sesión; por ejercicio, la última vez y la mejor
-- [ ] Exportar todo (historial, favoritas, bandas, configuración, racha) a un archivo JSON e importarlo
-- [ ] Hecho cuando: una sesión aparece en el historial al terminar, y exportar → desinstalar → importar lo recupera todo
+- [x] Guardar cada sesión terminada (rutina o sueltos, desde la app o el widget): fecha y hora de inicio y fin, tipo, y por cada serie
+  el ejercicio, el lado, la ronda, las repeticiones o segundos (lo hecho y lo previsto), la banda y los kilos.
+  Archivo `history.json` en el móvil (`History.kt`); la forma de cada sesión está explicada al principio de ese archivo
+- [x] Las sesiones paradas a mitad (Reiniciar o Parar en el widget) se guardan como «Incompleta» si se hizo al menos una serie;
+  no cuentan para la racha ni para la alternancia A/B. Las series saltadas guardan solo lo hecho; si no llegó a 1 s, no se apuntan
+- [x] También se guarda en la sesión cómo te ha ido cada módulo (fácil / justo / demasiado), para la Fase 9
+- [x] Pantalla «Historial» (tercera pestaña): lista por días y detalle de cada sesión; por ejercicio, la última vez y la mejor
+  (la de más kilos; sin kilos, la de más repeticiones o segundos)
+- [x] Exportar todo (historial, favoritas, bandas, pesos, configuración, racha) a un archivo JSON e importarlo.
+  Importar **combina**: no duplica sesiones ni borra lo que ya hay. Pruebas en `app/src/test` (`gradle testReleaseUnitTest`)
+- Decidido: el historial empieza vacío (los días de la racha anteriores no tienen detalle y no se muestran).
+  Si cierras la app del todo a mitad de una sesión, esa sesión no se guarda
+- [ ] **Tú:** fusionar la rama `claude/coruti-phase-1-history-backup-x0n7e3` en `main` y comprobar que «Compilar APK» acaba en verde
+- [ ] **Tú:** Hecho cuando: una sesión aparece en el historial al terminar (desde la app y desde el widget),
+  y exportar → desinstalar → importar lo recupera todo
+
+### Fase 1b · Favorita en el widget ✅ (hecho, va en la misma rama que la Fase 1)
+Para cuando la mayoría de ejercicios los haces con otra app y aquí solo quieres un par de ejercicios sueltos.
+- [x] En la app, ★ en una favorita: es la que sale en el widget (solo una; otro toque la quita). Se guarda en la copia de seguridad
+- [x] Widget grande: fila «Rutina / ★ favorita» para cambiar con un toque sin abrir la app (solo sale si hay una favorita marcada).
+  Con la favorita: Empezar la hace, − / + cambian sus rondas, y se ocultan módulos, A/B e intensidad
+- [x] Widget pequeño: Empezar hace lo elegido en el grande
+- [x] Desde el widget, la favorita se guarda en el historial como «Ejercicios sueltos» y cuenta para la racha sin cambiar la alternancia A/B
+- [x] El widget monta los ejercicios sueltos en Kotlin igual que la app (`Free.kt`; `FreePlanTest` deja 400 favoritas al azar
+  para compararlas con `buildFree` de `index.html`: iguales)
+- [ ] **Tú:** Hecho cuando: marcas ★ en una favorita, el widget la muestra, Empezar la hace con sus ejercicios, rondas y descanso,
+  y aparece en el historial
 
 ### Fase 2 · Supabase: datos en la nube y caja fuerte de claves
 - [ ] **Tú, antes:** crear el proyecto en supabase.com (gratis) y pasar la URL y la clave pública (`anon`)

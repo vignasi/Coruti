@@ -18,6 +18,15 @@ class RutinaWidget : AppWidgetProvider() {
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
         if (Workout.active) return // durante la sesión no se cambia la configuración
+        val fav = Store.widgetSource(context) == Store.SRC_FAV
+        when (intent.action) {
+            ACTION_SRC -> { Store.setWidgetSource(context, intent.getStringExtra(EXTRA_SRC) ?: return); WidgetUpdater.refresh(context, force = true); return }
+            ACTION_PLUS, ACTION_MINUS -> if (fav) {
+                Store.addWidgetFavRounds(context, if (intent.action == ACTION_PLUS) 1 else -1)
+                WidgetUpdater.refresh(context, force = true)
+                return
+            }
+        }
         val cfg = Store.config(context)
         when (intent.action) {
             ACTION_PLUS -> cfg.rounds = (cfg.rounds + 1).coerceAtMost(6)
@@ -42,6 +51,8 @@ class RutinaWidget : AppWidgetProvider() {
         const val ACTION_AUTO = "com.vignasi.rutinacore.AUTO"
         const val ACTION_MOD = "com.vignasi.rutinacore.MODULE"
         const val EXTRA_MOD = "m"
+        const val ACTION_SRC = "com.vignasi.rutinacore.SOURCE"
+        const val EXTRA_SRC = "src"
     }
 }
 
@@ -65,9 +76,10 @@ object WidgetUpdater {
         return PendingIntent.getForegroundService(ctx, req, i, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
     }
 
-    private fun bc(ctx: Context, req: Int, action: String, mod: String? = null): PendingIntent {
+    private fun bc(ctx: Context, req: Int, action: String, mod: String? = null, src: String? = null): PendingIntent {
         val i = Intent(ctx, RutinaWidget::class.java).setAction(action)
         if (mod != null) i.putExtra(RutinaWidget.EXTRA_MOD, mod)
+        if (src != null) i.putExtra(RutinaWidget.EXTRA_SRC, src)
         return PendingIntent.getBroadcast(ctx, req, i, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
     }
 
@@ -150,7 +162,7 @@ object WidgetUpdater {
             }
             rv.setTextViewText(R.id.ex_cap, cap)
             rv.setTextViewText(R.id.time, fmt(Workout.leftSec()))
-            var info = "Ronda ${st.r}/${Workout.rounds}"
+            var info = "${Workout.roundWord} ${st.r}/${Workout.rounds}"
             if (live && st.reps > 0) info += " · ${ex.unit} ${repNow(data, st)}/${st.reps}"
             else if (live && st.hold) info += " · quieto"
             rv.setTextViewText(R.id.info, info)
@@ -158,9 +170,15 @@ object WidgetUpdater {
             rv.setTextViewText(R.id.btn_play, if (Workout.running) "⏸  Pausa" else "▶  Seguir")
             rv.setViewVisibility(R.id.rounds_box, View.GONE)
             rv.setViewVisibility(R.id.config_box, View.GONE)
+            rv.setViewVisibility(R.id.src_box, View.GONE)
             rv.setViewVisibility(R.id.btn_skip, View.VISIBLE)
             rv.setViewVisibility(R.id.btn_stop, View.VISIBLE)
+        } else if (Store.widgetSource(ctx) == Store.SRC_FAV && Store.widgetFav(ctx) != null) {
+            idleFav(ctx, data, rv, Store.widgetFav(ctx)!!)
         } else {
+            srcRow(ctx, rv, fav = false)
+            rv.setViewVisibility(R.id.chip_auto, View.VISIBLE)
+            rv.setViewVisibility(R.id.chip_int, View.VISIBLE)
             val cfg = Store.config(ctx)
             val mods = activeModules(data, cfg, Store.lastDay(ctx))
             val steps = Store.plan(ctx, cfg)
@@ -208,6 +226,45 @@ object WidgetUpdater {
         return rv
     }
 
+    /** Fila «Rutina / ★ favorita»: solo si hay una favorita marcada en la app. */
+    private fun srcRow(ctx: Context, rv: RemoteViews, fav: Boolean) {
+        val f = Store.widgetFav(ctx)
+        if (f == null) { rv.setViewVisibility(R.id.src_box, View.GONE); return }
+        rv.setViewVisibility(R.id.src_box, View.VISIBLE)
+        chip(rv, R.id.chip_src_rut, "Rutina", !fav)
+        chip(rv, R.id.chip_src_fav, "★ " + f.name, fav)
+        rv.setContentDescription(R.id.chip_src_rut, "Rutina completa" + if (!fav) ": elegida" else "")
+        rv.setContentDescription(R.id.chip_src_fav, "Favorita ${f.name}" + if (fav) ": elegida" else "")
+        rv.setOnClickPendingIntent(R.id.chip_src_rut, bc(ctx, 57, RutinaWidget.ACTION_SRC, src = Store.SRC_RUTINA))
+        rv.setOnClickPendingIntent(R.id.chip_src_fav, bc(ctx, 58, RutinaWidget.ACTION_SRC, src = Store.SRC_FAV))
+    }
+
+    /** Widget parado con la favorita elegida: sus ejercicios, duración y rondas (− / + cambian las de la favorita). */
+    private fun idleFav(ctx: Context, data: Rutina, rv: RemoteViews, f: FreeSession) {
+        srcRow(ctx, rv, fav = true)
+        val steps = buildFree(data, f) { Store.bandOf(ctx, it) }
+        if (Workout.done) {
+            rv.setTextViewText(R.id.ex_name, "¡Terminado!")
+            rv.setTextViewText(R.id.ex_cap, "Apúntala en Polar como «Entrenamiento en circuito»")
+        } else {
+            rv.setTextViewText(R.id.ex_name, f.sel.joinToString(" + ") { data.ex(it.k).name })
+            rv.setTextViewText(R.id.ex_cap, f.sel.joinToString(" / ") { if (FreeSession.isHold(data, it.k)) "${it.n} s" else "${it.n} reps" } + " · descanso ${f.rest} s")
+        }
+        rv.setTextViewText(R.id.time, fmt(totalSeconds(steps)))
+        val kind = if (f.isAlt) (if (f.rounds == 1) "ronda alternada" else "rondas alternadas") else (if (f.rounds == 1) "serie" else "series")
+        rv.setTextViewText(R.id.info, "${f.rounds} $kind")
+        rv.setProgressBar(R.id.progress, 100, if (Workout.done) 100 else 0, false)
+        rv.setTextViewText(R.id.btn_play, if (Workout.done) "▶  Otra vez" else "▶  Empezar")
+        rv.setTextViewText(R.id.rounds_lbl, "${f.rounds}")
+        rv.setContentDescription(R.id.rounds_lbl, "${f.rounds} ${if (f.isAlt) "rondas" else "series"}")
+        rv.setViewVisibility(R.id.rounds_box, View.VISIBLE)
+        rv.setViewVisibility(R.id.chip_auto, View.GONE)
+        rv.setViewVisibility(R.id.chip_int, View.GONE)
+        rv.setViewVisibility(R.id.config_box, View.GONE)
+        rv.setViewVisibility(R.id.btn_skip, View.GONE)
+        rv.setViewVisibility(R.id.btn_stop, View.GONE)
+    }
+
     private fun chip(rv: RemoteViews, id: Int, text: String, on: Boolean) {
         rv.setTextViewText(id, text)
         rv.setInt(id, "setBackgroundResource", if (on) R.drawable.widget_btn else R.drawable.widget_btn_ghost)
@@ -220,11 +277,18 @@ object WidgetUpdater {
         if (Workout.active && st != null) {
             val name = if (st.prep) "Prepárate: " + data.ex(st.k).name else st.name
             rv.setTextViewText(R.id.mini_title, name)
-            var sub = "${fmt(Workout.leftSec())} · ronda ${st.r}/${Workout.rounds}"
+            var sub = "${fmt(Workout.leftSec())} · ${Workout.roundWord.lowercase()} ${st.r}/${Workout.rounds}"
             if (!st.prep && !st.rest && st.reps > 0) sub += " · ${repNow(data, st)}/${st.reps}"
             rv.setTextViewText(R.id.mini_sub, sub)
             rv.setTextViewText(R.id.mini_play, if (Workout.running) "⏸" else "▶")
             rv.setContentDescription(R.id.mini_play, if (Workout.running) "Pausa" else "Seguir")
+        } else if (Store.widgetSource(ctx) == Store.SRC_FAV && Store.widgetFav(ctx) != null) {
+            val f = Store.widgetFav(ctx)!!
+            val total = totalSeconds(buildFree(data, f) { Store.bandOf(ctx, it) })
+            rv.setTextViewText(R.id.mini_title, if (Workout.done) "¡Terminado!" else "★ ${f.name} · ${fmt(total)}")
+            rv.setTextViewText(R.id.mini_sub, "${f.rounds} ${if (f.isAlt) "rondas" else "series"} · ${statusLine(ctx)}")
+            rv.setTextViewText(R.id.mini_play, "▶")
+            rv.setContentDescription(R.id.mini_play, "Empezar ${f.name}")
         } else {
             val cfg = Store.config(ctx)
             val total = totalSeconds(Store.plan(ctx, cfg))
