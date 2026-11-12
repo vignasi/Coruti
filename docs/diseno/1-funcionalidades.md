@@ -1,7 +1,7 @@
 # Rediseño · 1. Funcionalidades
 
 Qué tiene que hacer Rutina core y qué necesitas en cada momento. **No describe el diseño actual**: es la base
-para diseñar las pantallas desde cero (Fase 1c del ROADMAP). Si algo falta o sobra, se corrige aquí antes de dibujar nada.
+para diseñar las pantallas desde cero (paso D2 del ROADMAP; el diseño está en `2-sistema-de-diseno.md` y `prototipo/`). Si algo falta o sobra, se corrige aquí antes de dibujar nada.
 
 ## Para quién y en qué situación
 
@@ -28,10 +28,13 @@ para diseñar las pantallas desde cero (Fase 1c del ROADMAP). Si algo falta o so
 1. **Qué hago ahora: el movimiento es lo principal de la pantalla.** Se ve a una **persona** haciendo el ejercicio
    (no un muñeco de palitos), en bucle, con el paso actual («Sube las manos a los hombros; los codos no se mueven»)
    y el nombre del ejercicio. Tiene que entenderse a 1–2 m.
-2. **Cuánto falta:** tiempo de la serie (lo más grande de la pantalla), repetición actual de cuántas,
-   ronda o serie de cuántas, barra de progreso.
+2. **Cuánto:** las repeticiones o los segundos, en grande debajo de la figura. Las repeticiones no tienen tiempo fijo:
+   la app marca el ritmo como guía pero **no pasa al siguiente hasta que tocas la pantalla** (cada uno tarda lo suyo y a veces
+   hay que parar 2 s). Los segundos y descansos sí cuentan atrás y pasan solos. Progreso en rayas: un paquete por ronda,
+   una raya por ejercicio y una para el descanso.
 3. **Lo que viene:** «Prepárate» antes de cada ejercicio con su nombre; siguiente ejercicio y tiempo total que queda.
-4. **Controles:** pausa / seguir, saltar, parar. Grandes y difíciles de tocar sin querer.
+4. **Controles:** toda la pantalla es «hecho, siguiente»; deslizar a la derecha vuelve al anterior. Un botón pequeño de pausa
+   con Seguir, Ejercicio anterior y Parar (con confirmación). Sin botones de parar ni saltar a la vista.
 5. **Ajustes en marcha** (solo si el ejercicio los usa): kilos usados (± medio kilo) y qué banda llevas.
    Se recuerdan para la próxima vez.
 6. Sonido: tono agudo al subir, grave al bajar, cuenta en voz alta opcional, «mitad» y pitidos finales.
@@ -89,7 +92,7 @@ Elegir objetivo (fuerza, músculo, cardio, movilidad), semanas y días; el plan 
 «fácil / justo / demasiado». Cada vez que repites, una sesión distinta.
 
 ### J. Perfil y cuentas
-1. Entrar con email (enlace mágico) o seguir sin cuenta, solo en el móvil.
+1. Entrar con email y un código de 6 cifras (decidido en B1) o seguir sin cuenta, solo en el móvil.
 2. Perfil: nombre, objetivo, peso y medidas (a mano, archivo de la báscula o desde Claude) con su gráfica.
 3. Varias personas (tú, tu mujer…), cada una con sus datos.
 
