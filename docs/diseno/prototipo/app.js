@@ -132,7 +132,7 @@ const cab = (titulo, atras) => `<header class="cabecera"><button class="icono-bt
 const origen = o => `<span class="origen">${ico(ORIGEN[o][0])}${ORIGEN[o][1]}</span>`;
 /* Figura 3D real (D1): figura-proto.js dibuja en el lienzo. modo: mini (quieta, postura clave), grande (en bucle, con etiquetas),
    libre (reproductor, a toda pantalla), sig (siguiente ejercicio, sin etiquetas). g fuerza hombre (m) o mujer (f). */
-const fig = (e, modo = 'mini', g = '') => `<div class="fig fig-${modo}" role="img" aria-label="${modo === 'mini' ? 'Figura' : 'Movimiento'} de ${esc(e.name)}"><canvas data-fig="${e.id}" data-modo="${modo}" ${g ? `data-g="${g}"` : ''} width="180" height="112"></canvas><span class="fig-txt">Cargando la figura…</span><span class="fig-falta">${esc(e.name)}<br>(figura pendiente: no está en rutina.json)</span></div>`;
+const fig = (e, modo = 'mini', g = '') => `<div class="fig fig-${modo}" ${modo === 'mini' ? 'aria-hidden="true"' : `role="img" aria-label="Movimiento de ${esc(e.name)}"`}><canvas data-fig="${e.id}" data-modo="${modo}" ${g ? `data-g="${g}"` : ''} width="180" height="112"></canvas><span class="fig-txt">Cargando la figura…</span><span class="fig-falta">${esc(e.name)}<br>(figura pendiente: no está en rutina.json)</span></div>`;
 window.FIG_GENERO = () => (S.fig.sexo === 'mujer' ? 'f' : 'm');
 const paso = (id, val, uni = '', etiqueta = '') => `<div class="paso" role="group" aria-label="${etiqueta}"><button data-act="menos" data-k="${id}" aria-label="Menos">${ico('menos')}</button><output aria-live="polite">${val}${uni}</output><button data-act="mas" data-k="${id}" aria-label="Más">${ico('mas')}</button></div>`;
 const inter = (id, on, etiqueta) => `<input type="checkbox" role="switch" class="interruptor" id="${id}" data-act="sw" data-k="${id}" ${on ? 'checked' : ''} aria-label="${etiqueta}">`;
@@ -155,7 +155,7 @@ P.mapa = { proto: true, render: () => `
       ['Historial', [['historial', 'Sesiones por días, Strava y pulso'], ['historial-vacio', 'Sin sesiones todavía'], ['detalle', 'Detalle de una sesión'], ['marcas', 'Por ejercicio: última y mejor']]],
       ['Tú', [['tu', 'Perfil y ajustes'], ['entrar', 'Entrar con email'], ['peso', 'Peso y medidas'], ['material', 'Material'], ['bandas', 'Mis bandas'], ['sonido', 'Sonido y voz'], ['figura', 'Hombre o mujer'], ['personalizar', 'Más adelante'], ['widget-conf', 'Qué hace el widget'], ['copia', 'Copia de seguridad']]],
       ['Conexiones', [['conexiones', 'Claude, Strava y Polar'], ['claude', 'Conectar Claude'], ['strava', 'Strava'], ['polar', 'Polar y pulso'], ['pulso', 'Probar pulso']]],
-      ['Fuera de la app', [['widgets', 'Widget grande y pequeño'], ['widget-fondo', 'Fondo: dos opciones con las imágenes reales']]],
+      ['Fuera de la app', [['widgets', 'Widget grande y pequeño'], ['widget-fondo', 'Fondo: A elegida (frente a B y al de hoy)']]],
       ['Referencia', [['sistema', 'Sistema de diseño']]],
     ].map(([g, l]) => `<section class="mapa-grupo"><h2 class="etiqueta">${g}</h2><div class="lista">${l.map(([id, t]) => item({ t: P[id].titulo || t, m: P[id].titulo ? t : '', go: id })).join('')}</div></section>`).join('')}
   </div>` };
@@ -555,7 +555,7 @@ P.conexiones = { titulo: 'Conexiones', render: () => { const c = S.conectado; re
   <div class="pantalla"><div class="lista">
     ${item({ t: 'Claude', m: c.claude ? 'Conectado · leyó tu historial hoy a las 8:10' : 'Sin conectar', go: 'claude', icono: 'chispa' })}
     ${item({ t: 'Strava', m: c.strava ? 'Conectado · 1 sesión pendiente' : 'Sin conectar', go: 'strava', icono: 'subir' })}
-    ${item({ t: 'Polar', m: c.polar ? 'Conectado' : 'Sin conectar · pulso en directo disponible', go: 'polar', icono: 'reloj2' })}
+    ${item({ t: 'Polar', m: c.polar ? 'Conectado' : 'Sin conectar · el pulso en directo funciona sin cuenta', go: 'polar', icono: 'reloj2' })}
   </div></div>`; } };
 
 P.claude = { titulo: 'Conectar Claude', render: () => `${cab('Claude', 'conexiones')}
@@ -623,7 +623,7 @@ const wGrandeMarcha = (op = 'a', tema = '', cls = '') => `<div class="w w-grande
 const wPeqMarcha = (op = 'a', tema = '', cls = '') => `<div class="w w-peq ${cls}" aria-label="Widget pequeño durante la sesión">${wImg('remo_incl_banda', op, tema)}<span class="fila" style="justify-content:space-between;gap:var(--e2)"><span class="meta w-corto">Remo inclinado</span><span class="w-tiempo">12</span></span><button class="w-btn">${ico('check')}Hecho</button></div>`;
 P.widgets = { sinPestanas: true, titulo: 'Widget grande y pequeño', render: () => `${cab('Widgets', 'mapa')}
   <div class="inicio">
-    <p class="meta">Con el fondo propuesto (opción A: el de la app, claro u oscuro). Cambia el tema arriba y hombre o mujer en Tú → Figura.</p>
+    <p class="meta">Con el fondo elegido (A: el de la app, claro u oscuro, según el tema del móvil). Cambia el tema arriba y hombre o mujer en Tú → Figura.</p>
     <span class="etiqueta">Grande · antes de empezar</span>
     <div class="w w-grande" aria-label="Widget grande">
       <div class="segmentos" role="group" aria-label="Qué empezar" style="background:var(--capa-2)"><button aria-pressed="true">Hoy</button><button aria-pressed="false">★ Favorita</button><button aria-pressed="false">Core</button></div>
@@ -645,11 +645,11 @@ P['widget-fondo'] = { sinPestanas: true, titulo: 'Fondo del widget: dos opciones
     <p>El fondo de hoy (<code>#1E6B74</code>) es el color de la camiseta: la figura se pierde, sobre todo ella. Dos salidas, con las imágenes reales:</p>
     ${seg('fig.sexo', ['Hombre', 'Mujer'], S.fig.sexo === 'hombre' ? 'Hombre' : 'Mujer', 'Figura')}
     <section class="seccion"><h2>Hoy: el problema</h2>${wGrandeMarcha('a', 'claro', 'w-b')}</section>
-    <section class="seccion"><h2>A · Fondo de la app, claro u oscuro <span class="estado bien">${ico('check')}Propuesta</span></h2>
+    <section class="seccion"><h2>A · Fondo de la app, claro u oscuro <span class="estado bien">${ico('check')}Elegida</span></h2>
       <div class="pila forzar-claro" style="background:var(--fondo);padding:var(--e3);border-radius:var(--r2)">${wGrandeMarcha('a', 'claro')}<div class="fila" style="align-items:flex-start;gap:var(--e3)">${wPeqMarcha('a', 'claro')}</div></div>
       <div class="pila forzar-oscuro" style="background:var(--fondo);padding:var(--e3);border-radius:var(--r2)">${wGrandeMarcha('a', 'oscuro')}<div class="fila" style="align-items:flex-start;gap:var(--e3)">${wPeqMarcha('a', 'oscuro')}</div></div>
       <p class="meta">La camiseta sigue siendo del color de la marca, igual que en la app. Las imágenes de claro y oscuro ya están hechas (D1). Sigue al tema del móvil.</p></section>
-    <section class="seccion"><h2>B · Fondo verde azulado y camiseta coral</h2>
+    <section class="seccion"><h2>B · Fondo verde azulado y camiseta coral <span class="estado neutro">Descartada</span></h2>
       <div class="pila" style="padding:var(--e3);border-radius:var(--r2);background:var(--capa-2)">${wGrandeMarcha('b', '', 'w-b')}<div class="fila" style="align-items:flex-start;gap:var(--e3)">${wPeqMarcha('b', '', 'w-b')}</div></div>
       <p class="meta">El widget conserva el color de hoy. Pero la camiseta coral tendría que ser la de toda la app (si no, la persona cambia de ropa entre la app y el widget), y el coral compite con el ámbar de la zona que trabaja.</p></section>
   </div>` };
