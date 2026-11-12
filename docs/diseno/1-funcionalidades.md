@@ -74,13 +74,40 @@ de una sesión o hacer solos.
 3. Antes de empezar: rondas (− / +) y, en la rutina, módulos, A/B e intensidad.
 4. Widget pequeño: empezar / pausa y lo mínimo (ejercicio, tiempo).
 
-## Lo que viene después (dejar sitio, no diseñarlo todavía)
-- Pulso en directo del Polar y zona (Fase 3) → hueco en el reproductor y en el historial.
-- Enviar a Strava, pendientes y reintentos (Fase 4) → estado por sesión en el historial.
-- Foto de Freeletics → sesión con ejercicios (Fase 5) → entrada desde Entrenar o Historial.
-- Carreras y otras actividades traídas de Strava (Fase 6) → aparecen en el historial.
-- Modos de cardio EMOM, Tabata, AMRAP (Fase 7) → otro tipo de sesión en Entrenar.
-- Coach por voz y planes por objetivo (Fases 8 y 9).
+## También entra en el diseño (aunque se construya más tarde)
+El diseño se hace una vez y completo. Estas pantallas y piezas tienen que existir ya en el prototipo:
+
+### H. Claude como entrenador (conector propio)
+1. En **Entrenar**: «Hoy» con la sesión del día, venga del plan de Claude, de un plan por objetivo o de una favorita.
+2. **Plan de la semana** (calendario): qué toca cada día (fuerza de cuerpo entero, descanso, carrera…), quién lo creó
+   (Claude, un plan por objetivo o tú) y si está hecho.
+3. Sesiones creadas por Claude: listas para empezar con un toque; se ve de dónde vienen y cuándo se cambiaron.
+4. En **Ajustes → Conexiones**: Claude conectado o no, y cómo conectarlo (instrucciones cortas).
+
+### I. Planes por objetivo (sin Claude)
+Elegir objetivo (fuerza, músculo, cardio, movilidad), semanas y días; el plan se va adaptando con el historial y el
+«fácil / justo / demasiado». Cada vez que repites, una sesión distinta.
+
+### J. Perfil y cuentas
+1. Entrar con email (enlace mágico) o seguir sin cuenta, solo en el móvil.
+2. Perfil: nombre, objetivo, peso y medidas (a mano, archivo de la báscula o desde Claude) con su gráfica.
+3. Varias personas (tú, tu mujer…), cada una con sus datos.
+
+### K. Strava y Polar
+1. En cada sesión del historial: subida a Strava (hecha, pendiente, error, duplicado) y botón «Enviar a Strava».
+2. En Ajustes → Conexiones: Strava y Polar conectados o no.
+3. Al terminar una sesión: esfuerzo y cómo te has sentido (se suben a Strava).
+
+### L. Pulso
+1. Pulso grande y zona en el reproductor cuando el reloj está conectado; estado de la conexión discreto.
+2. Pulso medio y máximo por ejercicio en el historial. Pantalla «Probar pulso».
+
+### M. Figura del ejercicio
+Estilo a elegir en Ajustes: muñeco de palos, muñeco redondeado o persona; hombre o mujer.
+Etiquetas de zona («BÍCEPS», «APRIETA EL CULO», «BANDA») solo en la vista grande.
+
+### Más adelante (dejar sitio, sin pantalla propia todavía)
+Modos de cardio EMOM, Tabata y AMRAP; coach por voz; carreras traídas de Strava en el historial.
 
 ## Decisiones tomadas
 - **Personas, no muñecos:** figura humana dibujada con volumen (cuerpo, ropa de deporte, cara sin detalles),
