@@ -70,6 +70,9 @@ class Variant(
 
 class Slot(val variants: List<Variant>)
 
+/** Ficha del catálogo (bloque «catalog» de rutina.json): la usan los ejercicios sueltos. */
+class CatEx(val zone: String, val needs: String?, val reps: Int, val secs: Int, val sides: List<String>?, val kg: DoubleArray?)
+
 class Module(val key: String, val name: String, val day: String, val rotate: Boolean, val slots: List<Slot>)
 
 class Rutina(
@@ -81,8 +84,11 @@ class Rutina(
     val exercises: Map<String, Exercise>,
     val base: List<Slot>,
     val modules: List<Module>,
-    val close: List<Slot>
+    val close: List<Slot>,
+    val catalog: Map<String, CatEx> = emptyMap()
 ) {
+    fun cat(key: String): CatEx? = catalog[key]
+
     fun ex(key: String): Exercise = exercises.getValue(key)
 
     companion object {
@@ -118,8 +124,23 @@ class Rutina(
                         m.optBoolean("rotate", false), objs(m.getJSONArray("slots")).map(::parseSlot)
                     )
                 },
-                close = objs(o.getJSONArray("close")).map(::parseSlot)
+                close = objs(o.getJSONArray("close")).map(::parseSlot),
+                catalog = parseCatalog(o.optJSONObject("catalog")?.optJSONObject("ex"))
             )
+        }
+
+        private fun parseCatalog(o: JSONObject?): Map<String, CatEx> {
+            val m = LinkedHashMap<String, CatEx>()
+            if (o == null) return m
+            for (k in o.keys()) {
+                val c = o.getJSONObject(k)
+                m[k] = CatEx(
+                    c.optString("zone", ""), optStr(c, "needs"), c.optInt("reps", 0), c.optInt("secs", 0),
+                    c.optJSONArray("sides")?.let(::strings),
+                    c.optJSONArray("kg")?.let { a -> DoubleArray(a.length()) { a.getDouble(it) } }
+                )
+            }
+            return m
         }
 
         private fun objs(a: JSONArray): List<JSONObject> = List(a.length()) { a.getJSONObject(it) }

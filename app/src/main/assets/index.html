@@ -1042,7 +1042,7 @@ loadData().then(d=>{
   if(window.__ready) window.__ready();
 }).catch(e=>{console.error(e);$("pname").textContent="No se pudo cargar rutina.json";});
 /* Para las pruebas automáticas */
-window.__t={get steps(){return steps},get idx(){return idx},get left(){return left},get cfg(){return cfg},get fr(){return fr},get bands(){return BANDS},get bandUse(){return BUSE},get mode(){return mode},get rec(){return rec},get view(){return view},renderHist,beepLog,buildPlan,buildFree,activeModules,dayType};
+window.__t={get steps(){return steps},get idx(){return idx},get left(){return left},get cfg(){return cfg},get fr(){return fr},get bands(){return BANDS},get bandUse(){return BUSE},get mode(){return mode},get rec(){return rec},get view(){return view},renderHist,normFree,beepLog,buildPlan,buildFree,activeModules,dayType};
 </script>
 </body>
 </html>
