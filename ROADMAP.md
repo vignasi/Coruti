@@ -70,6 +70,22 @@ Para cuando la mayoría de ejercicios los haces con otra app y aquí solo quiere
 - [ ] **Tú:** Hecho cuando: marcas ★ en una favorita, el widget la muestra, Empezar la hace con sus ejercicios, rondas y descanso,
   y aparece en el historial
 
+### Fase 1c · Rediseño desde cero
+La interfaz actual se hizo a base de añadidos: una sola página de ~33 pantallas, 29 combinaciones de letra en la app
+y 9 tamaños en el widget. No se arregla lo que hay: se diseña de nuevo a partir de lo que tiene que hacer la app,
+con los colores de la marca actual (verde azulado `#1E6B74`, ámbar `#F0B04A`, fondo `#EDF1F0`) pero bien.
+- [ ] 1. **Funcionalidades:** lista de lo que hace la app y lo que necesitas en cada momento, sin mirar el diseño actual. La validas tú
+- [ ] 2. **Sistema de diseño:** escala de letra corta (pocos tamaños), colores, espacios, botones y fichas, en app y widget
+- [ ] 3. **Pantallas:** prototipo navegable en el móvil (página web), pantalla a pantalla. Ideas ya decididas:
+  pestañas abajo «Entrenar · Ejercicios · Historial»; al abrir, tus favoritas con Empezar; reproductor a pantalla completa
+  al entrenar; ajustes que tocas una vez (material, voz, bandas) aparte; los ejercicios como cuadrícula de miniaturas
+  con su nombre debajo, y al tocar uno se abre su ficha con el movimiento entero animado
+- [ ] 4. **Validación con las skills de diseño** (crítica heurística, accesibilidad, textos) y corrección hasta que no queden fallos graves
+- [ ] 5. **Tu visto bueno** sobre el prototipo en tu móvil
+- [ ] 6. **Construir la app nueva** a partir del prototipo, por entregas con APK en cada una, sin romper historial, copias, widget ni rutinas
+- [ ] 7. **Widget** rediseñado con el mismo sistema
+- [ ] Hecho cuando: la app nueva hace todo lo que hacía la anterior y te parece bien en el móvil
+
 ### Fase 2 · Supabase: datos en la nube y caja fuerte de claves
 - [ ] **Tú, antes:** crear el proyecto en supabase.com (gratis) y pasar la URL y la clave pública (`anon`)
 - [ ] Inicio de sesión con email (enlace mágico)
