@@ -92,7 +92,7 @@ B1 Cuentas y nube ────────────────────�
 Después: P1 Pulso · P2 Planes por objetivo · P3 Peso y medidas · P4 Carreras de Strava · P5 Cardio · P6 Coach por voz
 ```
 
-**Ahora mismo:** tu visto bueno de D3 (D1 y D2 cerrados) y probar B1 en el móvil (solo tocan `docs/diseno/` o el almacenamiento y el servidor, no la interfaz).
+**Ahora mismo:** tu visto bueno de D3 (D1 y D2 cerrados) y probar B1 en el móvil.
 **Después, a la vez:** C1, B2 y S1.
 
 ### Bloque D · Diseño (antes de construir nada de interfaz)

@@ -7,7 +7,9 @@
    data-g="m|f" fuerza hombre o mujer (si no, el elegido en Ajustes). Si no hay WebGL o falla la carga, sale la figura dibujada
    (figura.js, estilo persona), que es el respaldo decidido en D1. */
 
-const BASE = window.FIG_BASE || '../figura/';
+// Dirección completa: «figura/figura3d.js» a secas no vale para import() (lo toma como nombre de paquete). Por eso la copia
+// publicada de D2 enseñaba siempre la figura dibujada y no la 3D (encontrado en D3).
+const BASE = new URL(window.FIG_BASE || '../figura/', location.href).href;
 const lento = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 await window.FIG_LISTA;                                  // figura.js cargado (lo inserta index.html)
 async function json(urls) { for (const u of urls) { try { const r = await fetch(u); if (r.ok) return await r.json(); } catch (e) {} } throw new Error('sin datos'); }
