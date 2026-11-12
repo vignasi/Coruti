@@ -70,8 +70,7 @@ no pasen solas y gestos en lugar de botones. Hecho, y repasado con las mismas tr
 | Textos | «Toca al acabar», «Ritmo 7 de 12», «Prepárate · 30 s», «Toca para seguir ya», «En pausa», «Ejercicio anterior», «Parar la sesión» |
 | Pantallas bajas | En 360×700 la figura sigue teniendo 450 px y todo cabe sin desplazar |
 
-Decidido distinto de lo que dijiste: **deslizar a la derecha = anterior** (y a la izquierda = siguiente), como pasar páginas en Android.
-Si de verdad lo quieres al revés, es un cambio de una línea.
+Gestos confirmados contigo, como en Freeletics: **tocar = siguiente** (el gesto principal, el más fácil cansado) y **deslizar a la derecha = anterior** para deshacer un toque sin querer.
 
 ## Lo que falta (D3)
 Tu visto bueno en el móvil. Sobre todo: leer el reproductor desde el suelo a 1–2 m, y si las cuatro pestañas y el
