@@ -49,12 +49,25 @@ BASE = {
 # Cada deformación: qué se cambia en MakeHuman, cuánto se amplía (MakeHuman cambia poco hasta el extremo)
 # y cuánto se aplica a los brazos (si adelgazan como el resto parecen de alambre).
 # Más delgado también pierde algo de músculo: si no, queda pecho de culturista con cintura y brazos finos.
+# Valores: número = absoluto; ("+", d) = relativo al cuerpo de partida.
+# La ampliación de la complexión NO es fija: se calcula para que él y ella cambien lo MISMO de cintura
+# (MakeHuman reparte el peso distinto: en ella va casi todo a barriga y caderas). En ella, el pecho crece con la complexión.
+WAIST_CHANGE = {"complexion_mas": 0.13, "complexion_menos": -0.09}   # +13 % / −9 % de cintura (ancho + fondo)
 MORPHS = {
-    "complexion_mas":   ({"weight": 1.0}, 1.6, 0.9),
-    "complexion_menos": ({"weight": 0.15, "muscle": -0.2}, 1.3, 0.45),
+    "complexion_mas":   ({"weight": 1.0, "cupsize": ("+", 0.1)}, None, 0.9),
+    "complexion_menos": ({"weight": 0.15, "muscle": ("+", -0.2), "cupsize": ("+", -0.05)}, None, 0.45),
     "musculo_mas":      ({"muscle": 1.0}, 1.6, 1.0),
     "musculo_menos":    ({"muscle": 0.25}, 1.3, 0.6),
 }
+
+
+def waist_size(co):
+    """Ancho + fondo del cuerpo a la altura del ombligo (sin brazos)."""
+    top = max(c.z for c in co)
+    zw = top * 0.6
+    ring = [c for c in co if abs(c.z - zw) < 0.012 and abs(c.x) < 0.2]
+    xs, ys = [c.x for c in ring], [c.y for c in ring]
+    return (max(xs) - min(xs)) + (max(ys) - min(ys))
 
 
 def srgb(hexc):
@@ -96,10 +109,16 @@ def build(g):
     set_body(h, base)
     final = mix_coords(h)
     morphs = {}
+    w0 = waist_size(final)
     for name, (change, gain, _) in MORPHS.items():
-        vals = {k: (base[k] + v if v < 0 else v) for k, v in change.items()}   # negativo = relativo al de partida
+        vals = {k: (min(1, max(0, base.get(k, 0.5) + v[1])) if isinstance(v, tuple) else v) for k, v in change.items()
+                if k != "cupsize" or g == "f"}
         set_body(h, {**base, **vals})
-        morphs[name] = [f + (c - f) * gain for f, c in zip(final, mix_coords(h))]
+        raw = mix_coords(h)
+        if gain is None:   # misma cintura para los dos
+            gain = WAIST_CHANGE[name] * w0 / (waist_size(raw) - w0)
+        morphs[name] = [f + (c - f) * gain for f, c in zip(final, raw)]
+        print("MORPH", g, name, "ampliación", round(gain, 2), "cintura", round(waist_size(morphs[name]) / w0 - 1, 3))
     set_body(h, base)
     rig = HS.add_builtin_rig(h, "mixamo")
 
