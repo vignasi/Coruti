@@ -59,13 +59,29 @@ Resumen de la búsqueda de noviembre de 2026. Los precios salen sobre todo de ag
 - **D. Modelo 3D de persona movido por la app.** La prueba está en `3d.html` y usa `Figura.solve`. Los huesos del modelo se colocan con las mismas posturas de `rutina.json`, con los pies y las manos ya resueltos. Funciona con los 34 ejercicios sin tocar los datos. La anatomía es correcta siempre, es la misma persona en todo, la luz y la sombra son reales, y el ritmo lo sigue marcando la app.
   - Coste: three.js pesa ~0,7 MB y cada modelo 1–4 MB (menos comprimido).
   - Los modelos de la prueba (Xbot y Michelle de Mixamo, tomados de los ejemplos de three.js) **no sirven para la app**: el maniquí no es una persona y Michelle es una bailarina de dibujos. Además, Mixamo no deja redistribuir sus modelos sueltos, por eso no están en el repo.
-  - Para la app haría falta un hombre y una mujer con ropa de deporte. Opciones:
+  - Para la app ya están hechos un hombre y una mujer propios (ver «Modelos 3D propios»). Las opciones que había:
     - MakeHuman: gratis, lo exportado es CC0. Hay que crearlos en su programa de escritorio.
     - Mixamo: gratis con cuenta de Adobe; puede ir dentro de la app, pero no en un repo público.
     - Comprar un modelo con licencia comercial.
   - El widget de Android no puede usar 3D: necesitaría imágenes renderizadas antes.
   - Faltan por hacer en 3D el material (bandas, mancuernas, silla) y las etiquetas.
 - Claude no genera imágenes ni vídeo por sí mismo: cualquiera de estas opciones necesita una cuenta en el servicio externo.
+
+## Modelos 3D propios (hechos en D1)
+- `modelos/persona_m.glb` (1,4 MB) y `modelos/persona_f.glb` (1,7 MB). Salen de MakeHuman (MPFB2, **CC0**: se pueden meter en la app y en un repo público) con `modelos/crear_modelos.py`, que es reproducible: se ejecuta con Blender como módulo de Python, sin pantalla. Cómo, al principio del script.
+- Esqueleto con nombres de Mixamo: el mismo código de `3d.html` mueve estos modelos y los de prueba.
+- La ropa (camiseta o top, pantalón corto o mallas, zapatillas) está **pintada sobre el cuerpo** con algo de volumen. Sigue cualquier deformación y nunca lo atraviesa. Pelo: el cuero cabelludo con volumen y, en ella, una coleta unida a la cabeza.
+- Colores en materiales separados (`piel`, `top`, `abajo`, `zapa`, `suela`, `pelo`, `ojos`): se cambian sin tocar la forma.
+- Deformaciones ya dentro, aún sin usar: `complexion_mas`, `complexion_menos`, `musculo_mas`, `musculo_menos`. Van ampliadas ×2,2 respecto a MakeHuman para que el recorrido 0→1 se note. Prueba: `3d.html?m=persona_f&morph=complexion_mas:1&piel=%238D5524&pelo=%23111111`.
+- `3d.html`, además de las posturas:
+  - dobla brazos y piernas lo justo para que manos y pies apoyados lleguen al suelo o a la silla (el cuerpo 3D tiene grosor y el dibujo no);
+  - pone las manos planas al apoyarse;
+  - dibuja sillas, sofá y pared.
+- Falta para la app:
+  - el material de mano (bandas, mancuernas, toalla) y las etiquetas en 3D;
+  - pulir los bordes de la ropa: siguen la malla y en algunos sitios salen dentados;
+  - abdominales marcados (con un mapa de relieve);
+  - imágenes renderizadas para el widget, que no puede mostrar 3D.
 
 ## Idea para más adelante: que cada persona personalice su figura (solo con 3D)
 Se podrían cambiar la complexión, lo marcado del músculo y del abdomen, el color de piel, el pelo y la ropa.
