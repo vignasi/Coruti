@@ -1,7 +1,7 @@
 # Rediseño · 1. Funcionalidades
 
 Qué tiene que hacer Rutina core y qué necesitas en cada momento. **No describe el diseño actual**: es la base
-para diseñar las pantallas desde cero (Fase 1c del ROADMAP). Si algo falta o sobra, se corrige aquí antes de dibujar nada.
+para diseñar las pantallas desde cero (paso D2 del ROADMAP; el diseño está en `2-sistema-de-diseno.md` y `prototipo/`). Si algo falta o sobra, se corrige aquí antes de dibujar nada.
 
 ## Para quién y en qué situación
 

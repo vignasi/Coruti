@@ -108,20 +108,24 @@ Después: P1 Pulso · P2 Planes por objetivo · P3 Peso y medidas · P4 Carreras
   Claude no genera imágenes ni vídeo por sí mismo
 - [ ] Hecho cuando: eliges estilo viendo todos los ejercicios en el móvil y no queda ningún fallo visible
 
-#### D2 · Producto completo, sistema de diseño y prototipo — en paralelo con D1
-- [x] Lista de funcionalidades (`docs/diseno/1-funcionalidades.md`)
-- [ ] Ampliar la lista con todo lo de este plan (Claude, planes, calendario, Strava, pulso, peso, usuarios, estilo de figura)
-- [ ] Sistema de diseño: pocos tamaños de letra, colores de la marca (`#1E6B74`, `#F0B04A`, `#EDF1F0` y oscuro),
-  espacios, componentes; también para el widget
-- [ ] Prototipo navegable desde cero de **todas** las pantallas, también las de lo que viene: Entrenar (hoy, plan de la semana,
-  favoritas), Ejercicios (cuadrícula de miniaturas → ficha con el movimiento), reproductor a pantalla completa, final de sesión,
-  Historial (con estado de Strava y pulso), Perfil (cuenta, peso y medidas, objetivo), Ajustes (material, bandas, voz, estilo
-  y sexo de la figura, conexiones: Claude, Strava, Polar), widget grande y pequeño. La figura va en un hueco fijo hasta que D1 termine
-- [ ] Publicado para abrirlo en el móvil
+#### D2 · Producto completo, sistema de diseño y prototipo — en paralelo con D1 ✅
+- [x] Lista de funcionalidades (`docs/diseno/1-funcionalidades.md`), ya con Claude, planes, calendario, Strava, pulso, peso, usuarios y estilo de figura
+- [x] Sistema de diseño (`docs/diseno/2-sistema-de-diseno.md`): 6 tamaños de letra (Atkinson Hyperlegible), colores de la marca
+  en claro y oscuro, espacios, componentes, reproductor y widget
+- [x] Prototipo navegable desde cero de **todas** las pantallas (`docs/diseno/prototipo/`, 33 pantallas): Entrenar (hoy, plan de la semana,
+  favoritas, primer día), sesión de Claude, rutina de core, sesión nueva, plan por objetivo, Ejercicios y ficha, reproductor, final de sesión,
+  Historial (Strava, pulso, vacío) y detalle, Tú (perfil, peso y medidas, personas, entrar), Ajustes (material, bandas, sonido, figura, widget,
+  copia), Conexiones (Claude, Strava, Polar, probar pulso) y widgets grande y pequeño. La figura va en un hueco fijo hasta que D1 termine
+- [x] Publicado para abrirlo en el móvil: https://claude.ai/artifact/2ANJVetACFiPvLW8NWhh57 (privado, con tu cuenta de Claude)
+- Decidido: 4 pestañas (Entrenar · Ejercicios · Historial · Tú, con Ajustes y Conexiones dentro de Tú), letra Atkinson Hyperlegible
+  dentro del APK, se mantiene el nombre «Rutina core»
 
 #### D3 · Validación
-- [ ] Revisión con las skills de diseño (crítica heurística, accesibilidad, textos) y corrección hasta no tener fallos graves
-- [ ] Tu visto bueno en el móvil. Hecho cuando: das el diseño por cerrado
+- [x] Revisión con las skills de diseño (crítica heurística, accesibilidad, textos) y corrección hasta no tener fallos graves
+  (`docs/diseno/3-validacion.md`; axe sin fallos en las 33 pantallas y los dos temas)
+- [ ] **Tú:** abrir el prototipo en el móvil y dar el visto bueno. Mirar sobre todo el reproductor con el móvil en el suelo a 1–2 m,
+  las cuatro pestañas y lo que hay dentro de «Tú». Hecho cuando: das el diseño por cerrado
+- [ ] Cuando D1 termine: poner la figura elegida en los huecos del prototipo y repasar miniaturas y reproductor
 
 ### Bloque B · Base técnica
 
