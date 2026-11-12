@@ -4,8 +4,8 @@ Una fase por conversación. Cada conversación empieza con el prompt de la fase,
 pregunta lo que haga falta antes de tocar código, trabaja en commits pequeños,
 marca aquí lo hecho y termina dando el prompt de la fase siguiente.
 
-**Regla de oro:** antes de empezar una fase, la anterior tiene que estar fusionada en `main`.
 Cada conversación nueva parte de `main`; si no se fusiona, empieza sin los cambios anteriores.
+Qué se puede hacer a la vez y en qué orden: ver «Plan a partir de aquí».
 
 ## Decisiones tomadas
 
@@ -40,7 +40,7 @@ Cada conversación nueva parte de `main`; si no se fusiona, empieza sin los camb
 - [x] Solo dos materiales de banda: bandas grandes y mini banda
 - [x] **Tú:** fusionar la rama `ccr-ca344ef2-pok0db` en `main` y comprobar que «Compilar APK» acaba en verde (versión 1.0.8)
 
-### Fase 1 · Historial de sesiones y copia de seguridad ✅ (hecho, falta fusionar y probar en el móvil)
+### Fase 1 · Historial de sesiones y copia de seguridad ✅ (fusionada, versión 1.0.9; falta probar en el móvil)
 Base de todo lo demás (Strava, nube, planes). Cada serie se guarda con su hora de inicio y fin, para poder subirla a Strava.
 - [x] Guardar cada sesión terminada (rutina o sueltos, desde la app o el widget): fecha y hora de inicio y fin, tipo, y por cada serie
   el ejercicio, el lado, la ronda, las repeticiones o segundos (lo hecho y lo previsto), la banda y los kilos.
@@ -58,7 +58,7 @@ Base de todo lo demás (Strava, nube, planes). Cada serie se guarda con su hora 
 - [ ] **Tú:** Hecho cuando: una sesión aparece en el historial al terminar (desde la app y desde el widget),
   y exportar → desinstalar → importar lo recupera todo
 
-### Fase 1b · Favorita en el widget ✅ (hecho, va en la misma rama que la Fase 1)
+### Fase 1b · Favorita en el widget ✅ (fusionada, versión 1.0.9; falta probar en el móvil)
 Para cuando la mayoría de ejercicios los haces con otra app y aquí solo quieres un par de ejercicios sueltos.
 - [x] En la app, ★ en una favorita: es la que sale en el widget (solo una; otro toque la quita). Se guarda en la copia de seguridad
 - [x] Widget grande: fila «Rutina / ★ favorita» para cambiar con un toque sin abrir la app (solo sale si hay una favorita marcada).
@@ -70,68 +70,119 @@ Para cuando la mayoría de ejercicios los haces con otra app y aquí solo quiere
 - [ ] **Tú:** Hecho cuando: marcas ★ en una favorita, el widget la muestra, Empezar la hace con sus ejercicios, rondas y descanso,
   y aparece en el historial
 
-### Fase 2 · Supabase: datos en la nube y caja fuerte de claves
+## Plan a partir de aquí (por bloques)
+
+**La idea:** una app de entrenamiento que funcione muy bien sola (planes por objetivo, como Freeletics, para quien no use Claude)
+y que, si quieres ir más fino, **se conecte a Claude** como se conecta a Strava: en una conversación que ya sabe tu objetivo,
+tu peso, lo que corres y lo que comes, Claude lee tu historial de la app y **te crea y cambia las sesiones y el plan de la semana
+dentro de la app**. Tú solo entrenas. Luego la app sube a Strava la sesión con ejercicios y pulso.
+Abierta a más personas (tu mujer u otros), cada una con su cuenta y sus datos.
+
+**Regla de oro (nueva):** los bloques que se pueden hacer a la vez van en **ramas distintas** y tocan **archivos distintos**.
+Antes de empezar un paso, los pasos de los que depende tienen que estar fusionados en `main`.
+El diseño se hace **una sola vez y completo**: incluye ya las pantallas de todo lo que viene (Claude, planes, Strava, pulso,
+peso, usuarios), para no rehacerlo dentro de dos días.
+
+```
+D1 Figura ──────────┐
+D2 Diseño completo ─┴─► D3 Validación ─┐
+B1 Cuentas y nube ─────────────────────┼─► C1 App nueva ─► C2 Widget
+                    └─► B2 Conector Claude ─► (usa C1 para enseñar los planes)
+                    └─► S1 Strava ─────────► (botón en el historial de C1)
+Después: P1 Pulso · P2 Planes por objetivo · P3 Peso y medidas · P4 Carreras de Strava · P5 Cardio · P6 Coach por voz
+```
+
+**Ahora mismo, a la vez:** D1, D2 y B1 (solo tocan `docs/diseno/` o el almacenamiento y el servidor, no la interfaz).
+**Después, a la vez:** C1, B2 y S1.
+
+### Bloque D · Diseño (antes de construir nada de interfaz)
+
+#### D1 · Figura del ejercicio (sesión muy fina) — en paralelo con D2
+- [x] Prueba de persona con volumen, hombre o mujer, y etiquetas de zona solo en grande (`docs/diseno/figura/`)
+- [ ] **Tres estilos a elegir en Ajustes:** muñeco de palos (el de ahora, mejorado), muñeco redondeado y persona
+- [ ] Persona: sin juntas visibles, **pies y zapatillas bien orientados** (en el puente están girados al revés), cara, manos;
+  bien de pie, tumbado y de lado; bien en miniatura y en grande
+- [ ] Todos los ejercicios de `rutina.json` revisados con capturas, en los tres estilos y en hombre y mujer
+- [ ] Investigar (solo investigar y decidir contigo): imágenes o vídeos generados con un servicio externo de IA,
+  uno de ida y otro de vuelta por ejercicio. Coste, peso en la APK y si la persona se mantiene igual en todos.
+  Claude no genera imágenes ni vídeo por sí mismo
+- [ ] Hecho cuando: eliges estilo viendo todos los ejercicios en el móvil y no queda ningún fallo visible
+
+#### D2 · Producto completo, sistema de diseño y prototipo — en paralelo con D1
+- [x] Lista de funcionalidades (`docs/diseno/1-funcionalidades.md`)
+- [ ] Ampliar la lista con todo lo de este plan (Claude, planes, calendario, Strava, pulso, peso, usuarios, estilo de figura)
+- [ ] Sistema de diseño: pocos tamaños de letra, colores de la marca (`#1E6B74`, `#F0B04A`, `#EDF1F0` y oscuro),
+  espacios, componentes; también para el widget
+- [ ] Prototipo navegable desde cero de **todas** las pantallas, también las de lo que viene: Entrenar (hoy, plan de la semana,
+  favoritas), Ejercicios (cuadrícula de miniaturas → ficha con el movimiento), reproductor a pantalla completa, final de sesión,
+  Historial (con estado de Strava y pulso), Perfil (cuenta, peso y medidas, objetivo), Ajustes (material, bandas, voz, estilo
+  y sexo de la figura, conexiones: Claude, Strava, Polar), widget grande y pequeño. La figura va en un hueco fijo hasta que D1 termine
+- [ ] Publicado para abrirlo en el móvil
+
+#### D3 · Validación
+- [ ] Revisión con las skills de diseño (crítica heurística, accesibilidad, textos) y corrección hasta no tener fallos graves
+- [ ] Tu visto bueno en el móvil. Hecho cuando: das el diseño por cerrado
+
+### Bloque B · Base técnica
+
+#### B1 · Cuentas y datos en la nube (Supabase) — en paralelo con D1 y D2
 - [ ] **Tú, antes:** crear el proyecto en supabase.com (gratis) y pasar la URL y la clave pública (`anon`)
-- [ ] Inicio de sesión con email (enlace mágico)
-- [ ] Tablas con seguridad por usuario (RLS) para el historial, las favoritas, las bandas y la configuración; sincronizar al terminar cada sesión y al abrir la app
-- [ ] Edge Function base para guardar secretos (la usarán Strava y la IA)
-- [ ] Hecho cuando: con otro móvil (o tras reinstalar) e iniciando sesión, aparece todo
+- [ ] Modelo de datos pensado para todo el plan: personas (perfil, objetivo, peso y medidas), ejercicios, sesiones y series,
+  favoritas, planes y días del plan, conexiones (Strava, Polar, Claude), con seguridad por persona (RLS)
+- [ ] Inicio de sesión con email (enlace mágico); sin cuenta se sigue usando solo en el móvil
+- [ ] Al entrar por primera vez se sube lo que hay en el móvil; después se sincroniza al terminar cada sesión y al abrir la app
+- [ ] Edge Function base para guardar secretos (Strava, Polar, IA). Ninguna clave dentro del APK
+- [ ] La pantalla de entrar es provisional y sencilla; la buena llega con C1
+- [ ] Hecho cuando: con otro móvil, o tras reinstalar, entras y aparece todo; y tu mujer con su cuenta ve solo lo suyo
 - Ojo: el plan gratuito pausa el proyecto tras ~1 semana sin uso; se reactiva desde la web y no se pierden datos
 
-### Fase 3 · Pulso en directo del Polar Vantage V3
-Para ver el pulso en directo en la app y guardar el pulso por ejercicio (el reloj sigue grabando para Polar Flow).
-- [ ] **Tú, antes (una sola vez):** en Polar Flow, en el perfil de deporte que uses (p. ej. «Entrenamiento en circuito»),
-  activar «Compartir FC con otros dispositivos» → «visible para todos»
-- Cómo se usa: en el reloj eliges el deporte y empiezas a grabar; la app se conecta y lee el pulso
-- [ ] Primer paso de la fase: pantalla «Probar pulso» para confirmar con tu reloj que el móvil lo ve y lee el pulso.
-  Es lo único que no se puede comprobar sin tu reloj delante
-- [ ] Leer el pulso por Bluetooth (servicio estándar de frecuencia cardíaca, 0x180D) con los permisos de Android;
-  reconectar solo si se corta y seguir la sesión sin pulso si no hay reloj
-- [ ] Guardar el pulso segundo a segundo en la sesión
-- [ ] Mostrar el pulso grande y la zona en el reproductor; pulso medio y máximo por ejercicio en el historial
-- [ ] Descanso inteligente (opcional): el descanso acaba al bajar de X ppm o al llegar al máximo
-- [ ] Hecho cuando: en una sesión real se ve el pulso en directo y queda guardado
+#### B2 · Conector de Claude ⭐ — después de B1, en paralelo con C1 y S1
+- [ ] Servidor MCP propio (en Supabase) que se añade en Claude como conector personalizado, con inicio de sesión de tu cuenta de la app
+- [ ] Lo que Claude puede **leer**: perfil y objetivo, peso y medidas, historial con series, kilos, bandas y pulso,
+  favoritas, plan actual, catálogo de ejercicios con el material que tienes
+- [ ] Lo que Claude puede **escribir**: crear o cambiar una sesión (ejercicios, repeticiones, rondas, descanso, bandas),
+  el plan de la semana («lunes fuerza de cuerpo entero, martes descanso…»), favoritas, y apuntar peso o medidas
+- [ ] En la app: «Plan de Claude» en Entrenar, y cada sesión que crea Claude lista para empezar con un toque
+- [ ] Hecho cuando: en una conversación le pides a Claude la sesión de hoy y aparece en la app sin tocar nada más
+- Necesita una suscripción de Claude que permita conectores personalizados. Sin ella, la app funciona igual con sus propios planes (P2)
 
-### Fase 4 · Strava con ejercicios, sin perder Polar Flow ⭐ prioridad
-- [ ] **Primero, investigar de verdad** (antes de escribir código): 1) si la API de Strava deja añadir ejercicios
-  a una actividad existente, como hace su app (camino sencillo: Polar sigue subiendo); 2) si no, confirmar que la API AccessLink de Polar da el archivo FIT
-  de cada sesión con el pulso, que Strava muestra las series de un FIT subido por API, y si hay otra forma más sencilla
-  que cumpla los dos requisitos. Decidir el camino contigo
-- [ ] **Tú, antes:** registrar una app en strava.com/settings/api y otra en Polar AccessLink (gratis);
-  los secretos se guardan en Supabase, no en el código
-- [ ] Conectar Strava y Polar una vez (OAuth vía Edge Function)
-- [ ] Tabla que traduce cada ejercicio del catálogo a su ejercicio FIT (los que no tienen equivalente, al tipo más cercano)
-- [ ] Por cada sesión nueva de Polar: si coincide en hora con una sesión de la app o de Freeletics, añadir las series y un
-  título claro («Rutina core · Espalda + Brazos»); si no, reenviarla tal cual. Subir a Strava
-- [ ] Pendientes y reintentos; botón «Enviar a Strava» en el historial; aviso si Strava responde «duplicado»
-- [ ] Hecho cuando: una sesión real aparece en Polar Flow como siempre y en Strava con la lista de ejercicios y el pulso,
+### Bloque C · La app nueva
+
+#### C1 · Construir la app a partir del diseño validado — después de D3 y B1
+- [ ] Por entregas, con APK en cada una: navegación y Entrenar; reproductor y figura; Ejercicios y ficha; Historial; Perfil y Ajustes
+- [ ] Sin perder nada: historial, copias, favoritas, bandas, pesos, racha, rutina de core, favorita en el widget
+- [ ] Hecho cuando: hace todo lo de antes con el diseño nuevo y te parece bien en el móvil
+
+#### C2 · Widget con el diseño nuevo — después de C1
+- [ ] Mismo sistema de diseño; muestra la sesión de hoy (también la del plan de Claude) o la favorita elegida
+
+### Bloque S · Strava con ejercicios y pulso, sin perder Polar Flow ⭐ — después de B1, en paralelo con C1 y B2
+- [ ] **Primero, investigar de verdad** (antes de escribir código):
+  1) si la API de Strava deja añadir ejercicios a una actividad que ya existe (camino sencillo: Polar sigue subiendo);
+  2) si en Polar Flow se puede **dejar de subir a Strava solo la fuerza y el circuito** y seguir subiendo las carreras;
+  3) si no, confirmar que la API AccessLink de Polar da el archivo FIT con el pulso y que Strava muestra las series de un FIT subido por API.
+  Decidir el camino contigo
+- [ ] **Tú, antes:** registrar una app en strava.com/settings/api y otra en Polar AccessLink (gratis); los secretos, en Supabase
+- [ ] Conectar Strava y Polar una vez; tabla de cada ejercicio del catálogo a su ejercicio FIT
+- [ ] Subir cada sesión con ejercicios, pulso, esfuerzo y cómo te has sentido, y un título claro; botón «Enviar a Strava»
+  en las que no se hayan subido; pendientes, reintentos y aviso de duplicado
+- [ ] Hecho cuando: una sesión real está en Polar Flow como siempre y en Strava con la lista de ejercicios y el pulso,
   y una carrera sigue llegando a Strava
 
-### Fase 5 · Foto de Freeletics → sesión con ejercicios en Strava ⭐
-- Flujo: grabas Freeletics con el Polar como siempre; haces la captura de la sesión → la IA (Claude, a través de la
-  Edge Function) reconoce el nombre, los ejercicios, las repeticiones y las rondas → la revisas → cuando llega la sesión
-  de Polar de esa hora, se sube a Strava como en la Fase 4, con ejercicios, pulso y título («Freeletics · Aphrodite»)
-- [ ] Captura → IA → sesión revisable; los ejercicios que no estén en la tabla FIT van al tipo más cercano
-- [ ] También vale la captura de antes de entrenar: queda como «sesión de hoy» y se completa al terminar la grabación
-- [ ] Hecho cuando: con una sesión real de Freeletics, Strava muestra sus ejercicios y el pulso
-- Coste: unos céntimos por foto (API de IA)
-- Aclarado: la lista de ejercicios del 9 de noviembre la añadiste a mano en Strava; Freeletics no sube nada
-
-### Fase 6 · Traer de Strava carreras y otras actividades
-- [ ] Leer de Strava las actividades que no son de la app (carreras, bici…) y mostrarlas en el historial con distancia, tiempo y pulso
-- [ ] Hecho cuando: una carrera grabada con el Polar aparece sola en el historial
-
-### Fase 7 · Modos de cardio
-- [ ] EMOM, Tabata y AMRAP con los ejercicios del catálogo, usando el mismo reproductor
-- [ ] Con pulso (Fase 3) si está disponible
-
-### Fase 8 · Coach por voz
-- [ ] A mitad de serie, una clave de técnica del ejercicio («codos pegados», «junta los omóplatos»)
-- [ ] Opción para activarlo o desactivarlo
-
-### Fase 9 · Planes por objetivo
-- [ ] Fuerza, cardio y movilidad, de 4 a 8 semanas, con calendario
-- [ ] Progresión según el historial y el «fácil / justo / demasiado»
+### Bloque P · Después (cada uno, cuando toque; casi todos independientes entre sí)
+- **P1 · Pulso en directo del Polar Vantage V3** (antes: Fase 3). **Tú, una vez:** en Polar Flow, en el perfil de deporte,
+  «Compartir FC con otros dispositivos» → «visible para todos». Pantalla «Probar pulso»; pulso por Bluetooth (0x180D),
+  reconectar si se corta; pulso segundo a segundo en la sesión; grande en el reproductor; medio y máximo por ejercicio;
+  descanso inteligente opcional. Hecho cuando: en una sesión real se ve en directo y queda guardado
+- **P2 · Planes por objetivo** (antes: Fase 9), para quien no use Claude: fuerza, músculo, cardio y movilidad, de 4 a 8 semanas,
+  con calendario y progresión según el historial y el «fácil / justo / demasiado». **Cada vez que repites, una sesión distinta**
+- **P3 · Peso y medidas:** apuntarlos a mano, importar un archivo de la báscula inteligente o que te los pase Claude
+  (tu tarea semanal que descarga los datos de la báscula puede enviarlos por el conector). Gráfica en Perfil
+- **P4 · Traer de Strava carreras y otras actividades** (antes: Fase 6) y mostrarlas en el historial
+- **P5 · Modos de cardio** EMOM, Tabata y AMRAP con el mismo reproductor (antes: Fase 7)
+- **P6 · Coach por voz** con claves de técnica a mitad de serie (antes: Fase 8)
+- **P7 · Freeletics** (antes: Fase 5): con el conector de Claude probablemente ya no hace falta la foto
+  (le dices a Claude qué has hecho y lo apunta). Se decide después de B2
 
 ## Cómo es cada conversación
 
