@@ -51,7 +51,9 @@ const frontSign=memo(ex=>{
   ex.poses.map(withC).forEach(p=>{const n=perp(nrm(sub(p.s,p.p)));
     kd+=dot(sub(p.k1,lerp(p.p,p.a1,.5)),n)+dot(sub(p.k2,lerp(p.p,p.a2,.5)),n);
     hd+=dot(sub(lerp(p.w1,p.w2,.5),p.s),n);});
-  return Math.abs(kd)>3?Math.sign(kd):(Math.sign(hd)||-1);
+  // las rodillas mandan solo si están dobladas de verdad (de media más de 2,5 por pierna y postura): en remo_db están
+  // casi rectas y un poco hacia atrás, y ahí mandan las manos (si no, la persona sale boca arriba y con los pies al revés)
+  return Math.abs(kd)>2.5*2*ex.poses.length?Math.sign(kd):(Math.sign(hd)||Math.sign(kd)||-1);
 });
 /* De frente: a qué lado del cuerpo va cada brazo y cada pierna (el 1 hacia +lat o hacia −lat), mirando todas las posturas */
 const sidesOf=memo(ex=>{
@@ -98,7 +100,10 @@ function geom(ex,p0,o){
     const P=root["p"+i],K=p["k"+i];let A=p["a"+i];
     if(view==="frente"){const d=nrm(sub(A,K));feet[i]={A,d,front:true,out:sd.leg*(i==="1"?1:-1)};continue;}
     // rodilla: hacia dónde dobla (si está recta, hacia delante del cuerpo)
-    let kb=sub(K,lerp(P,A,.5));const bent=len(kb)>2.5;
+    let kb=sub(K,lerp(P,A,.5));
+    // rodilla un poco hacia atrás (hiperextendida en los datos): se pasa delante, un poco doblada
+    {const nf=side(perp(nrm(sub(A,P))),front),c=dot(kb,nf);if(c<0&&len(kb)<4.5){p["k"+i]=add(K,mul(nf,-2*c));kb=sub(p["k"+i],lerp(P,A,.5));}}
+    const bent=len(kb)>2.5;
     let d=nrm(sub(A,K)),n=side(perp(d),bent?kb:front);
     let sup=supportY(ex,A);
     // boca abajo con las piernas rectas (plancha, flexiones): de puntillas; se sube el tobillo para que la punta toque el suelo
@@ -438,5 +443,8 @@ function draw(cv,ex,t,clamp,o={}){
 }
 /* Postura ya resuelta (pies, manos, vista) para otros dibujantes, por ejemplo una prueba en 3D */
 function solve(ex,t,clamp,o={}){const st=state(ex,t,clamp);return {st,gm:geom(ex,st.pose,{key:o.key,B:BODY[o.gender==="f"?"f":"m"]})};}
-window.Figura={draw,keyT,phaseT,state,solve,styles:["palos","redondo","persona"]};
+/* Etiquetas sobre otro dibujo (la figura 3D): toScreen pasa un punto del dibujo a unidades del lienzo (180 × 112) */
+function drawLabels(cv,ex,st,gm,t,o,toScreen){const ctx=cv.getContext("2d"),sc=cv.width/180;
+  labels(ctx,ex,st,gm,t,o.text||{},toScreen,sc,colorsFor(o),null);}
+window.Figura={draw,keyT,phaseT,state,solve,labels:drawLabels,colors:colorsFor,styles:["palos","redondo","persona"]};
 })();
