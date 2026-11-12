@@ -92,12 +92,12 @@ B1 Cuentas y nube ────────────────────�
 Después: P1 Pulso · P2 Planes por objetivo · P3 Peso y medidas · P4 Carreras de Strava · P5 Cardio · P6 Coach por voz
 ```
 
-**Ahora mismo, a la vez:** D1, D2 y B1 (solo tocan `docs/diseno/` o el almacenamiento y el servidor, no la interfaz).
+**Ahora mismo, a la vez:** D2 y B1 (D1 cerrado) (solo tocan `docs/diseno/` o el almacenamiento y el servidor, no la interfaz).
 **Después, a la vez:** C1, B2 y S1.
 
 ### Bloque D · Diseño (antes de construir nada de interfaz)
 
-#### D1 · Figura del ejercicio (sesión muy fina) — en paralelo con D2
+#### D1 · Figura del ejercicio (sesión muy fina) ✅ cerrado: figura 3D, hombre y mujer (se elige en Ajustes)
 - [x] Prueba de persona con volumen, hombre o mujer, y etiquetas de zona solo en grande (`docs/diseno/figura/`)
 - [x] **Tres estilos a elegir:** muñeco de palos (el de ahora, mejorado: pies, manos, cuello, lo de detrás en gris),
   muñeco redondeado y persona; los tres sobre la misma geometría (`figura.js`). Página para elegir: `docs/diseno/figura/index.html`
@@ -119,8 +119,14 @@ Después: P1 Pulso · P2 Planes por objetivo · P3 Peso y medidas · P4 Carreras
 - [x] Página para elegir en el móvil: figura dibujada, 3D o las dos, hombre o mujer, con todos los ejercicios (`elegir.html`, publicada)
 - [x] Los 34 ejercicios revisados en 3D con capturas a ancho de móvil: hombre y mujer, en grande (final y mitad de cada movimiento),
   en miniatura, claro y oscuro (`3d.html`)
-- [ ] **Tú:** abrir la página en el móvil, elegir estilo y decidir entre figura dibujada, imágenes o vídeo generados, o modelo 3D (opciones A–D de `NOTAS.md`).
-  Hecho cuando: eliges estilo viendo todos los ejercicios en el móvil y no queda ningún fallo visible
+- [x] **Tú:** elegida en el móvil la **figura 3D (opción D), con hombre y mujer** para que cada persona elija
+- [x] `crear_modelos.py` ejecutado entero desde cero con MakeHuman/MPFB2: los modelos salen iguales en el cuerpo y mejor en la cabeza
+  (oreja entera de piel, pelo alrededor en curva, nuca recta) y sin dientes en el tirante de ella ni en el cuello de la camiseta de él
+- [x] Imágenes de la figura 3D hechas antes para el widget, que no puede mostrar 3D: una por fase (71 por sexo), claro y oscuro,
+  WebP de 400 px con fondo transparente, ~6 KB cada una, 1,7 MB todas (`widget/`, cómo se hacen en `NOTAS.md`)
+- [x] Los 34 ejercicios revisados otra vez con capturas a 412 px, hombre y mujer, con los modelos nuevos
+- Para D2 y C1/C2 (en `NOTAS.md`): el fondo actual del widget (`#1E6B74`) es el color de la camiseta y ella se pierde;
+  lo que hay que pasar a `rutina.json`; peso de la figura 3D en la APK (5,3–6,1 MB: three.js, dos modelos e imágenes)
 
 #### D2 · Producto completo, sistema de diseño y prototipo — en paralelo con D1
 - [x] Lista de funcionalidades (`docs/diseno/1-funcionalidades.md`)
