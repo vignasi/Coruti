@@ -185,16 +185,18 @@ export async function crear({modelo,gender='m',loader}){
 
   /* Encuadre fijo por ejercicio (todas las posturas y la mitad de cada movimiento): la cámara no salta al animar */
   const FR=new Map();
-  function frameOf(ex,k){const key=k+'|'+(ex.poses.length);if(FR.has(key))return FR.get(key);
-    propsAt(ex,k);const box=new THREE.Box3();let t=0;
+  function frameOf(ex,k,big){const key=k+'|'+(big?1:0);if(FR.has(key))return FR.get(key);
+    propsAt(ex,k);const box=new THREE.Box3(),pts=[];let t=0;
     ex.phases.forEach((ph,i)=>{for(const tt of [t+ph.move/2,t+ph.move]){const R=pose(ex,k,tt,true);drawGear(ex,R);
-      box.expandByObject(root.children.find(o=>o.isSkinnedMesh)||root);for(const n in B)if(!/Index|Middle|Ring|Pinky|Thumb|Eye/.test(n))box.expandByPoint(wp(n));
-      gear.children.forEach(g=>box.expandByObject(g));}t+=ph.move+ph.hold;});
-    drawProps(ex,k);props.children.forEach(m=>box.expandByObject(m));
-    const hd=new THREE.Box3();for(const n in B)if(!/Index|Middle|Ring|Pinky|Thumb|Eye/.test(n))hd.expandByPoint(wp(n));
+      const b=new THREE.Box3();for(const n in B)if(!/Index|Middle|Ring|Pinky|Thumb|Eye|Hand$/.test(n))b.expandByPoint(wp(n));
+      b.expandByScalar(.075);box.union(b);for(const S of ['Left','Right'])box.expandByPoint(grip(S).addScalar(0));
+      gear.children.forEach(g=>box.expandByObject(g));
+      if(big&&ph.arrow){fitOf(R);box.expandByPoint(toWorld(R,[ph.arrow[0],ph.arrow[1]]));box.expandByPoint(toWorld(R,[ph.arrow[2],ph.arrow[3]]));}}
+      t+=ph.move+ph.hold;});
+    drawProps(ex,k);props.children.forEach(m=>{const b=new THREE.Box3().setFromObject(m);if(b.max.y<1.5)box.union(b);else{box.max.y=Math.max(box.max.y,0);}});
     box.min.y=0;FR.set(key,box);return box;}
   function place(box,big){
-    const b=box.clone().expandByScalar(big?.16:.1);b.min.y=Math.min(b.min.y,0);const c=b.getCenter(new THREE.Vector3()),s=b.getSize(new THREE.Vector3());
+    const b=box.clone().expandByScalar(big?.06:.03);b.min.y=Math.min(b.min.y,0);const c=b.getCenter(new THREE.Vector3()),s=b.getSize(new THREE.Vector3());
     const th=Math.tan(THREE.MathUtils.degToRad(12));const dist=Math.max(s.x/(2*th*180/112),s.y/(2*th))*1.02+s.z*.5;
     cam.position.set(c.x,c.y+dist*.1,c.z+dist);cam.lookAt(c.x,c.y,c.z);cam.updateMatrixWorld(true);
     sun.position.set(c.x-1.5,3,c.z+2.5);sun.target.position.set(c.x,0,c.z);sun.target.updateMatrixWorld();}
@@ -208,7 +210,7 @@ export async function crear({modelo,gender='m',loader}){
     const dpr=window.devicePixelRatio||1,cw=cv.clientWidth||300;
     if(cv.width!==Math.round(cw*dpr)){cv.width=Math.round(cw*dpr);cv.height=Math.round(cw*112/180*dpr);}
     const k=o.key,big=!!o.labels,dk=!!o.dark;
-    const box=frameOf(ex,k);const R=pose(ex,k,t,clamp);drawProps(ex,k);drawGear(ex,R);place(box,big);
+    const box=frameOf(ex,k,big);const R=pose(ex,k,t,clamp);drawProps(ex,k);drawGear(ex,R);place(box,big);
     M.prop.color.set(dk?0x2B3734:0xDDE5E3);lineMat.color.set(dk?0x3A4744:0xC3CFCB);floor.material.opacity=dk?.35:.18;
     hemi.intensity=dk?1.35:1.6;
     const r=renderer();if(r.getSize(new THREE.Vector2()).x!==cv.width){r.setPixelRatio(1);r.setSize(cv.width,cv.height,false);}
