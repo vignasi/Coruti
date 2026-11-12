@@ -178,6 +178,7 @@ function paint(ctx,groups,ow){
     }
   });
 }
+const holes=rs=>{const h=new Path2D();h.rect(-400,-400,1000,1000);rs.forEach(([c,r])=>{h.moveTo(c[0]+r,c[1]);h.arc(c[0],c[1],r,0,Math.PI*2);});return h;};
 const G=(fill,line,shade=false)=>({fill,line,shade,items:[]});
 
 /* ---------- Material ---------- */
@@ -215,7 +216,7 @@ const HAIR={m:"#2E211B",f:"#4A2C1F"};
 const CLOTH={top:"#1E6B74",topFar:"#17545B",topLine:"#0E3237",bottom:"#323E3B",bottomFar:"#242E2C",bottomLine:"#0D1413",
   shoe:"#F5F7F6",shoeFar:"#D3DBD8",shoeLine:"#5E6B68",sole:"#8C9996",lace:"#1E6B74"};
 function colorsFor(o){const dk=!!o.dark;return {
-  ink:dk?"#E4EBE8":"#1F2A28",bg:o.bg||(dk?"#171F1D":"#FFFFFF"),ground:dk?"#3A4744":"#C3CFCB",
+  ink:dk?"#E4EBE8":"#1F2A28",far:dk?"#7D8E8A":"#8D9A97",bg:o.bg||(dk?"#171F1D":"#FFFFFF"),ground:dk?"#3A4744":"#C3CFCB",
   rNear:dk?"#D3E3E0":"#2F5A5F",rFar:dk?"#6D8682":"#93AEAE",
   prop:dk?"#24302D":"#DDE5E3",propLine:dk?"#3A4744":"#B9C6C2",strap:dk?"#9AA9A5":"#55625F",towel:dk?"#B8C4C1":"#8E9C99",db:dk?"#C9D3D0":"#2F3A38",
   hl:dk?"#F0B04A":"#D98E1F",hlInk:"#1D1406",accent:dk?"#62B8C1":"#1E6B74",surface:o.bg||(dk?"#171F1D":"#FFFFFF")};}
@@ -343,19 +344,21 @@ function simple(ctx,ex,gm,o,C,ow,round){
   };
   if(!round){
     const W={arm:4.2,leg:5,foot:3.6,torso:6.6,neck:4};
-    const layer=(items,halo)=>{ctx.lineCap="round";ctx.lineJoin="round";
-      if(halo)items.forEach(([pts,w])=>lineLimb(pts,w+2.6,C.bg));items.forEach(([pts,w])=>lineLimb(pts,w,C.ink));};
+    // halo del color del fondo para separar lo de delante de lo de detrás, salvo junto a la raíz (hombro, cadera): ahí sería una junta
+    const layer=(items,halo,col=C.ink,roots=[])=>{ctx.lineCap="round";ctx.lineJoin="round";
+      if(halo){ctx.save();if(roots.length)ctx.clip(holes(roots),"evenodd");items.forEach(([pts,w])=>lineLimb(pts,w+2,C.bg));ctx.restore();}
+      items.forEach(([pts,w])=>lineLimb(pts,w,col));};
     const torso=[quad(p.s,p.c,p.p,10),W.torso],neck=[[p.s,p.h],W.neck];
-    const headC=()=>{ctx.fillStyle=C.bg;ctx.beginPath();ctx.arc(...p.h,B.head+1.3,0,7);ctx.fill();ctx.fillStyle=C.ink;ctx.beginPath();ctx.arc(...p.h,B.head,0,7);ctx.fill();};
+    const headC=()=>{ctx.fillStyle=C.ink;ctx.beginPath();ctx.arc(...p.h,B.head,0,7);ctx.fill();};
     drawGear(ctx,ex,gm,C,ow,"back");
     if(frente){layer([[parts.leg("1"),W.leg],[parts.foot("1"),W.foot],[parts.leg("2"),W.leg],[parts.foot("2"),W.foot]],false);
-      drawGear(ctx,ex,gm,C,ow,"band-back");layer([torso,neck],true);headC();drawGear(ctx,ex,gm,C,ow,"front");
-      layer([[parts.arm("1"),W.arm],[parts.arm("2"),W.arm]],true);return;}
-    layer([[parts.arm("2"),W.arm],[parts.leg("2"),W.leg],[parts.foot("2"),W.foot]],false);
+      drawGear(ctx,ex,gm,C,ow,"band-back");layer([torso,neck],false);headC();drawGear(ctx,ex,gm,C,ow,"front");
+      layer([[parts.arm("1"),W.arm],[parts.arm("2"),W.arm]],true,C.ink,[[p.s,8]]);return;}
+    layer([[parts.arm("2"),W.arm],[parts.leg("2"),W.leg],[parts.foot("2"),W.foot]],false,C.far);
     drawGear(ctx,ex,gm,C,ow,"band-back");
-    layer([torso,neck,[parts.leg("1"),W.leg],[parts.foot("1"),W.foot]],true);headC();
+    layer([torso,neck,[parts.leg("1"),W.leg],[parts.foot("1"),W.foot]],true,C.ink,[[p.s,7],[p.p,9]]);headC();
     drawGear(ctx,ex,gm,C,ow,"front");
-    layer([[parts.arm("1"),W.arm]],true);return;
+    layer([[parts.arm("1"),W.arm]],true,C.ink,[[p.s,8]]);return;
   }
   // redondo: formas llenas en dos tonos (lo de detrás más claro), sin contorno; halo del fondo entre capas
   const fr=gm.front,ref=frente?gm.lat:fr,[a0,a1,a2]=B.arm.map(x=>x*.92),[t0,t1]=B.thigh.map(x=>x*.9),[s0,s1]=B.shin.map(x=>x*.92);
@@ -365,13 +368,13 @@ function simple(ctx,ex,gm,o,C,ow,round){
   const legT=i=>[tube(seg(P(i),p["k"+i]),lin(t0,t1),lin(t0,t1),ref),tube(seg(p["k"+i],gm.feet[i].A),lin(s0,s1),lin(s0,s1),ref),footR(gm.feet[i])];
   const w=frente?(t=>t<.6?B.shF*.95-(B.shF*.95-B.waistF*.95)*(t/.6):B.waistF*.95+(B.hipFw*.92-B.waistF*.95)*((t-.6)/.4)):(t=>B.sh*.85-(B.sh*.85-B.waist*.95)*t+1.2*bump(t,.6,1.1));
   const torsoT=tube(quad(p.s,p.c,p.p),w,w,ref),neckT=tube(seg(p.s,p.h,4),()=>B.neck,()=>B.neck,ref),headT=circ(p.h,B.head+.3);
-  const halo=(items)=>{ctx.save();ctx.strokeStyle=C.bg;ctx.lineWidth=2.4;ctx.lineJoin="round";const U=new Path2D();items.forEach(it=>U.addPath(it.path||it));ctx.stroke(U);ctx.restore();};
-  const fill=(items,col)=>{halo(items);paint(ctx,[{fill:col,line:null,shade:false,items}],0);};
+  const halo=(items,roots)=>{ctx.save();if(roots)ctx.clip(holes(roots),"evenodd");ctx.strokeStyle=C.bg;ctx.lineWidth=2.4;ctx.lineJoin="round";const U=new Path2D();items.forEach(it=>U.addPath(it.path||it));ctx.stroke(U);ctx.restore();};
+  const fill=(items,col,roots,noHalo)=>{if(!noHalo)halo(items,roots);paint(ctx,[{fill:col,line:null,shade:false,items}],0);};
   drawGear(ctx,ex,gm,C,ow,"back");
-  if(frente){fill([...legT("1"),...legT("2")],C.rNear);drawGear(ctx,ex,gm,C,ow,"band-back");fill([torsoT,neckT,headT],C.rNear);
-    drawGear(ctx,ex,gm,C,ow,"front");fill(armT("2"),C.rNear);fill(armT("1"),C.rNear);return;}
-  fill(armT("2"),C.rFar);fill(legT("2"),C.rFar);drawGear(ctx,ex,gm,C,ow,"band-back");
-  fill([torsoT,neckT,headT,...legT("1")],C.rNear);drawGear(ctx,ex,gm,C,ow,"front");fill(armT("1"),C.rNear);
+  if(frente){drawGear(ctx,ex,gm,C,ow,"band-back");fill([...legT("1"),...legT("2"),torsoT,neckT,headT],C.rNear,null,true);
+    drawGear(ctx,ex,gm,C,ow,"front");fill(armT("2"),C.rNear,[[gm.root.s2,6]]);fill(armT("1"),C.rNear,[[gm.root.s1,6]]);return;}
+  fill(armT("2"),C.rFar,null,true);fill(legT("2"),C.rFar,null,true);drawGear(ctx,ex,gm,C,ow,"band-back");
+  fill([torsoT,neckT,headT,...legT("1")],C.rNear,[[p.p,9]]);drawGear(ctx,ex,gm,C,ow,"front");fill(armT("1"),C.rNear,[[p.s,7]]);
 }
 
 /* ---------- Etiquetas (solo en grande), como en la app: zona que trabaja, flecha del movimiento, «AQUÍ ESTIRA», banda ---------- */
