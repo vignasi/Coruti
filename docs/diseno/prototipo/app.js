@@ -680,12 +680,12 @@ P.medir = { proto: true, titulo: 'Rendimiento en este móvil', render: () => { c
   const fila = (t, v, ok, nota) => `<div class="item" style="cursor:default"><span class="crece"><span class="nombre">${t}</span><span class="meta">${nota}</span></span><span class="estado ${ok ? 'bien' : 'aviso'}">${ico(ok ? 'check' : 'aviso')}${v}</span></div>`;
   return `${cab('Rendimiento', 'mapa')}
   <div class="pantalla">
-    <p>Mide lo que tarda la figura 3D en <strong>este</strong> móvil. Abre antes Ejercicios una vez para que se carguen los modelos. Tarda unos segundos.</p>
+    <p>Mide lo que tarda la figura 3D en <strong>este</strong> móvil. Tarda unos segundos.</p>
     ${m ? `<div class="lista">
       ${m.tres ? '' : fila('Figura 3D', 'No', false, 'Sin WebGL: sale la figura dibujada')}
       ${fila('Una miniatura', Math.round(m.porMini) + ' ms', m.porMini < 60, `Las ${m.n} de Ejercicios: ${(m.todas / 1000).toFixed(1)} s, una a una sin bloquear. Bien si &lt; 60 ms`)}
       ${fila('Reproductor', Math.round(m.fps) + ' fps', m.fps >= 30, `Un fotograma de ${m.lienzo} px: ${Math.round(m.porFoto)} ms. Bien si ≥ 30 fps`)}
-      ${fila('Encuadre de un ejercicio nuevo', Math.round(m.encuadre) + ' ms', m.encuadre < 300, 'Una vez por ejercicio; el siguiente se mide antes. Bien si &lt; 300 ms')}
+      ${fila('Encuadre de un ejercicio nuevo', Math.round(m.encuadre) + ' ms', m.encuadre < 1000, 'Una vez por ejercicio, a trozos (no bloquea el toque); el siguiente se mide antes. Bien si &lt; 1 s')}
     </div><p class="meta">Mándame estas cifras con el modelo del móvil.</p>` : ''}
     <button class="btn btn-principal btn-grande" data-act="medir" ${S.midiendo ? 'disabled' : ''}>${S.midiendo ? 'Midiendo…' : m ? 'Medir otra vez' : 'Medir'}</button>
   </div>`; } };
