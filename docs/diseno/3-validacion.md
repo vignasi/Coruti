@@ -79,7 +79,22 @@ cumple Fitts a 1–2 m; deshacer con deslizar a la derecha; parar detrás de pau
 PENDIENTE
 
 ## 4. Textos
-PENDIENTE
+
+Pasada con la skill de textos (útil, conciso, conversacional, claro; errores con causa y salida; mismo nombre para lo mismo):
+
+| Antes | Después | Por qué |
+|---|---|---|
+| «Prepárate · 30 s» en letra pequeña gris | «PREPÁRATE · 30 S» como «DESCANSO» | Mismo aviso de fase para lo mismo |
+| Polar: «Sin conectar · pulso en directo disponible» | «Sin conectar · el pulso en directo funciona sin cuenta» | Parecía que hacía falta conectarlo para el pulso |
+| Lector de pantalla en las miniaturas: «Figura de Dead bug, Dead bug, 16 reps» | «Dead bug, 16 reps» | El nombre salía dos veces |
+| Widget: «fondo propuesto (opción A…)» / «Propuesta» | «fondo elegido (A…)» / «Elegida»; B «Descartada» | Ya está decidido |
+
+Revisado y bien: botones con verbo (Empezar, Guardar y volver, Enviar a Strava, Crear plan); errores de Strava con qué pasó y qué
+hacer; confirmación de parar con su consecuencia («Se guarda como incompleta… No cuenta para la racha»); pantallas vacías con
+el siguiente paso; peso sin juicios («−1,2 kg en 8 semanas»); personalización con «complexión», nunca «gordito».
+
+Se queda así: «reps» y «dead bug» (es como se dice en el gimnasio y en Freeletics); «Z3» junto al pulso (zona, se explica en
+«Probar pulso»).
 
 ## Lo que falta (tu visto bueno)
 PENDIENTE

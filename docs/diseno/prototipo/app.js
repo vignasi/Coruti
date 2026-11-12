@@ -156,7 +156,7 @@ P.mapa = { proto: true, render: () => `
       ['Tú', [['tu', 'Perfil y ajustes'], ['entrar', 'Entrar con email'], ['peso', 'Peso y medidas'], ['material', 'Material'], ['bandas', 'Mis bandas'], ['sonido', 'Sonido y voz'], ['figura', 'Hombre o mujer'], ['personalizar', 'Más adelante'], ['widget-conf', 'Qué hace el widget'], ['copia', 'Copia de seguridad']]],
       ['Conexiones', [['conexiones', 'Claude, Strava y Polar'], ['claude', 'Conectar Claude'], ['strava', 'Strava'], ['polar', 'Polar y pulso'], ['pulso', 'Probar pulso']]],
       ['Fuera de la app', [['widgets', 'Widget grande y pequeño'], ['widget-fondo', 'Fondo: A elegida (frente a B y al de hoy)']]],
-      ['Referencia', [['sistema', 'Sistema de diseño']]],
+      ['Referencia', [['sistema', 'Sistema de diseño'], ['medir', 'Rendimiento de la figura 3D en este móvil']]],
     ].map(([g, l]) => `<section class="mapa-grupo"><h2 class="etiqueta">${g}</h2><div class="lista">${l.map(([id, t]) => item({ t: P[id].titulo || t, m: P[id].titulo ? t : '', go: id })).join('')}</div></section>`).join('')}
   </div>` };
 
@@ -337,7 +337,8 @@ P.reproductor = { sinPestanas: true, titulo: 'Reproductor', render: () => {
   else if (R.fase === 'prepara') { cantidad = `<span class="repro-cantidad acc">${R.t}</span>`; abajo = `<span class="aviso-fase" aria-live="assertive">Prepárate · ${x.secs} s</span>`; }
   else if (x.reps) { cantidad = `<span class="repro-cantidad">${x.reps}<small>reps</small></span>`; abajo = `<span class="repro-reloj">${guia < x.reps ? `Ritmo ${guia} de ${x.reps}` : 'Toca al acabar'} · ${mm(R.t)}</span>`; }
   else { cantidad = `<span class="repro-cantidad">${mm(R.t)}</span>`; abajo = `<span class="repro-reloj">de ${mm(x.secs)}${x.sides ? ' por lado' : ''}</span>`; }
-  return `<div class="repro ${R.fase}" data-act="tap">
+  const luego = PASOS.slice(R.pos + 1).find(q => q.tipo === 'ej');
+  return `<div class="repro ${R.fase}" data-act="tap" ${luego ? `data-luego="${rLista[luego.k].id}"` : ''}>
     <button class="oculto-visual" data-act="tap">${desc ? 'Terminar el descanso' : 'Hecho: pasar al siguiente'}</button>
     <div class="repro-figura">
       ${desc ? fig(e, 'sig').replace('class="fig fig-sig"', 'class="fig fig-sig libre pequena"') : fig(e, 'libre').replace('class="fig fig-libre"', 'class="fig fig-libre libre"')}
@@ -674,6 +675,21 @@ P.sistema = { proto: true, titulo: 'Sistema de diseño', render: () => `${cab('S
     <p class="meta">Un paquete por ronda, una raya por ejercicio y una más corta y hueca para el descanso. Hecho en verde azulado, el actual en ámbar.</p></section>
   </div>` };
 
+/* Rendimiento en el móvil de verdad (D3): en el ordenador de pruebas la GPU es por software y no sirve para medir */
+P.medir = { proto: true, titulo: 'Rendimiento en este móvil', render: () => { const m = S.medida;
+  const fila = (t, v, ok, nota) => `<div class="item" style="cursor:default"><span class="crece"><span class="nombre">${t}</span><span class="meta">${nota}</span></span><span class="estado ${ok ? 'bien' : 'aviso'}">${ico(ok ? 'check' : 'aviso')}${v}</span></div>`;
+  return `${cab('Rendimiento', 'mapa')}
+  <div class="pantalla">
+    <p>Mide lo que tarda la figura 3D en <strong>este</strong> móvil. Abre antes Ejercicios una vez para que se carguen los modelos. Tarda unos segundos.</p>
+    ${m ? `<div class="lista">
+      ${m.tres ? '' : fila('Figura 3D', 'No', false, 'Sin WebGL: sale la figura dibujada')}
+      ${fila('Una miniatura', Math.round(m.porMini) + ' ms', m.porMini < 60, `Las ${m.n} de Ejercicios: ${(m.todas / 1000).toFixed(1)} s, una a una sin bloquear. Bien si &lt; 60 ms`)}
+      ${fila('Reproductor', Math.round(m.fps) + ' fps', m.fps >= 30, `Un fotograma de ${m.lienzo} px: ${Math.round(m.porFoto)} ms. Bien si ≥ 30 fps`)}
+      ${fila('Encuadre de un ejercicio nuevo', Math.round(m.encuadre) + ' ms', m.encuadre < 300, 'Una vez por ejercicio; el siguiente se mide antes. Bien si &lt; 300 ms')}
+    </div><p class="meta">Mándame estas cifras con el modelo del móvil.</p>` : ''}
+    <button class="btn btn-principal btn-grande" data-act="medir" ${S.midiendo ? 'disabled' : ''}>${S.midiendo ? 'Midiendo…' : m ? 'Medir otra vez' : 'Medir'}</button>
+  </div>`; } };
+
 /* ---------- Hojas inferiores ---------- */
 const HOJAS = {
   dia: () => { const d = SEMANA.find(x => x.n === S.diaSel) || SEMANA[4]; return `<h2 class="h2">${d.n} · ${d.tipo}</h2><p class="meta">${d.carrera ? 'Se graba con el reloj; aquí llega desde Strava.' : ORIGEN[d.o][1]}</p>${d.carrera || d.est === 'descanso' ? '' : `<button class="btn btn-principal btn-grande" data-go="reproductor">${ico('play')}Hacerla hoy</button>`}<button class="btn btn-secundario" data-act="cerrar" data-msg="Cambiada por una favorita">${ico('estrella')}Cambiar por una favorita</button><button class="btn btn-texto" data-act="cerrar" data-msg="${d.n}: descanso">${ico('luna')}Dejar como descanso</button>`; },
@@ -754,6 +770,8 @@ const A = {
   desc: b => { S.conectado[b.dataset.v] = false; }, con: b => { S.conectado[b.dataset.v] = true; toast('Conectado'); return 'nada'; },
   salir: () => { S.cuenta = false; toast('Has salido. Tus datos siguen en este móvil'); return 'nada'; },
   reenviar: () => toast('Código enviado otra vez'),
+  medir: () => { if (!window.FIG || S.midiendo) return 'nada'; S.midiendo = true; pintar(false);
+    setTimeout(() => window.FIG.medir().then(m => { S.medida = m; }).catch(() => {}).finally(() => { S.midiendo = false; pintar(false); }), 50); return 'nada'; },
 };
 document.addEventListener('click', ev => {
   const t = ev.target.closest('[data-go],[data-act],[data-tema]'); if (!t) return;

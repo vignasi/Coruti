@@ -67,36 +67,47 @@ function dibujar(cv, k, t, clamp, etiquetas, g) {
    durante todo el bucle, y la figura se agranda hasta que eso llena el ancho de la pantalla (sin pasar del alto).
    Así los de pie salen más grandes sin cortar la etiqueta de la zona, la flecha ni la banda (antes se recortaba
    un 15 % fijo por cada lado y se perdían «JUNTA ESCÁPULAS» o «GLÚTEO DE LADO»). */
-const anchos = {};
-function anchoUtil(k, g) {
-  const id = k + g + (oscuro() ? 'o' : 'c'); if (anchos[id]) return anchos[id];
-  const fiable = modelos[g] || !crear || !hayWebGL;           // con el 3D aún cargando no se guarda
-  const caja = document.createElement('div'); caja.style.cssText = 'position:absolute;left:-9999px;top:0;width:160px';
-  const cv = document.createElement('canvas'); cv.style.width = '160px'; caja.appendChild(cv); document.body.appendChild(caja);
-  let x0 = 1, x1 = 0;
-  try {
-    for (let t = 0; t < 6; t += 0.4) {
-      dibujar(cv, k, t, false, true, g);
-      const w = cv.width, h = cv.height, d = cv.getContext('2d').getImageData(0, 0, w, h).data;
-      for (let y = 0; y < h; y++) {
-        let n = 0, a = w, b = -1;
-        for (let x = 0; x < w; x++) if (d[(y * w + x) * 4 + 3] > 120) { n++; if (x < a) a = x; b = x; }
-        if (n > w * 0.8 || b < 0) continue;                    // la línea del suelo cruza todo: no cuenta
-        x0 = Math.min(x0, a / w); x1 = Math.max(x1, (b + 1) / w);
+const anchos = {}, midiendo = {};
+// Se mide con la figura dibujada (figura.js: misma geometría, mismo encuadre y mismas etiquetas que la 3D, pero en 2D y sin
+// leer de la GPU, que es lo caro), a trozos para no bloquear el toque. Mientras, la figura sale entera a lo ancho.
+async function anchoUtil(k, g) {
+  const id = k + g; if (anchos[id]) return anchos[id];
+  if (midiendo[id]) return midiendo[id];
+  return (midiendo[id] = (async () => {
+    const caja = document.createElement('div'); caja.style.cssText = 'position:absolute;left:-9999px;top:0;width:120px';
+    const cv = document.createElement('canvas'); cv.style.width = '120px'; caja.appendChild(cv); document.body.appendChild(caja);
+    let x0 = 1, x1 = 0;
+    try {
+      for (let t = 0; t < 6; t += 0.5) {
+        const cw = cv.clientWidth || 120; if (cv.width !== cw) { cv.width = cw; cv.height = Math.round(cw * 112 / 180); }
+        window.Figura.draw(cv, D.exercises[k], t, false, { key: k, labels: true, text: D.marks, pt: t, gender: g, style: 'persona', bg: 'transparent' });
+        const w = cv.width, h = cv.height, d = cv.getContext('2d').getImageData(0, 0, w, h).data;
+        for (let y = 0; y < h; y++) {
+          let n = 0, a = w, b = -1;
+          for (let x = 0; x < w; x++) if (d[(y * w + x) * 4 + 3] > 120) { n++; if (x < a) a = x; b = x; }
+          if (n > w * 0.8 || b < 0) continue;                  // la línea del suelo cruza todo: no cuenta
+          x0 = Math.min(x0, a / w); x1 = Math.max(x1, (b + 1) / w);
+        }
+        await new Promise(r => setTimeout(r, 0));
       }
-    }
-  } catch (e) { x0 = 0; x1 = 1; }
-  caja.remove();
-  if (x1 <= x0) { x0 = 0; x1 = 1; }
-  const r = [Math.max(0, x0 - 0.02), Math.min(1, x1 + 0.02)];
-  if (fiable) anchos[id] = r;
-  return r;
+    } catch (e) { x0 = 0; x1 = 1; }
+    caja.remove(); delete midiendo[id];
+    if (x1 <= x0) { x0 = 0; x1 = 1; }
+    const r = [Math.max(0, x0 - 0.04), Math.min(1, x1 + 0.04)];       // margen: el cuerpo 3D tiene grosor
+    anchos[id] = r;
+    return r;
+  })());
 }
 function encuadrar(cv, k, g) {
   const hueco = cv.closest('.fig'); if (!hueco || !hueco.clientWidth) return;
-  const W = hueco.clientWidth, H = hueco.clientHeight, [a, b] = anchoUtil(k, g);
+  const id = k + g, W = hueco.clientWidth, H = hueco.clientHeight;
+  const [a, b] = anchos[id] || [0, 1];
   const w = Math.min(H * 180 / 112, W / (b - a), W * 1.8), izq = W / 2 - (a + b) / 2 * w;
   cv.style.width = w + 'px'; cv.style.left = Math.min(0, Math.max(W - w, izq)) + 'px';
+  if (!anchos[id]) anchoUtil(k, g).then(() => { if (cv.isConnected && cv.dataset.fig === k) encuadrar(cv, k, g); });
+  // el siguiente ejercicio se mide antes, mientras haces este
+  const sig = cv.closest('[data-luego]')?.dataset.luego;
+  if (sig && D.exercises[sig]) setTimeout(() => anchoUtil(sig, g), 1500);
 }
 
 /* Miniaturas: se dibujan una a una (no bloquean la página) y se guardan */
@@ -158,7 +169,32 @@ function pintar(raiz = document) {
   trabajar();
 }
 
+/* Medir en este móvil (pantalla «Rendimiento»): lo que tarda una miniatura, un fotograma del reproductor y un encuadre nuevo */
+async function medir() {
+  const g = generoDe(document.body); let tres = true;
+  try { await modelo(g); } catch (e) { tres = false; }
+  const caja = document.createElement('div'); caja.style.cssText = 'position:absolute;left:-9999px;top:0';
+  const mini = document.createElement('canvas'), grande = document.createElement('canvas');
+  mini.style.width = '182px'; grande.style.width = Math.round(innerWidth * 1.3) + 'px';
+  caja.append(mini, grande); document.body.appendChild(caja);
+  const espera = () => new Promise(r => setTimeout(r, 0));
+  const ks = Object.keys(D.exercises);
+  dibujar(mini, ks[0], 0, true, false, g); mini.getContext('2d').getImageData(0, 0, 1, 1);   // calentar
+  let t0 = performance.now();
+  for (const k of ks) { dibujar(mini, k, window.Figura.keyT(D.exercises[k]), true, false, g); mini.getContext('2d').getImageData(0, 0, 1, 1); }
+  const porMini = (performance.now() - t0) / ks.length; await espera();
+  const k = 'remo_incl_banda'; dibujar(grande, k, 0, false, true, g); grande.getContext('2d').getImageData(0, 0, 1, 1);
+  t0 = performance.now();
+  for (let i = 0; i < 20; i++) { dibujar(grande, k, i / 10, false, true, g); grande.getContext('2d').getImageData(0, 0, 1, 1); }
+  const porFoto = (performance.now() - t0) / 20; await espera();
+  Object.keys(anchos).forEach(x => delete anchos[x]);
+  t0 = performance.now(); await anchoUtil('curl_goma', g); const encuadre = performance.now() - t0;
+  caja.remove();
+  return { tres, porMini, todas: porMini * ks.length, n: ks.length, porFoto, fps: Math.min(60, 1000 / porFoto), lienzo: grande.width + ' × ' + grande.height, encuadre };
+}
+
 window.FIG = {
+  medir,
   pintar, ejercicios: Object.keys(D.exercises),
   look(nuevo) { look = { ...nuevo }; lookId = JSON.stringify(look); Object.values(modelos).forEach(aplicar); },
   precargar(g) { modelo(g).catch(() => {}); },
