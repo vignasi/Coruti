@@ -281,7 +281,8 @@ object Cloud {
         val local = SyncLogic.stateOf(Backup.snapshot(c))
         val lHash = SyncLogic.hash(local)
         val rHash = remote?.let { SyncLogic.hash(it) }
-        val action = SyncLogic.decide(lHash, rHash, p.getString("lastL", null), p.getString("lastR", null))
+        val action = SyncLogic.decide(lHash, rHash, p.getString("lastL", null), p.getString("lastR", null),
+            localBlank = SyncLogic.isBlank(local, History.all(c).length()))
         var newLocal = local
         when (action) {
             SyncLogic.Action.NONE -> {}

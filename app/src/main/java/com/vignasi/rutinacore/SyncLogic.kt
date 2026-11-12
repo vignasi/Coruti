@@ -108,15 +108,25 @@ object SyncLogic {
 
     /**
      * Qué hacer con el estado. [lastLocal] y [lastRemote] son las huellas de la última sincronización
-     * (null si nunca se ha sincronizado con esta cuenta en este móvil).
+     * (null si nunca se ha sincronizado con esta cuenta en este móvil). [localBlank]: el móvil no tiene nada tuyo
+     * (recién instalado o tras cambiar de cuenta), así que sus ajustes por defecto no deben pisar los de la nube.
      */
-    fun decide(local: String, remote: String?, lastLocal: String?, lastRemote: String?): Action = when {
+    fun decide(local: String, remote: String?, lastLocal: String?, lastRemote: String?, localBlank: Boolean = false): Action = when {
         remote == null -> Action.PUSH                         // la cuenta aún no tiene nada en la nube
-        lastLocal == null || lastRemote == null -> Action.MERGE  // primera vez en este móvil
+        (lastLocal == null || lastRemote == null) && localBlank -> Action.PULL  // móvil nuevo: se baja todo
+        lastLocal == null || lastRemote == null -> Action.MERGE  // primera vez en este móvil, con datos en los dos lados
         local == lastLocal && remote == lastRemote -> Action.NONE
         remote == lastRemote -> Action.PUSH
         local == lastLocal -> Action.PULL
         else -> Action.MERGE
+    }
+
+    /** ¿El móvil no tiene nada tuyo? Sin historial, días de racha, pesos, favoritas ni bandas (los ajustes por defecto no cuentan). */
+    fun isBlank(state: JSONObject, historyCount: Int): Boolean {
+        val free = state.optJSONObject("free")
+        return historyCount == 0 && (state.optJSONArray("days")?.length() ?: 0) == 0 &&
+            (state.optJSONObject("weights")?.length() ?: 0) == 0 &&
+            (free?.optJSONArray("favs")?.length() ?: 0) == 0 && (free?.optJSONArray("bands")?.length() ?: 0) == 0
     }
 
     /** Combina el estado de la nube con el del móvil; el móvil va por encima (como una copia importada). */

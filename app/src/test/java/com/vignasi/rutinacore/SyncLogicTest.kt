@@ -66,6 +66,18 @@ class SyncLogicTest {
         assertEquals(SyncLogic.Action.PUSH, SyncLogic.decide("L2", "R", "L", "R"))
         assertEquals(SyncLogic.Action.PULL, SyncLogic.decide("L", "R2", "L", "R"))
         assertEquals(SyncLogic.Action.MERGE, SyncLogic.decide("L2", "R2", "L", "R"))
+        // Móvil recién instalado: se baja todo, sus ajustes por defecto no pisan los de la nube
+        assertEquals(SyncLogic.Action.PULL, SyncLogic.decide("L", "R", null, null, localBlank = true))
+        assertEquals(SyncLogic.Action.PUSH, SyncLogic.decide("L", null, null, null, localBlank = true))
+        // Ya sincronizado: estar vacío no cambia nada (p. ej. si borraste las favoritas)
+        assertEquals(SyncLogic.Action.PUSH, SyncLogic.decide("L2", "R", "L", "R", localBlank = true))
+    }
+
+    @Test fun movilEnBlanco() {
+        assertTrue(SyncLogic.isBlank(JSONObject("""{"days":[],"config":{"rounds":3},"weights":{},"free":{"widgetFav":""}}"""), 0))
+        assertFalse(SyncLogic.isBlank(JSONObject("""{"days":["2026-11-11"]}"""), 0))
+        assertFalse(SyncLogic.isBlank(JSONObject("""{"free":{"favs":[{"name":"A"}]}}"""), 0))
+        assertFalse(SyncLogic.isBlank(JSONObject("{}"), 1))
     }
 
     @Test fun lasFavoritasVanASuTablaYVuelven() {
