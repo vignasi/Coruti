@@ -162,7 +162,11 @@ class MainActivity : Activity() {
         fun getFree(key: String): String = Store.getFree(this@MainActivity, key)
 
         @JavascriptInterface
-        fun setFree(key: String, value: String) = Store.setFree(this@MainActivity, key, value)
+        fun setFree(key: String, value: String) {
+            Store.setFree(this@MainActivity, key, value)
+            // Lo que muestra el widget depende de la favorita marcada, de sus rondas y de las bandas
+            if (key != "free.last") runOnUiThread { WidgetUpdater.refresh(this@MainActivity, force = true) }
+        }
 
         /** El contenido de assets/rutina.json: la página y el widget usan los mismos datos. */
         @JavascriptInterface

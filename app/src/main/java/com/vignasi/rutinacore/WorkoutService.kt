@@ -82,7 +82,7 @@ class WorkoutService : Service() {
             val data = Rutina.get(this)
             val mods = activeModules(data, cfg, Store.lastDay(this))
             Workout.start(buildSteps(data, cfg, Store.lastDay(this), Store.sessions(this)), cfg, dayType(mods))
-            Workout.rec = SessionRecorder(modsLabel(mods), dayType(mods), cfg.rounds)
+            Workout.rec = SessionRecorder("rutina", modsLabel(mods), dayType(mods), cfg.rounds)
             resetCues()
             acquireWake()
             lastTick = SystemClock.elapsedRealtime()

@@ -19,6 +19,7 @@ object Backup {
         val p = Store.prefs(c)
         val free = JSONObject()
         for ((k, pref) in FREE) parse(p.getString(pref, null))?.let { free.put(k, it) }
+        free.put("widgetFav", Store.widgetFavName(c))
         return JSONObject()
             .put("app", APP).put("v", VERSION).put("exportedAt", System.currentTimeMillis())
             .put("history", History.all(c))
@@ -81,6 +82,7 @@ object Backup {
         if (favs.length() > 0) free.put("favs", favs)
         val bands = cf.optJSONArray("bands")?.takeIf { it.length() > 0 } ?: lf.optJSONArray("bands")
         bands?.let { free.put("bands", it) }
+        free.put("widgetFav", cf.optString("widgetFav", "").ifEmpty { lf.optString("widgetFav", "") })
         free.put("bandUse", overlay(lf.optJSONObject("bandUse"), cf.optJSONObject("bandUse")))
 
         return JSONObject()
@@ -105,6 +107,7 @@ object Backup {
             .putString("weights", (s.optJSONObject("weights") ?: JSONObject()).toString())
         val free = s.optJSONObject("free") ?: JSONObject()
         for ((k, pref) in FREE) free.opt(k)?.let { e.putString(pref, it.toString()) }
+        e.putString("free.widgetFav", free.optString("widgetFav", ""))
         e.apply()
         s.optJSONObject("config")?.let { Store.setConfigJson(c, it.toString()) }
         History.replaceAll(c, s.optJSONArray("history") ?: JSONArray())

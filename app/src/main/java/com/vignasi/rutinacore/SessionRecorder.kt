@@ -9,7 +9,7 @@ import java.util.TimeZone
  * Apunta la sesión hecha desde el widget con la misma forma que recStart/recClose/recSave en index.html:
  * cada serie con su hora de inicio y fin, lo hecho si se saltó, los kilos y la banda.
  */
-class SessionRecorder(private val title: String, private val day: String, private val rounds: Int) {
+class SessionRecorder(private val type: String, private val title: String, private val day: String, private val rounds: Int) {
     private val start = System.currentTimeMillis()
     private val id = start.toString(36) + "-" + (Math.random() * Int.MAX_VALUE).toLong().toString(36).take(6)
     private val sets = JSONArray()
@@ -47,7 +47,7 @@ class SessionRecorder(private val title: String, private val day: String, privat
             .put("secs", if (!hold) 0 else if (skipped) Math.round(el) else st.s)
             .put("planSecs", if (hold) st.s else 0)
             .put("kg", kg ?: JSONObject.NULL)
-            .put("band", band(c, st.k) ?: JSONObject.NULL)
+            .put("band", (if (Rutina.get(c).cat(st.k)?.needs == "gomas") Store.bandOf(c, st.k) else null) ?: JSONObject.NULL)
             .put("mod", st.mod ?: JSONObject.NULL)
             .put("skipped", skipped))
     }
@@ -58,20 +58,10 @@ class SessionRecorder(private val title: String, private val day: String, privat
         if (sets.length() == 0) return
         val end = System.currentTimeMillis()
         History.add(c, JSONObject()
-            .put("id", id).put("v", 1).put("type", "rutina").put("src", "widget")
+            .put("id", id).put("v", 1).put("type", type).put("src", "widget")
             .put("title", title).put("day", day).put("rounds", rounds)
             .put("start", start).put("end", end)
             .put("tz", TimeZone.getDefault().getOffset(start) / 60000)
             .put("sets", sets).put("complete", complete))
     }
-
-    /** La banda grande que usas en ese ejercicio (la misma que recuerda la pantalla de ejercicios sueltos). */
-    private fun band(c: Context, k: String): String? = try {
-        val use = JSONObject(Store.getFree(c, "free.bandUse").ifEmpty { "{}" })
-        val name = use.optString(k, "")
-        val saved = try { JSONArray(Store.getFree(c, "free.bands")) } catch (e: Exception) { JSONArray() }
-        val bands = (0 until saved.length()).map { saved.optString(it) }.filter { it.isNotBlank() }
-            .ifEmpty { listOf("Banda 1", "Banda 2", "Banda 3", "Banda 4") }
-        name.takeIf { it.isNotEmpty() && it in bands }
-    } catch (e: Exception) { null }
 }

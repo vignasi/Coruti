@@ -172,6 +172,8 @@ fieldset:disabled{opacity:.55}
 .fav .go{flex:1;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;text-align:left;line-height:1.25;padding:8px 14px;min-height:56px;background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
 .fav .go small{font-weight:400;font-size:.85rem}
 .fav .del{padding:0 12px;font-size:.9rem}
+.fav .wid{padding:0;min-width:var(--tap);font-size:1.3rem;color:var(--soft)}
+.fav .wid[aria-pressed="true"]{background:var(--hl);border-color:var(--hl);color:var(--hl-ink)}
 .savefav{display:flex;gap:8px}
 .savefav input{flex:1;min-width:0;min-height:var(--tap);border-radius:12px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);font:1rem var(--body);padding:0 12px}
 /* Historial */
@@ -285,7 +287,7 @@ body.hist .player,body.hist #setup,body.hist #free,body.hist .exhead,body.hist .
     <div class="body">
       <fieldset id="freef">
         <legend class="sr">Elige los ejercicios y cómo hacerlos</legend>
-        <div class="field" id="ffavf" hidden><span class="lbl" id="lfav">Favoritas</span><small class="hint">Un toque y empieza.</small>
+        <div class="field" id="ffavf" hidden><span class="lbl" id="lfav">Favoritas</span><small class="hint">Un toque y empieza. Con ★ eliges la que sale en el widget.</small>
           <div class="favs" id="ffavs" role="group" aria-labelledby="lfav"></div></div>
         <div class="field"><span class="lbl" id="lfsel">Tu sesión</span>
           <ol class="sel" id="fsel" aria-labelledby="lfsel"></ol><small class="hint" id="fselhint"></small></div>
@@ -718,6 +720,7 @@ function renderFree(){
 }
 /* ---------- Favoritas ---------- */
 function favs(){try{const a=JSON.parse(store.free("free.favs"));return Array.isArray(a)?a:[]}catch(e){return []}}
+const widgetFav=()=>store.free("free.widgetFav")||"";
 function saveFavs(a){store.setFree("free.favs",JSON.stringify(a));}
 const autoName=f=>f.sel.map(it=>D.exercises[it.k].name).join(" + ");
 function favSub(f){const n=normFree(f);return `${n.rounds} ${isAlt(n)?"rondas alternadas":(n.rounds===1?"serie":"series")} · ${n.sel.map(it=>isHoldEx(it.k)?it.n+" s":it.n+" reps").join(" / ")} · descanso ${n.rest} s`;}
@@ -728,9 +731,14 @@ function renderFavs(){
     go.firstChild.textContent="▶ "+f.name;go.lastChild.textContent=favSub(f);go.setAttribute("aria-label","Empezar "+f.name);
     go.onclick=()=>{const n=normFree(f);fr={...fr,sel:n.sel,rounds:n.rounds,rest:n.rest,alt:n.alt};applyFree();favName=f.name;
       $("ffavmsg").textContent="";if(!bplay.disabled)bplay.click();};
+    const wid=document.createElement("button");wid.className="wid";const onW=widgetFav()===f.name;
+    wid.textContent=onW?"★":"☆";wid.setAttribute("aria-pressed",onW);wid.setAttribute("aria-label","Usar "+f.name+" en el widget");
+    wid.onclick=()=>{const on=widgetFav()===f.name;store.setFree("free.widgetFav",on?"":f.name);
+      $("ffavmsg").textContent=on?"El widget vuelve a la rutina completa.":`«${f.name}» sale en el widget.`;renderFavs();};
     const del=document.createElement("button");del.className="del";del.textContent="Borrar";del.setAttribute("aria-label","Borrar la favorita "+f.name);
-    del.onclick=()=>{saveFavs(favs().filter(x=>x.name!==f.name));$("ffavmsg").textContent=`«${f.name}» borrada.`;renderFavs();};
-    row.append(go,del);box.appendChild(row);});
+    del.onclick=()=>{saveFavs(favs().filter(x=>x.name!==f.name));if(widgetFav()===f.name)store.setFree("free.widgetFav","");
+      $("ffavmsg").textContent=`«${f.name}» borrada.`;renderFavs();};
+    row.append(go,wid,del);box.appendChild(row);});
 }
 function saveFav(){
   if(!fr.sel.length){$("ffavmsg").textContent="Elige primero algún ejercicio.";return;}
