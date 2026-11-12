@@ -21,9 +21,9 @@ Fecha: 12 nov 2026. Severidad de 0 (nada) a 4 (impide la tarea). **Queda sin fal
 | 12 | Duración distinta en Hoy (19 min) y al terminar (38 min) | Coherencia (H4) | 2 | Mismo cálculo en las dos |
 
 Se queda como está, a propósito:
-- **Parar** tiene el mismo tamaño que Saltar: se puede tocar sin querer, pero pide confirmación y la sesión sigue en pausa.
-- El nombre del ejercicio en la sesión va a 28 sp: a 2 m se lee justo. Lo que se tiene que leer de lejos es la figura,
-  el tiempo y la repetición; el nombre se lee en «Prepárate», cuando te acercas a cambiar de material. **Probar en el móvil (D3).**
+- El nombre del ejercicio en la sesión va a 28 sp: a 2 m se lee justo. De lejos se ve la figura y la cantidad;
+  el nombre se lee al acercarte a tocar. **Probar en el móvil (D3).**
+- (Los controles Parar · Pausa · Saltar de la primera versión se quitaron después: ver el apartado 4.)
 
 ## 2. Accesibilidad (WCAG 2.1 AA)
 
@@ -58,6 +58,20 @@ y 200 % (por eso los tamaños van en sp) y que el reproductor siga cabiendo con 
 
 Revisado y bien: botones con verbo, errores con causa y salida, confirmación de parar con su consecuencia
 («Se guarda como incompleta… No cuenta para la racha»), sin textos de relleno ni ayuda permanente.
+
+## 4. Cambio del reproductor tras tu revisión
+Pediste la figura a toda pantalla, la información pequeña abajo, rayas de progreso como Freeletics, que las repeticiones
+no pasen solas y gestos en lugar de botones. Hecho, y repasado con las mismas tres skills:
+
+| Revisión | Resultado |
+|---|---|
+| Crítica | Tocar en cualquier sitio cumple Fitts a 1–2 m (no hay que apuntar). Riesgo: pasar sin querer al apoyar la mano; se corrige deslizando a la derecha (anterior), sin perder nada. Parar queda detrás de pausa + confirmación (H5). Rayas = progreso visible (gradiente de meta). Sin fallos graves |
+| Accesibilidad | axe 0 fallos. El contenedor tocable no es un botón con botones dentro: hay un botón real «Hecho: pasar al siguiente» para lector de pantalla y teclado, y flechas izquierda/derecha |
+| Textos | «Toca al acabar», «Ritmo 7 de 12», «Prepárate · 30 s», «Toca para seguir ya», «En pausa», «Ejercicio anterior», «Parar la sesión» |
+| Pantallas bajas | En 360×700 la figura sigue teniendo 450 px y todo cabe sin desplazar |
+
+Decidido distinto de lo que dijiste: **deslizar a la derecha = anterior** (y a la izquierda = siguiente), como pasar páginas en Android.
+Si de verdad lo quieres al revés, es un cambio de una línea.
 
 ## Lo que falta (D3)
 Tu visto bueno en el móvil. Sobre todo: leer el reproductor desde el suelo a 1–2 m, y si las cuatro pestañas y el

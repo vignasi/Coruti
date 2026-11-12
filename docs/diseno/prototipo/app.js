@@ -81,6 +81,7 @@ const SESION_HOY = {
     { id: 'plancha', secs: 30 },
     { id: 'deadbug', reps: 16 },
   ],
+  claves: { remo_incl_banda: 'Codos pegados al cuerpo, hasta el ombligo', press_goma: 'Banda por la espalda, bajo las axilas', curl_goma: 'Codos quietos a los lados', flex: 'Manos debajo de los hombros', plancha: 'Culo apretado, coxis hacia abajo', deadbug: 'Lumbar pegada al suelo' },
   nota: 'Hoy subo 2 reps el remo: el lunes lo marcaste como «fácil». Plancha y dead bug para cerrar.',
 };
 const SEMANA = [
@@ -285,50 +286,67 @@ P.ficha = { titulo: 'Ficha de un ejercicio', render: () => { const e = ej(S.ex);
     <button class="btn btn-principal btn-grande" data-act="anadir" data-id="${e.id}">${ico('mas')}Añadir a una sesión</button>
   </div>`; } };
 
-/* Reproductor */
-const R = { fase: 'prepara', i: 0, ronda: 1, t: 5, pausa: false, timer: null };
-const rLista = SESION_HOY.ej, rDur = x => x.secs || x.reps * 3;
-function rTotalQueda() { let s = 0; for (let r = R.ronda; r <= SESION_HOY.rondas; r++) rLista.forEach((x, k) => { if (r > R.ronda || k >= R.i) s += rDur(x) + 5; }); return Math.round(s / 60); }
-function rTick() {
-  if (R.pausa || location.hash.slice(1) !== 'reproductor') return;
-  R.t--;
-  if (R.t <= 0) rSiguiente(); else pintar(false);
+/* Reproductor
+   La figura ocupa la pantalla; abajo, donde no se pisa: clave, nombre, cantidad, siguiente y rayas de progreso.
+   Ejercicios de repeticiones: no pasan solos. Se marca el ritmo como guía y, al acabar, tocas la pantalla.
+   Ejercicios de segundos y descansos: cuenta atrás y pasan solos (tocar adelanta).
+   Tocar la pantalla = siguiente · deslizar a la derecha = anterior · botón de pausa = seguir, anterior o parar. */
+const rLista = SESION_HOY.ej;
+const PASOS = [];
+for (let r = 1; r <= SESION_HOY.rondas; r++) {
+  rLista.forEach((x, k) => PASOS.push({ tipo: 'ej', r, k }));
+  if (r < SESION_HOY.rondas) PASOS.push({ tipo: 'desc', r });
 }
-function rSiguiente() {
-  const x = rLista[R.i];
-  if (R.fase === 'prepara') { R.fase = 'serie'; R.t = rDur(x); }
-  else if (R.fase === 'serie') {
-    if (R.i < rLista.length - 1) { R.i++; R.fase = 'prepara'; R.t = 5; }
-    else if (R.ronda < SESION_HOY.rondas) { R.ronda++; R.i = 0; R.fase = 'descanso'; R.t = SESION_HOY.descanso; }
-    else { location.hash = 'final'; return; }
-  } else { R.fase = 'prepara'; R.t = 5; }
-  pintar(false);
+const R = { pos: 0, fase: 'serie', t: 0, pausa: false, swipe: null, ignorarClic: false, visto: false };
+function rEmpezar(pos) {
+  R.pos = lim(pos, 0, PASOS.length - 1); const p = PASOS[R.pos];
+  if (p.tipo === 'desc') { R.fase = 'descanso'; R.t = SESION_HOY.descanso; }
+  else if (rLista[p.k].secs) { R.fase = 'prepara'; R.t = 5; }
+  else { R.fase = 'serie'; R.t = 0; }
+}
+function rReiniciar() { R.pausa = false; R.visto = false; rEmpezar(0); }
+function rTick() {
+  if (R.pausa || S.hoja || location.hash.slice(1) !== 'reproductor') return;
+  const x = PASOS[R.pos].tipo === 'ej' ? rLista[PASOS[R.pos].k] : null;
+  if (R.fase === 'serie' && x && x.reps) { R.t++; return pintar(false); } // repeticiones: cuenta hacia arriba y espera al toque
+  R.t--;
+  if (R.t > 0) return pintar(false);
+  if (R.fase === 'prepara') { R.fase = 'serie'; R.t = x.secs; return pintar(false); }
+  rSiguiente();
+}
+function rSiguiente() { R.visto = true; if (R.pos >= PASOS.length - 1) { location.hash = 'final'; return; } rEmpezar(R.pos + 1); pintar(false); }
+function rAnterior() { if (R.pos === 0) return; let p = R.pos - 1; rEmpezar(p); pintar(false); }
+const mm = s => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+function rayas() {
+  const grupos = [];
+  PASOS.forEach((p, i) => { if (!grupos[p.r - 1]) grupos[p.r - 1] = []; grupos[p.r - 1].push({ ...p, i }); });
+  return `<div class="rayas" aria-hidden="true">${grupos.map(g => `<span class="grupo" style="--n:${g.length}">${g.map(p => `<i class="${p.i < R.pos ? 'hecho' : p.i === R.pos ? 'ahora' : ''} ${p.tipo === 'desc' ? 'desc' : ''}"></i>`).join('')}</span>`).join('')}</div>`;
 }
 P.reproductor = { sinPestanas: true, titulo: 'Reproductor', render: () => {
-  const x = rLista[R.i], e = ej(x.id), d = rDur(x);
-  const hecho = R.fase === 'serie' ? d - R.t : 0, rep = x.reps ? Math.min(x.reps, Math.floor(hecho / 3) + 1) : null;
-  const mm = s => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
-  const sig = R.i < rLista.length - 1 ? ej(rLista[R.i + 1].id).name : R.ronda < SESION_HOY.rondas ? 'Descanso y ronda ' + (R.ronda + 1) : 'Final';
-  const fase = { prepara: 'Prepárate', descanso: 'Descanso', serie: '' }[R.fase];
-  return `<div class="repro ${R.fase}">
-    <div class="repro-arriba"><button class="icono-btn" data-act="parar" aria-label="Parar la sesión">${ico('cerrar')}</button>
-      <span class="meta">Ejercicio ${R.i + 1} de ${rLista.length} · Ronda ${R.ronda} de ${SESION_HOY.rondas}</span>
-      ${S.pulsoOn ? (S.sinSenal ? `<button class="pulso" data-act="pulsopill" style="border:0;font-size:var(--t1);color:var(--tinta-2)">${ico('corazon').replace('<svg', '<svg style="color:var(--tinta-2)"')}Sin señal del reloj</button>` : `<button class="pulso" data-act="pulsopill" style="border:0" aria-label="Pulso 128, zona 3">${ico('corazon')}128 <span class="zona">Z3</span></button>`) : ''}</div>
-    ${R.fase === 'descanso' ? `<div class="fig grande" style="flex:1" role="img" aria-label="Descanso"><span class="fig-txt">Siguiente: ${esc(e.name)}</span></div>` : fig(e, true, true)}
-    <div class="pila">${fase ? `<span class="aviso-fase" aria-live="assertive">${fase}</span>` : ''}
-      <h1 class="repro-nombre">${e.name}${x.banda ? ` <span class="meta" style="font-size:var(--t3)">· banda ${x.banda.toLowerCase()}</span>` : ''}</h1>
-      ${R.fase === 'serie' ? `<p class="repro-paso">${esc(e.cues[0] || '')}</p>` : ''}</div>
-    <div class="fila" style="align-items:flex-end;justify-content:space-between">
-      <div class="repro-tiempo" aria-label="Quedan ${R.t} segundos">${mm(R.t)}</div>
-      ${rep && R.fase === 'serie' ? `<div class="repro-cifras" style="flex-direction:column;align-items:flex-end;gap:0"><span class="de">rep</span><span><span class="num">${rep}</span><span class="de"> / ${x.reps}</span></span></div>` : ''}
+  const p = PASOS[R.pos], ronda = p.r, desc = p.tipo === 'desc';
+  const sigPaso = PASOS[R.pos + 1], sig = sigPaso ? (sigPaso.tipo === 'desc' ? null : ej(rLista[sigPaso.k].id)) : null;
+  const x = desc ? rLista[0] : rLista[p.k], e = ej(desc ? PASOS[R.pos + 1] && rLista[PASOS[R.pos + 1].k].id : x.id);
+  const guia = x.reps && !desc ? Math.min(x.reps, Math.floor(R.t / 3) + 1) : 0;
+  const pos = `Ronda ${ronda} de ${SESION_HOY.rondas}${desc ? '' : ` · ejercicio ${p.k + 1} de ${rLista.length}`}`;
+  const pulso = S.pulsoOn ? (S.sinSenal ? `<button class="pulso apagado" data-act="pulsopill">${ico('corazon')}Sin señal</button>` : `<button class="pulso" data-act="pulsopill" aria-label="Pulso 128, zona 3">${ico('corazon')}128 <span class="zona">Z3</span></button>`) : '';
+  let cantidad, abajo;
+  if (desc) { cantidad = `<span class="repro-cantidad acc">${mm(R.t)}</span>`; abajo = `<span class="repro-reloj">Toca para seguir ya</span>`; }
+  else if (R.fase === 'prepara') { cantidad = `<span class="repro-cantidad acc">${R.t}</span>`; abajo = `<span class="repro-reloj">Prepárate · ${x.secs} s</span>`; }
+  else if (x.reps) { cantidad = `<span class="repro-cantidad">${x.reps}<small>reps</small></span>`; abajo = `<span class="repro-reloj">${guia < x.reps ? `Ritmo ${guia} de ${x.reps}` : 'Toca al acabar'} · ${mm(R.t)}</span>`; }
+  else { cantidad = `<span class="repro-cantidad">${mm(R.t)}</span>`; abajo = `<span class="repro-reloj">de ${mm(x.secs)}${x.sides ? ' por lado' : ''}</span>`; }
+  return `<div class="repro ${R.fase}" data-act="tap">
+    <button class="oculto-visual" data-act="tap">${desc ? 'Terminar el descanso' : 'Hecho: pasar al siguiente'}</button>
+    <div class="repro-figura">
+      ${desc ? `<div class="fig libre pequena" role="img" aria-label="Siguiente: ${esc(e.name)}"><span class="fig-txt">Descanso<br>siguiente: ${esc(e.name)}</span></div>` : `<div class="fig libre" role="img" aria-label="Figura de ${esc(e.name)}"><span class="fig-txt">Figura a toda pantalla<br>D1 la dibuja aquí</span><span class="fig-zona">${esc(e.zone.toUpperCase())}</span></div>`}
+      <div class="repro-arriba"><button class="icono-btn redondo" data-act="pausa" aria-label="Pausa">${ico('pausa')}</button><span class="repro-pos">${pos}</span>${pulso}</div>
     </div>
-    <div class="barra" role="progressbar" aria-label="Progreso de la serie" aria-valuemin="0" aria-valuemax="${d}" aria-valuenow="${hecho}"><i style="width:${R.fase === 'serie' ? (hecho / d) * 100 : 0}%"></i></div>
-    <p class="repro-luego">Luego: <strong>${sig}</strong> · quedan ${rTotalQueda()} min</p>
-    ${x.banda ? `<div class="repro-ajustes"><button class="chip" data-act="hoja" data-v="banda">${ico('banda')}Banda ${x.banda.toLowerCase()}</button></div>` : ''}
-    <div class="controles">
-      <button class="lado" data-act="parar">${ico('parar')}Parar</button>
-      <button class="central" data-act="pausa" aria-label="${R.pausa ? 'Seguir' : 'Pausa'}">${ico(R.pausa ? 'play' : 'pausa')}</button>
-      <button class="lado" data-act="saltar">${ico('saltar')}Saltar</button>
+    <div class="repro-info">
+      ${desc ? `<span class="aviso-fase" aria-live="assertive">Descanso</span>` : `<p class="repro-clave">${esc(SESION_HOY.claves[x.id] || e.cues[0] || '')}</p>`}
+      <div class="repro-linea"><h1 class="repro-nombre">${desc ? 'Respira' : e.name}</h1>${cantidad}</div>
+      <div class="repro-linea">${abajo}${!desc && x.banda ? `<button class="chip" data-act="hoja" data-v="banda">${ico('banda')}Banda ${x.banda.toLowerCase()}</button>` : ''}</div>
+      ${rayas()}
+      <p class="repro-luego">${sig ? `${desc ? 'Empiezas con' : 'Luego'}: <strong>${sig.name}</strong>` : sigPaso ? `Luego: <strong>descanso de ${SESION_HOY.descanso} s</strong>` : 'Es el último'}</p>
+      ${!R.visto ? `<p class="repro-pista">Toca la pantalla al acabar · desliza a la derecha para volver</p>` : ''}
     </div>
   </div>`; } };
 
@@ -565,13 +583,13 @@ P.widgets = { sinPestanas: true, titulo: 'Widget grande y pequeño', render: () 
     </div>
     <span class="etiqueta">Grande · durante la sesión</span>
     <div class="w">
-      <div class="fila">${fig(ej('remo_incl_banda'))}<span class="crece"><span class="nombre" style="font-weight:700;display:block">Remo inclinado con banda</span><span class="meta">Rep 7 / 12 · Ronda 2 / 3</span><span class="w-tiempo" style="display:block">0:16</span></span></div>
-      <div class="barra"><i style="width:55%"></i></div>
-      <div class="fila"><button class="w-btn w-alt crece" aria-label="Parar">${ico('parar')}</button><button class="w-btn crece" aria-label="Pausa">${ico('pausa')}</button><button class="w-btn w-alt crece" aria-label="Saltar">${ico('saltar')}</button></div>
+      <div class="fila">${fig(ej('remo_incl_banda'))}<span class="crece"><span class="nombre" style="font-weight:700;display:block">Remo inclinado con banda</span><span class="meta">Ronda 2 de 3 · luego: press de suelo</span><span class="w-tiempo" style="display:block">12 <span class="meta">reps</span></span></span></div>
+      <div class="rayas"><span class="grupo" style="--n:7">${'<i class="hecho"></i>'.repeat(6)}<i class="desc hecho"></i></span><span class="grupo" style="--n:7"><i class="ahora"></i>${'<i></i>'.repeat(5)}<i class="desc"></i></span><span class="grupo" style="--n:6">${'<i></i>'.repeat(6)}</span></div>
+      <div class="fila"><button class="w-btn w-alt" style="width:56px" aria-label="Pausa">${ico('pausa')}</button><button class="w-btn crece">${ico('check')}Hecho</button></div>
     </div>
     <div class="fila" style="gap:var(--e4);align-items:flex-start;flex-wrap:wrap">
       <div class="pila"><span class="etiqueta">Pequeño</span><div class="w w-peq"><span class="meta">Hoy · ${minutos(SESION_HOY)} min</span><span class="nombre" style="font-weight:700;line-height:1.2">Fuerza de tren superior</span><button class="w-btn">${ico('play')}Empezar</button></div></div>
-      <div class="pila"><span class="etiqueta">Pequeño · en marcha</span><div class="w w-peq"><span class="meta">Remo inclinado</span><span class="w-tiempo">0:16</span><button class="w-btn" aria-label="Pausa">${ico('pausa')}</button></div></div>
+      <div class="pila"><span class="etiqueta">Pequeño · en marcha</span><div class="w w-peq"><span class="meta">Remo inclinado</span><span class="w-tiempo">12 <span class="meta">reps</span></span><button class="w-btn">${ico('check')}Hecho</button></div></div>
     </div>
   </div>` };
 
@@ -581,8 +599,7 @@ P.sistema = { proto: true, titulo: 'Sistema de diseño', render: () => `${cab('S
     <section class="seccion"><h2>Color</h2><div class="muestra">${[['--accion', 'Acción · marca'], ['--trabajo', 'Trabajo · marca'], ['--fondo', 'Fondo · marca'], ['--capa', 'Capa'], ['--capa-2', 'Capa 2 · hueco'], ['--tinta', 'Texto'], ['--tinta-2', 'Texto secundario'], ['--linea', 'Línea'], ['--bien', 'Bien'], ['--aviso', 'Aviso'], ['--error', 'Error'], ['--accion-suave', 'Seleccionado']].map(([v, t]) => `<span class="c"><i style="background:var(${v})"></i>${t}</span>`).join('')}</div>
     <p class="meta">Ámbar solo para el cuerpo que trabaja y el progreso de la serie; nunca como texto sobre fondo claro.</p></section>
     <section class="seccion"><h2>Letra · Atkinson Hyperlegible</h2>
-      <p style="font-size:var(--p2);font-weight:700;line-height:1">0:45</p><p class="meta">p2 · tiempo del reproductor (96–132)</p>
-      <p style="font-size:var(--p1);font-weight:700;line-height:1">7 / 12</p><p class="meta">p1 · 44 · repetición</p>
+      <p style="font-size:var(--p2);font-weight:700;line-height:1">12<small style="font-size:var(--t3);color:var(--tinta-2)"> reps</small></p><p class="meta">p2 · 64–104 · cuántas, en el reproductor</p>
       <p style="font-size:var(--t4);font-weight:700">Título de pantalla</p><p class="meta">t4 · 28</p>
       <p style="font-size:var(--t3);font-weight:700">Título de sección</p><p class="meta">t3 · 20</p>
       <p>Texto de la app, ejercicios y explicaciones.</p><p class="meta">t2 · 16 · también este texto secundario en t1 · 14</p></section>
@@ -591,7 +608,9 @@ P.sistema = { proto: true, titulo: 'Sistema de diseño', render: () => `${cab('S
     <section class="seccion"><h2>Controles</h2>${seg('demo', ['Suave', 'Normal', 'Fuerte'], 'Normal', 'Nivel')}<div class="fila">${paso('demo', 12, '', 'Repeticiones')}<span class="crece"></span>${inter('demo-sw', true, 'Interruptor de ejemplo')}</div><div class="chips"><button class="chip" aria-pressed="true">Core</button><button class="chip" aria-pressed="false">Glúteo</button><button class="chip" aria-pressed="false">Espalda</button></div></section>
     <section class="seccion"><h2>Estados de Strava</h2><div class="fila envuelve">${Object.keys(STRAVA).map(estado).join('')}</div></section>
     <section class="seccion"><h2>Origen de una sesión</h2><div class="fila envuelve" style="gap:var(--e4)">${Object.keys(ORIGEN).map(origen).join('')}</div></section>
-    <section class="seccion"><h2>Hueco de la figura</h2><div class="fila" style="align-items:flex-start"><div style="width:96px">${fig(ej('puente'))}</div><div class="crece">${fig(ej('puente'), true, true)}</div></div><p class="meta">Miniatura 1:1 sin etiquetas; grande 4:3 con la etiqueta de zona en ámbar.</p></section>
+    <section class="seccion"><h2>Hueco de la figura</h2><div class="fila" style="align-items:flex-start"><div style="width:96px">${fig(ej('puente'))}</div><div class="crece">${fig(ej('puente'), true, true)}</div></div><p class="meta">Miniatura 1:1 sin etiquetas; grande 4:3 con la etiqueta de zona en ámbar. En el reproductor, sin caja y a toda pantalla.</p>
+    <h3 class="h2">Rayas de progreso</h3><div style="padding:var(--e2);background:var(--capa);border-radius:var(--r1)">${(() => { const g = (a, b) => `<span class="grupo" style="--n:${a + b}">${'<i class="hecho"></i>'.repeat(a)}${'<i></i>'.repeat(b)}</span>`; return `<div class="rayas"><span class="grupo" style="--n:7">${'<i class="hecho"></i>'.repeat(6)}<i class="desc hecho"></i></span><span class="grupo" style="--n:7"><i class="hecho"></i><i class="hecho"></i><i class="ahora"></i><i></i><i></i><i></i><i class="desc"></i></span><span class="grupo" style="--n:6">${'<i></i>'.repeat(6)}</span></div>`; })()}</div>
+    <p class="meta">Un paquete por ronda, una raya por ejercicio y una más corta y hueca para el descanso. Hecho en verde azulado, el actual en ámbar.</p></section>
   </div>` };
 
 /* ---------- Hojas inferiores ---------- */
@@ -599,6 +618,7 @@ const HOJAS = {
   dia: () => { const d = SEMANA.find(x => x.n === S.diaSel) || SEMANA[4]; return `<h2 class="h2">${d.n} · ${d.tipo}</h2><p class="meta">${d.carrera ? 'Se graba con el reloj; aquí llega desde Strava.' : ORIGEN[d.o][1]}</p>${d.carrera || d.est === 'descanso' ? '' : `<button class="btn btn-principal btn-grande" data-go="reproductor">${ico('play')}Hacerla hoy</button>`}<button class="btn btn-secundario" data-act="cerrar" data-msg="Cambiada por una favorita">${ico('estrella')}Cambiar por una favorita</button><button class="btn btn-texto" data-act="cerrar" data-msg="${d.n}: descanso">${ico('luna')}Dejar como descanso</button>`; },
   personas: () => `<h2 class="h2">¿Quién entrena?</h2><div class="lista">${PERSONAS.map(p => `<button class="item" data-act="cerrar"><span class="item-icono" style="border-radius:50%;font-weight:700">${p.i}</span><span class="crece"><span class="nombre">${p.n}</span><span class="meta">${p.yo ? 'En este móvil ahora' : 'Sus propios datos'}</span></span>${p.yo ? ico('check', 'chev') : ''}</button>`).join('')}</div><button class="btn btn-secundario" data-go="entrar">${ico('mas')}Añadir persona</button>`,
   banda: () => `<h2 class="h2">¿Qué banda llevas?</h2><div class="lista">${BANDAS.map(b => `<button class="item" data-act="cerrar"><span style="width:28px;height:28px;border-radius:50%;background:${b.c};border:2px solid var(--linea)" aria-hidden="true"></span><span class="crece"><span class="nombre">${b.n}</span><span class="meta">${b.d}</span></span>${b.n === 'Roja' ? ico('check', 'chev') : ''}</button>`).join('')}</div><p class="meta">La próxima vez sale la que elijas.</p>`,
+  pausa: () => `<h2 class="h2">En pausa</h2><button class="btn btn-principal btn-grande" data-act="cerrar">${ico('play')}Seguir</button><button class="btn btn-secundario" data-act="anterior">${ico('atras')}Ejercicio anterior</button><button class="btn btn-texto" data-act="hoja" data-v="parar">${ico('parar')}Parar la sesión</button>`,
   parar: () => `<h2 class="h2">¿Parar la sesión?</h2><p>Se guarda como incompleta con las series hechas. No cuenta para la racha.</p><button class="btn btn-peligro btn-grande" data-act="pararya">${ico('parar')}Parar y guardar</button><button class="btn btn-principal btn-grande" data-act="cerrar">Seguir entrenando</button>`,
   peso: () => `<h2 class="h2">Apuntar</h2><div class="campo"><label for="p-kg">Peso (kg)</label><input id="p-kg" inputmode="decimal" value="78,4"></div><div class="campo"><label for="p-cm">Cintura (cm, opcional)</label><input id="p-cm" inputmode="decimal" placeholder="86"></div><button class="btn btn-principal btn-grande" data-act="cerrar" data-msg="Peso guardado">Guardar</button>`,
 };
@@ -655,12 +675,14 @@ const A = {
   toast: b => toast(b.dataset.msg), copiar: () => { try { navigator.clipboard.writeText('https://ejemplo.supabase.co/functions/v1/mcp').catch(() => {}); } catch (e) {} toast('Dirección copiada'); },
   hoja: b => { S.hoja = b.dataset.v; },
   dia: b => { S.diaSel = b.dataset.v; S.hoja = 'dia'; },
-  pulsopill: () => { S.sinSenal = !S.sinSenal; }, cerrar: b => { if (S.hoja === 'parar') R.pausa = false; S.hoja = null; if (b.dataset.msg) toast(b.dataset.msg); },
+  pulsopill: () => { S.sinSenal = !S.sinSenal; }, cerrar: b => { if (S.hoja === 'parar' || S.hoja === 'pausa') R.pausa = false; S.hoja = null; if (b.dataset.msg) toast(b.dataset.msg); },
   velo: (b, ev) => { if (ev.target === b) S.hoja = null; else return 'nada'; },
-  parar: () => { R.pausa = true; S.hoja = 'parar'; }, pararya: () => { S.hoja = null; location.hash = 'final'; return 'nav'; },
-  pausa: () => { R.pausa = !R.pausa; }, saltar: () => { rSiguiente(); return 'nada'; },
+  pararya: () => { S.hoja = null; location.hash = 'final'; return 'nav'; },
+  pausa: () => { R.pausa = true; S.hoja = 'pausa'; },
+  anterior: () => { R.pausa = false; S.hoja = null; rAnterior(); return 'nada'; },
+  tap: () => { if (R.ignorarClic) { R.ignorarClic = false; return 'nada'; } rSiguiente(); return 'nada'; },
   guardarfin: () => { location.hash = 'entrenar'; setTimeout(() => toast(S.final.strava ? 'Guardada. Subiendo a Strava…' : 'Guardada'), 50); return 'nav'; },
-  repetir: () => { Object.assign(R, { fase: 'prepara', i: 0, ronda: 1, t: 5, pausa: false }); location.hash = 'reproductor'; return 'nav'; },
+  repetir: () => { rReiniciar(); location.hash = 'reproductor'; return 'nav'; },
   enviar: b => { S.enviado = b.dataset.id; toast('Enviada a Strava'); return 'nada'; },
   det: b => { S.det = b.dataset.id; location.hash = 'detalle'; return 'nav'; },
   desc: b => { S.conectado[b.dataset.v] = false; }, con: b => { S.conectado[b.dataset.v] = true; toast('Conectado'); return 'nada'; },
@@ -671,7 +693,7 @@ document.addEventListener('click', ev => {
   const t = ev.target.closest('[data-go],[data-act],[data-tema]'); if (!t) return;
   if (t.dataset.tema) { const r = document.documentElement, v = { undefined: 'light', light: 'dark', dark: undefined }[r.dataset.theme];
     if (v) r.dataset.theme = v; else delete r.dataset.theme; t.textContent = 'Tema: ' + ({ light: 'claro', dark: 'oscuro' }[v] || 'auto'); pintar(false); return; }
-  if (t.dataset.go) { S.hoja = null; if (t.dataset.go === 'reproductor' && rutaActual() !== 'reproductor') Object.assign(R, { fase: 'prepara', i: 0, ronda: 1, t: 5, pausa: false }); if (location.hash.slice(1) === t.dataset.go) pintar(); else location.hash = t.dataset.go; return; }
+  if (t.dataset.go) { S.hoja = null; if (t.dataset.go === 'reproductor' && rutaActual() !== 'reproductor') rReiniciar(); if (location.hash.slice(1) === t.dataset.go) pintar(); else location.hash = t.dataset.go; return; }
   const f = A[t.dataset.act]; if (!f) return;
   if (t.dataset.act === 'sw') return; // lo lleva el evento change
   const r = f(t, ev); if (r !== 'nav' && r !== 'nada') pintar(false);
@@ -680,7 +702,18 @@ document.addEventListener('change', ev => { const t = ev.target; if (t.dataset &
 document.addEventListener('submit', ev => { ev.preventDefault(); if (ev.target.dataset.form === 'entrar') { S.hoja = 'enviado'; pintar(false); } });
 window.addEventListener('hashchange', () => { if (rutaActual() !== 'entrar' && S.hoja === 'enviado') S.hoja = null; pintar(); });
 document.addEventListener('keydown', ev => {
-  if (ev.key === 'Tab' && S.hoja) { const h = document.querySelector('.hoja'); const f = h ? [...h.querySelectorAll('button,a,input')] : []; if (f.length) { const i = f.indexOf(document.activeElement); if (ev.shiftKey && i <= 0) { ev.preventDefault(); f[f.length - 1].focus(); } else if (!ev.shiftKey && i === f.length - 1) { ev.preventDefault(); f[0].focus(); } } } if (ev.key === 'Escape' && S.hoja) { if (S.hoja === 'parar') R.pausa = false; S.hoja = null; pintar(false); } });
+  if (ev.key === 'Tab' && S.hoja) { const h = document.querySelector('.hoja'); const f = h ? [...h.querySelectorAll('button,a,input')] : []; if (f.length) { const i = f.indexOf(document.activeElement); if (ev.shiftKey && i <= 0) { ev.preventDefault(); f[f.length - 1].focus(); } else if (!ev.shiftKey && i === f.length - 1) { ev.preventDefault(); f[0].focus(); } } } if (ev.key === 'Escape' && S.hoja) { if (S.hoja === 'parar' || S.hoja === 'pausa') R.pausa = false; S.hoja = null; pintar(false); } });
+document.addEventListener('pointerdown', ev => { if (ev.target.closest('.repro')) R.swipe = { x: ev.clientX, y: ev.clientY }; });
+document.addEventListener('pointerup', ev => {
+  if (!R.swipe) return; const dx = ev.clientX - R.swipe.x, dy = ev.clientY - R.swipe.y; R.swipe = null;
+  if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) { R.ignorarClic = true; setTimeout(() => { R.ignorarClic = false; }, 0); if (dx > 0) rAnterior(); else rSiguiente(); }
+});
+document.addEventListener('keydown', ev => {
+  if (rutaActual() !== 'reproductor' || S.hoja) return;
+  if (ev.key === 'ArrowRight') { ev.preventDefault(); rSiguiente(); }
+  else if (ev.key === 'ArrowLeft') { ev.preventDefault(); rAnterior(); }
+});
+rEmpezar(0);
 document.documentElement.lang = 'es';
 setInterval(rTick, 1000);
 pintar();

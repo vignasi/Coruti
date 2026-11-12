@@ -8,7 +8,7 @@ y los espacios en **dp**.
 ## Idea
 - **Verde azulado = lo que se toca** (botones, enlaces, seleccionado).
 - **Ámbar = el cuerpo trabajando**: zona que trabaja en la figura y progreso de la serie en marcha. Nunca como texto sobre fondo claro.
-- Durante la sesión manda la distancia (móvil en el suelo a 1–2 m): figura, tiempo y repetición enormes; todo lo demás, pequeño o fuera.
+- Durante la sesión manda la distancia (móvil en el suelo a 1–2 m): **la figura a toda pantalla** y la cantidad (reps o segundos) grande; lo demás, pequeño y abajo.
 - Fuera de la sesión, pantallas tranquilas: una acción principal por pantalla, el resto en listas.
 
 ## Color
@@ -41,15 +41,14 @@ Contrastes comprobados (WCAG AA): texto ≥ 4,5:1 en los dos temas (acción sobr
 | `t2` | 16 sp | 400 / 700 | Texto y botones |
 | `t3` | 20 sp | 700 | Títulos de sección y tarjeta; botón grande |
 | `t4` | 28 sp | 700 | Título de pantalla, cifras (peso, pulso), nombre del ejercicio en la sesión |
-| `p1` | 44 sp | 700 | Solo reproductor: repetición |
-| `p2` | 72–132 sp | 700 | Solo reproductor: tiempo (30 % del ancho, menos en pantallas bajas) |
+| `p2` | 64–104 sp | 700 | Solo reproductor: cuántas (reps o segundos), según el alto de la pantalla |
 
-Seis tamaños en total; no se inventan otros. Interlineado 1,4 en texto y 1,1–1,15 en títulos.
+Cinco tamaños en total; no se inventan otros. Interlineado 1,4 en texto y 1,1–1,15 en títulos.
 
 ## Espacios, radios y tamaños
 - Espacios: **4 · 8 · 12 · 16 · 24 · 32 · 48** dp. Margen lateral de pantalla 16; entre secciones 24.
 - Radios: **8** campos, chips, segmentos y miniaturas · **16** tarjetas, hojas y figura grande · **redondo** botones.
-- Tocable mínimo **48 dp**; durante la sesión **72 dp** (Parar, Saltar) y **96 dp** el botón de pausa (80 en pantallas bajas).
+- Tocable mínimo **48 dp**. Durante la sesión **toda la pantalla** es el botón «hecho».
 - Filas de lista: 64 dp de alto mínimo.
 
 ## Componentes
@@ -77,9 +76,20 @@ Cuatro pestañas abajo: **Entrenar · Ejercicios · Historial · Tú** («Tú» 
 El reproductor, el final de sesión y la pantalla de entrar van sin pestañas. Las subpantallas llevan cabecera con «Atrás».
 
 ### Reproductor
-Arriba: cerrar, «Ejercicio x de y · Ronda x de y», pulso (o «Sin señal del reloj»). En medio la figura, que ocupa el espacio libre.
-Abajo, de grande a pequeño: tiempo, repetición, barra ámbar, «Luego: …», banda o kilos, y los tres controles (Parar · Pausa · Saltar).
-«Parar» y la X piden confirmación en una hoja. «Prepárate» y «Descanso» ponen el tiempo en `accion`.
+Inspirado en lo que te gusta de Freeletics: pantalla limpia, la persona enorme y la información pequeña abajo.
+- **La figura ocupa toda la pantalla**, sin caja ni marco, sobre fondo `capa` (blanco en claro). Etiqueta de zona en ámbar en su esquina.
+- **Arriba, encima de la figura y pequeño:** pausa (48 dp), «Ronda x de y · ejercicio x de y» y el pulso (o «Sin señal»).
+- **Abajo, donde no se pisa**, de arriba abajo: la clave corta («Manos debajo de los hombros»), el nombre y **la cantidad en grande**
+  (`12 reps` o `0:30`), una línea pequeña (ritmo y tiempo que llevas, o «Prepárate»), banda o kilos si el ejercicio los usa,
+  las **rayas de progreso** y «Luego: …» con el ejercicio siguiente.
+- **Rayas:** un paquete por ronda, una raya por ejercicio y una más corta y hueca para el descanso. Hecho en `accion`, el actual en `trabajo`.
+- **Repeticiones: no pasan solas.** La app marca el ritmo como guía («Ritmo 7 de 12», tonos y voz) y cuenta el tiempo hacia arriba,
+  pero espera a que toques la pantalla: si paras 2 s a mitad, no pasa nada. Lo que se guarda es el tiempo real de la serie.
+- **Segundos y descansos:** cuenta atrás y pasan solos («Prepárate» de 5 s antes de los de segundos). Tocar adelanta.
+- **Gestos:** tocar en cualquier sitio = hecho, siguiente. Deslizar a la derecha = anterior (deslizar a la izquierda = siguiente).
+  Con teclado o lector de pantalla: botón «Hecho: pasar al siguiente» y flechas.
+- **No hay botón de parar ni de saltar en pantalla.** La pausa abre una hoja: Seguir · Ejercicio anterior · Parar la sesión
+  (que pide confirmación). La primera vez sale la pista «Toca la pantalla al acabar · desliza a la derecha para volver».
 
 ## Widget
 Mismos tokens; Android limita lo que se puede dibujar, así que:
@@ -88,8 +98,8 @@ Mismos tokens; Android limita lo que se puede dibujar, así que:
   lo permite (Android 12+ con `fontFamily` de recurso); si no, la del sistema: es lo único que cambia.
 - Botones de 48 dp: Empezar/Pausa en `accion`; Parar y Saltar en `capa-2`.
 - **Grande, antes de empezar:** segmentos Hoy · ★ Favorita · Core, nombre y origen de la sesión, duración, rondas (− / +), Empezar.
-- **Grande, en marcha:** miniatura de la figura, ejercicio, repetición y ronda, tiempo, barra ámbar, Parar · Pausa · Saltar.
-- **Pequeño:** antes, «Hoy · 19 min», nombre y Empezar; en marcha, ejercicio, tiempo y Pausa.
+- **Grande, en marcha:** miniatura de la figura, ejercicio, cantidad, ronda y siguiente, rayas de progreso, Pausa y **Hecho**.
+- **Pequeño:** antes, «Hoy · 19 min», nombre y Empezar; en marcha, ejercicio, cantidad y Hecho.
 
 ## Textos
 - Tuteo, frases cortas, verbos en los botones (Empezar, Enviar a Strava, Crear plan, Guardar y volver).
