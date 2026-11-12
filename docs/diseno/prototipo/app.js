@@ -119,7 +119,7 @@ const S = {
   nueva: { rondas: 4, desc: 75, alternar: true, rodAntes: false, rodDespues: true, reps: { remo_incl_banda: 12, curl_goma: 12 } },
   core: { dia: 'B', rondas: 2, mod: { abdomen: [false, 'Normal'], pecho: [false, 'Normal'], espalda: [true, 'Normal'], brazos: [true, 'Suave'], gluteo: [true, 'Fuerte'] } },
   obj: { meta: 'Fuerza', semanas: 6, dias: ['L', 'X', 'V'] },
-  fig: { estilo: 'persona', sexo: 'hombre' }, widget: 'fav',
+  fig: { sexo: 'hombre' }, figPrev: 'puente', look: { complexion: 0, musculo: 0, piel: '', pelo: '', top: '' }, widget: 'fav',
   mat2: { gomas: true, banda: true, rodillo: true, mancuernas: false },
   sonido: { tonos: true, voz: true, mitad: true, bajar: false },
   pulsoOn: true, conectado: { claude: true, strava: true, polar: false }, cuenta: true, enviado: false,
@@ -130,7 +130,10 @@ const S = {
 /* ---------- Piezas ---------- */
 const cab = (titulo, atras) => `<header class="cabecera"><button class="icono-btn" data-go="${atras}" aria-label="Atrás">${ico('atras')}</button><h1>${titulo}</h1></header>`;
 const origen = o => `<span class="origen">${ico(ORIGEN[o][0])}${ORIGEN[o][1]}</span>`;
-const fig = (e, grande = false, zona = false) => `<div class="fig${grande ? ' grande' : ''}" role="img" aria-label="Figura de ${esc(e.name)}"><span class="fig-txt">Figura<br>${grande ? 'D1 la dibuja aquí' : 'D1'}</span>${zona ? `<span class="fig-zona">${esc(e.zone.toUpperCase())}</span>` : ''}</div>`;
+/* Figura 3D real (D1): figura-proto.js dibuja en el lienzo. modo: mini (quieta, postura clave), grande (en bucle, con etiquetas),
+   libre (reproductor, a toda pantalla), sig (siguiente ejercicio, sin etiquetas). g fuerza hombre (m) o mujer (f). */
+const fig = (e, modo = 'mini', g = '') => `<div class="fig fig-${modo}" role="img" aria-label="${modo === 'mini' ? 'Figura' : 'Movimiento'} de ${esc(e.name)}"><canvas data-fig="${e.id}" data-modo="${modo}" ${g ? `data-g="${g}"` : ''} width="180" height="112"></canvas><span class="fig-txt">Cargando la figura…</span><span class="fig-falta">${esc(e.name)}<br>(figura pendiente: no está en rutina.json)</span></div>`;
+window.FIG_GENERO = () => (S.fig.sexo === 'mujer' ? 'f' : 'm');
 const paso = (id, val, uni = '', etiqueta = '') => `<div class="paso" role="group" aria-label="${etiqueta}"><button data-act="menos" data-k="${id}" aria-label="Menos">${ico('menos')}</button><output aria-live="polite">${val}${uni}</output><button data-act="mas" data-k="${id}" aria-label="Más">${ico('mas')}</button></div>`;
 const inter = (id, on, etiqueta) => `<input type="checkbox" role="switch" class="interruptor" id="${id}" data-act="sw" data-k="${id}" ${on ? 'checked' : ''} aria-label="${etiqueta}">`;
 const seg = (k, ops, val, etiqueta) => `<div class="segmentos" role="group" aria-label="${etiqueta}">${ops.map(o => `<button data-act="seg" data-k="${k}" data-v="${o}" aria-pressed="${o === val}">${o}</button>`).join('')}</div>`;
@@ -144,15 +147,15 @@ const P = {};
 P.mapa = { proto: true, render: () => `
   <div class="pantalla">
     <div class="pila"><h1 class="titulo-pantalla">Rutina core · prototipo</h1>
-    <p class="meta">Todas las pantallas del diseño nuevo, también las que se construyen más tarde. Los datos son de ejemplo. La figura va en un hueco fijo hasta que termine D1.</p></div>
+    <p class="meta">Todas las pantallas del diseño nuevo, también las que se construyen más tarde. Los datos son de ejemplo. La figura es la 3D de D1 (hombre o mujer, en Tú → Figura). La primera vez tarda unos segundos en cargar.</p></div>
     ${[
       ['Entrenar', [['entrenar', 'Hoy, semana y favoritas'], ['vacio', 'Primer día, sin plan ni favoritas'], ['semana', 'Plan de la semana'], ['sesion', 'Sesión creada por Claude'], ['core', 'Rutina de core'], ['nueva', 'Sesión nueva de ejercicios sueltos'], ['elegir', 'Elegir ejercicios'], ['objetivo', 'Plan por objetivo']]],
       ['Durante y después', [['reproductor', 'Reproductor a pantalla completa'], ['final', 'Final de sesión']]],
       ['Ejercicios', [['ejercicios', 'Cuadrícula con filtros'], ['ficha', 'Ficha de un ejercicio']]],
       ['Historial', [['historial', 'Sesiones por días, Strava y pulso'], ['historial-vacio', 'Sin sesiones todavía'], ['detalle', 'Detalle de una sesión'], ['marcas', 'Por ejercicio: última y mejor']]],
-      ['Tú', [['tu', 'Perfil y ajustes'], ['entrar', 'Entrar con email'], ['peso', 'Peso y medidas'], ['material', 'Material'], ['bandas', 'Mis bandas'], ['sonido', 'Sonido y voz'], ['figura', 'Estilo de la figura'], ['widget-conf', 'Qué hace el widget'], ['copia', 'Copia de seguridad']]],
+      ['Tú', [['tu', 'Perfil y ajustes'], ['entrar', 'Entrar con email'], ['peso', 'Peso y medidas'], ['material', 'Material'], ['bandas', 'Mis bandas'], ['sonido', 'Sonido y voz'], ['figura', 'Hombre o mujer'], ['personalizar', 'Más adelante'], ['widget-conf', 'Qué hace el widget'], ['copia', 'Copia de seguridad']]],
       ['Conexiones', [['conexiones', 'Claude, Strava y Polar'], ['claude', 'Conectar Claude'], ['strava', 'Strava'], ['polar', 'Polar y pulso'], ['pulso', 'Probar pulso']]],
-      ['Fuera de la app', [['widgets', 'Widget grande y pequeño']]],
+      ['Fuera de la app', [['widgets', 'Widget grande y pequeño'], ['widget-fondo', 'Fondo: dos opciones con las imágenes reales']]],
       ['Referencia', [['sistema', 'Sistema de diseño']]],
     ].map(([g, l]) => `<section class="mapa-grupo"><h2 class="etiqueta">${g}</h2><div class="lista">${l.map(([id, t]) => item({ t: P[id].titulo || t, m: P[id].titulo ? t : '', go: id })).join('')}</div></section>`).join('')}
   </div>` };
@@ -212,7 +215,7 @@ P.sesion = { titulo: 'Fuerza de tren superior', render: () => `${cab('Sesión de
     <div class="pila"><h1 class="titulo-pantalla">${SESION_HOY.titulo}</h1>${origen('claude')}<p class="meta">${SESION_HOY.cambio}</p></div>
     <div class="tarjeta"><span class="etiqueta">Nota de Claude</span><p>${SESION_HOY.nota}</p></div>
     <div class="fila envuelve meta"><span>${SESION_HOY.rondas} rondas</span>·<span>${SESION_HOY.descanso} s de descanso</span>·<span>${minutos(SESION_HOY)} min</span></div>
-    <div class="lista">${SESION_HOY.ej.map(x => { const e = ej(x.id); return `<button class="item" data-act="ficha" data-id="${e.id}"><span style="width:56px;flex:none">${fig(e)}</span><span class="crece"><span class="nombre">${e.name}</span><span class="meta">${x.reps ? x.reps + ' reps' : x.secs + ' s'}${x.banda ? ' · banda ' + x.banda.toLowerCase() : ''}</span></span>${ico('chev', 'chev')}</button>`; }).join('')}</div>
+    <div class="lista">${SESION_HOY.ej.map(x => { const e = ej(x.id); return `<button class="item" data-act="ficha" data-id="${e.id}"><span style="width:88px;flex:none">${fig(e)}</span><span class="crece"><span class="nombre">${e.name}</span><span class="meta">${x.reps ? x.reps + ' reps' : x.secs + ' s'}${x.banda ? ' · banda ' + x.banda.toLowerCase() : ''}</span></span>${ico('chev', 'chev')}</button>`; }).join('')}</div>
     <button class="btn btn-principal btn-grande" data-go="reproductor">${ico('play')}Empezar</button>
     <button class="btn btn-texto" data-act="toast" data-msg="Guardada en favoritas">${ico('estrella')}Guardar como favorita</button>
   </div>` };
@@ -274,7 +277,7 @@ P.elegir = { titulo: 'Elegir ejercicios', render: () => { const l = filtrar(); r
 
 P.ficha = { titulo: 'Ficha de un ejercicio', render: () => { const e = ej(S.ex); return `${cab(e.name, 'ejercicios')}
   <div class="pantalla">
-    ${fig(e, true, true)}
+    ${fig(e, 'grande')}
     <div class="fila envuelve"><span class="estado neutro">${e.zone}</span><span class="estado neutro">${MATERIAL[e.needs]}</span></div>
     <div class="pila"><span class="etiqueta">Dosis orientativa</span><p class="h2">${e.info || dosis(e)}</p></div>
     <section class="seccion"><h2>Claves</h2><ol class="pila" style="margin:0;padding-left:1.4em">${e.cues.map(c => `<li>${esc(c)}</li>`).join('')}</ol></section>
@@ -337,7 +340,7 @@ P.reproductor = { sinPestanas: true, titulo: 'Reproductor', render: () => {
   return `<div class="repro ${R.fase}" data-act="tap">
     <button class="oculto-visual" data-act="tap">${desc ? 'Terminar el descanso' : 'Hecho: pasar al siguiente'}</button>
     <div class="repro-figura">
-      ${desc ? `<div class="fig libre pequena" role="img" aria-label="Siguiente: ${esc(e.name)}"><span class="fig-txt">Descanso<br>siguiente: ${esc(e.name)}</span></div>` : `<div class="fig libre" role="img" aria-label="Figura de ${esc(e.name)}"><span class="fig-txt">Figura a toda pantalla<br>D1 la dibuja aquí</span><span class="fig-zona">${esc(e.zone.toUpperCase())}</span></div>`}
+      ${desc ? fig(e, 'sig').replace('class="fig fig-sig"', 'class="fig fig-sig libre pequena"') : fig(e, 'libre').replace('class="fig fig-libre"', 'class="fig fig-libre libre"')}
       <div class="repro-arriba"><button class="icono-btn redondo" data-act="pausa" aria-label="Pausa">${ico('pausa')}</button><span class="repro-pos">${pos}</span>${pulso}</div>
     </div>
     <div class="repro-info">
@@ -438,7 +441,7 @@ P.tu = { tab: 'tu', render: () => `
       ${item({ t: 'Material', m: 'Bandas grandes, mini banda, rodillo', go: 'material', icono: 'mancuerna' })}
       ${item({ t: 'Mis bandas', m: 'Verde, roja y negra', go: 'bandas', icono: 'banda' })}
       ${item({ t: 'Sonido y voz', m: 'Tonos y cuenta en voz alta', go: 'sonido', icono: 'sonido' })}
-      ${item({ t: 'Figura', m: 'Persona · hombre', go: 'figura', icono: 'figura' })}
+      ${item({ t: 'Figura', m: S.fig.sexo === 'mujer' ? 'Mujer' : 'Hombre', go: 'figura', icono: 'figura' })}
       ${item({ t: 'Widget', m: 'Favorita: Remo + curl con banda', go: 'widget-conf', icono: 'widget' })}
     </div></section>
     <section class="seccion"><h2 class="etiqueta">Conexiones y datos</h2><div class="lista">
@@ -506,11 +509,33 @@ P.sonido = { titulo: 'Sonido y voz', render: () => `${cab('Sonido y voz', 'tu')}
   <div class="pantalla"><div class="lista">${[['tonos', 'Tonos en cada repetición', 'Agudo al subir, grave al bajar'], ['voz', 'Contar en voz alta', ''], ['mitad', 'Avisar a la mitad', 'En los ejercicios de mantener'], ['bajar', 'Bajar el volumen cada ronda', '']].map(([k, t, m]) => `<label class="item" for="s-${k}"><span class="crece"><span class="nombre">${t}</span>${m ? `<span class="meta">${m}</span>` : ''}</span>${inter('s-' + k, S.sonido[k], t)}</label>`).join('')}</div>
   <p class="meta">La pantalla no se apaga durante la sesión.</p></div>` };
 
-P.figura = { titulo: 'Estilo de la figura', render: () => `${cab('Figura', 'tu')}
+P.figura = { titulo: 'Figura: hombre o mujer', render: () => `${cab('Figura', 'tu')}
   <div class="pantalla">
-    <section class="seccion"><h2>Estilo</h2><div class="rejilla" style="grid-template-columns:repeat(3,minmax(0,1fr))">${[['palos', 'Palos'], ['redondeado', 'Redondeado'], ['persona', 'Persona']].map(([k, t]) => `<button class="miniatura" data-act="figest" data-v="${k}" aria-pressed="${S.fig.estilo === k}"><div class="fig"><span class="fig-txt">${t}</span></div><span class="check">${S.fig.estilo === k ? ico('check') : ''}</span><span class="nombre">${t}</span></button>`).join('')}</div></section>
-    <section class="seccion"><h2>Cuerpo</h2>${seg('fig.sexo', ['Hombre', 'Mujer'], S.fig.sexo === 'hombre' ? 'Hombre' : 'Mujer', 'Cuerpo')}</section>
-    <section class="seccion"><h2>Vista previa</h2>${fig(ej('puente'), true, true)}<p class="meta">Las etiquetas de zona solo salen en la vista grande.</p></section>
+    <section class="seccion"><h2>Quién hace los ejercicios</h2>
+      <div class="rejilla">${[['m', 'Hombre', 'hombre'], ['f', 'Mujer', 'mujer']].map(([g, t, v]) => `<button class="miniatura" data-act="figsexo" data-v="${v}" aria-pressed="${S.fig.sexo === v}">${fig(ej('remo_incl_banda'), 'mini', g)}<span class="check">${S.fig.sexo === v ? ico('check') : ''}</span><span class="nombre">${t}</span></button>`).join('')}</div>
+      <p class="meta">Es la misma figura en toda la app y en el widget. Cada persona de la cuenta elige la suya.</p></section>
+    <section class="seccion"><h2>Vista previa</h2>${fig(ej(S.figPrev), 'grande')}
+      <div class="chips" role="group" aria-label="Ejercicio de la vista previa">${['puente', 'plancha', 'remo_incl_banda', 'almeja'].map(k => `<button class="chip" data-act="figprev" data-v="${k}" aria-pressed="${S.figPrev === k}">${esc(ej(k).name)}</button>`).join('')}</div>
+      <p class="meta">En grande salen la zona que trabaja (punto ámbar), la flecha del movimiento y la banda. En las miniaturas, solo la postura.</p></section>
+    <div class="lista">${item({ t: 'Personalizar la figura', m: 'Complexión, músculo, piel, pelo y ropa · más adelante', go: 'personalizar', icono: 'lapiz' })}</div>
+  </div>` };
+
+const PIEL = [['', 'De serie'], ['#F1C7A5', 'Clara'], ['#C98F68', 'Media'], ['#8D5524', 'Morena'], ['#5A3A22', 'Oscura']];
+const PELO = [['', 'De serie'], ['#111111', 'Negro'], ['#6B4226', 'Castaño'], ['#C9A15A', 'Rubio'], ['#9A9A9A', 'Canoso']];
+const ROPA = [['', 'Verde azulado (marca)'], ['#D9634C', 'Coral'], ['#3B4A6B', 'Azul marino'], ['#E8ECEB', 'Gris claro']];
+const muestras = (k, ops) => `<div class="muestras" role="group" aria-label="${k}">${ops.map(([c, t]) => `<button class="muestra-c" data-act="look" data-k="${k}" data-v="${c}" aria-pressed="${S.look[k] === c}" aria-label="${t}" title="${t}" style="--c:${c || 'transparent'}">${c ? '' : 'De serie'}</button>`).join('')}</div>`;
+const rango = (k, t, a, b) => `<div class="campo"><label for="r-${k}">${t}</label><div class="fila"><span class="meta">${a}</span><input class="rango crece" id="r-${k}" type="range" min="-1" max="1" step="0.25" value="${S.look[k]}" data-act="rango" data-k="${k}"><span class="meta">${b}</span></div></div>`;
+P.personalizar = { titulo: 'Personalizar la figura (más adelante)', render: () => `${cab('Personalizar', 'figura')}
+  <div class="pantalla">
+    <div class="tarjeta"><span class="etiqueta">Más adelante</span><p>No entra en la primera versión. Ya funciona aquí sobre el modelo real para ver si merece la pena.</p></div>
+    <div style="position:sticky;top:calc(-1 * var(--e4));z-index:1;background:var(--fondo);padding-block:var(--e2)">${fig(ej('remo_incl_banda'), 'grande')}</div>
+    <section class="seccion"><h2>Cuerpo</h2>${rango('complexion', 'Complexión', 'Menos', 'Más')}${rango('musculo', 'Músculo', 'Menos', 'Más')}
+      <p class="meta">Opcional y sin juicio: no se liga a tu peso real salvo que lo pidas.</p></section>
+    <section class="seccion"><h2>Piel</h2>${muestras('piel', PIEL)}</section>
+    <section class="seccion"><h2>Pelo</h2>${muestras('pelo', PELO)}</section>
+    <section class="seccion"><h2>Camiseta</h2>${muestras('top', ROPA)}</section>
+    <button class="btn btn-secundario" data-act="lookcero">${ico('reintentar')}Volver a la de serie</button>
+    <p class="meta">El widget usa imágenes hechas antes: si cambias la figura, el móvil las rehace (unos segundos).</p>
   </div>` };
 
 P['widget-conf'] = { titulo: 'Qué hace el widget', render: () => `${cab('Widget', 'tu')}
@@ -576,26 +601,57 @@ P.pulso = { titulo: 'Probar pulso', render: () => `${cab('Probar pulso', 'polar'
     <div class="tarjeta" style="text-align:left;width:100%"><h2 class="h2">¿No aparece?</h2><ol class="pila" style="margin:0;padding-left:1.4em"><li>En el reloj, empieza a grabar o entra en el pre-entreno.</li><li>En Polar Flow, en el perfil de deporte: Compartir FC con otros dispositivos → Visible para todos.</li><li>Acerca el móvil al reloj.</li></ol></div>
   </div>` };
 
-/* Widgets */
+/* Widgets: imágenes WebP de la figura 3D (D1, docs/diseno/figura/widget/), una por fase; aquí se alternan como en el widget */
+const FASES_W = { remo_incl_banda: 2, press_goma: 2, curl_goma: 2, flex: 2, plancha: 2, deadbug: 4, puente: 2 };
+let WF = 0;
+const temaOscuro = () => getComputedStyle(document.documentElement).getPropertyValue('color-scheme').trim() === 'dark';
+function wSrc(id, i, op, tema) {
+  const g = window.FIG_GENERO();
+  if (op === 'b') return `widget-ropa-coral/${g}/${id}_${i}.webp`;
+  return `${window.FIG_BASE}widget/${g}/${tema || (temaOscuro() ? 'oscuro' : 'claro')}/${id}_${i}.webp`;
+}
+const wImg = (id, op = 'a', tema = '') => `<img class="w-fig" data-wex="${id}" data-wop="${op}" data-wtema="${tema}" alt="" src="${wSrc(id, WF % FASES_W[id], op, tema)}">`;
+function widgetAnim() { document.querySelectorAll('img[data-wex]').forEach(im => { const id = im.dataset.wex, src = wSrc(id, WF % FASES_W[id], im.dataset.wop, im.dataset.wtema); if (!im.src.endsWith(src.replace(/^\.\.\//, ''))) im.setAttribute('src', src); }); }
+setInterval(() => { if (!matchMedia('(prefers-reduced-motion: reduce)').matches) { WF++; widgetAnim(); } }, 1400);
+const RAYAS_W = `<div class="rayas" aria-hidden="true"><span class="grupo" style="--n:7">${'<i class="hecho"></i>'.repeat(6)}<i class="desc hecho"></i></span><span class="grupo" style="--n:7"><i class="ahora"></i>${'<i></i>'.repeat(5)}<i class="desc"></i></span><span class="grupo" style="--n:6">${'<i></i>'.repeat(6)}</span></div>`;
+const wGrandeMarcha = (op = 'a', tema = '', cls = '') => `<div class="w w-grande ${cls}" aria-label="Widget grande durante la sesión">
+      <div class="w-arriba"><span class="meta">Ronda 2 de 3 · 1 de 6</span><span class="meta">${ico('corazon')}128</span></div>
+      <div class="fila w-cuerpo">${wImg('remo_incl_banda', op, tema)}<span class="crece"><span class="w-nombre">Remo inclinado con banda</span><span class="w-tiempo">12 <span class="meta">reps</span></span><span class="meta">Banda roja · luego: press de suelo</span></span></div>
+      ${RAYAS_W}
+      <div class="fila"><button class="w-btn w-alt" style="width:56px" aria-label="Pausa">${ico('pausa')}</button><button class="w-btn crece">${ico('check')}Hecho</button></div>
+    </div>`;
+const wPeqMarcha = (op = 'a', tema = '', cls = '') => `<div class="w w-peq ${cls}" aria-label="Widget pequeño durante la sesión">${wImg('remo_incl_banda', op, tema)}<span class="fila" style="justify-content:space-between;gap:var(--e2)"><span class="meta w-corto">Remo inclinado</span><span class="w-tiempo">12</span></span><button class="w-btn">${ico('check')}Hecho</button></div>`;
 P.widgets = { sinPestanas: true, titulo: 'Widget grande y pequeño', render: () => `${cab('Widgets', 'mapa')}
   <div class="inicio">
+    <p class="meta">Con el fondo propuesto (opción A: el de la app, claro u oscuro). Cambia el tema arriba y hombre o mujer en Tú → Figura.</p>
     <span class="etiqueta">Grande · antes de empezar</span>
-    <div class="w" aria-label="Widget grande">
+    <div class="w w-grande" aria-label="Widget grande">
       <div class="segmentos" role="group" aria-label="Qué empezar" style="background:var(--capa-2)"><button aria-pressed="true">Hoy</button><button aria-pressed="false">★ Favorita</button><button aria-pressed="false">Core</button></div>
-      <div class="fila"><span class="crece"><span class="nombre" style="font-weight:700;font-size:var(--t3);display:block;line-height:1.2">Fuerza de tren superior</span><span class="meta">${origen('claude')} · 6 ejercicios · ${minutos(SESION_HOY)} min</span></span></div>
+      <div class="fila w-cuerpo">${wImg('remo_incl_banda')}<span class="crece"><span class="w-nombre">Fuerza de tren superior</span><span class="meta">${origen('claude')}</span><span class="meta">6 ejercicios · ${minutos(SESION_HOY)} min</span></span></div>
       <div class="fila"><span class="crece meta">Rondas</span>${paso('w.rondas', 3, '', 'Rondas')}</div>
       <button class="w-btn">${ico('play')}Empezar</button>
     </div>
     <span class="etiqueta">Grande · durante la sesión</span>
-    <div class="w">
-      <div class="fila">${fig(ej('remo_incl_banda'))}<span class="crece"><span class="nombre" style="font-weight:700;display:block">Remo inclinado con banda</span><span class="meta">Ronda 2 de 3 · luego: press de suelo</span><span class="w-tiempo" style="display:block">12 <span class="meta">reps</span></span></span></div>
-      <div class="rayas"><span class="grupo" style="--n:7">${'<i class="hecho"></i>'.repeat(6)}<i class="desc hecho"></i></span><span class="grupo" style="--n:7"><i class="ahora"></i>${'<i></i>'.repeat(5)}<i class="desc"></i></span><span class="grupo" style="--n:6">${'<i></i>'.repeat(6)}</span></div>
-      <div class="fila"><button class="w-btn w-alt" style="width:56px" aria-label="Pausa">${ico('pausa')}</button><button class="w-btn crece">${ico('check')}Hecho</button></div>
-    </div>
+    ${wGrandeMarcha()}
     <div class="fila" style="gap:var(--e4);align-items:flex-start;flex-wrap:wrap">
-      <div class="pila"><span class="etiqueta">Pequeño</span><div class="w w-peq"><span class="meta">Hoy · ${minutos(SESION_HOY)} min</span><span class="nombre" style="font-weight:700;line-height:1.2">Fuerza de tren superior</span><button class="w-btn">${ico('play')}Empezar</button></div></div>
-      <div class="pila"><span class="etiqueta">Pequeño · en marcha</span><div class="w w-peq"><span class="meta">Remo inclinado</span><span class="w-tiempo">12 <span class="meta">reps</span></span><button class="w-btn">${ico('check')}Hecho</button></div></div>
+      <div class="pila"><span class="etiqueta">Pequeño</span><div class="w w-peq">${wImg('remo_incl_banda')}<span class="meta">Hoy · ${minutos(SESION_HOY)} min</span><button class="w-btn">${ico('play')}Empezar</button></div></div>
+      <div class="pila"><span class="etiqueta">Pequeño · en marcha</span>${wPeqMarcha()}</div>
     </div>
+    <button class="btn btn-secundario" data-go="widget-fondo">Ver las dos opciones de fondo</button>
+  </div>` };
+
+P['widget-fondo'] = { sinPestanas: true, titulo: 'Fondo del widget: dos opciones', render: () => `${cab('Fondo del widget', 'widgets')}
+  <div class="pantalla">
+    <p>El fondo de hoy (<code>#1E6B74</code>) es el color de la camiseta: la figura se pierde, sobre todo ella. Dos salidas, con las imágenes reales:</p>
+    ${seg('fig.sexo', ['Hombre', 'Mujer'], S.fig.sexo === 'hombre' ? 'Hombre' : 'Mujer', 'Figura')}
+    <section class="seccion"><h2>Hoy: el problema</h2>${wGrandeMarcha('a', 'claro', 'w-b')}</section>
+    <section class="seccion"><h2>A · Fondo de la app, claro u oscuro <span class="estado bien">${ico('check')}Propuesta</span></h2>
+      <div class="pila forzar-claro" style="background:var(--fondo);padding:var(--e3);border-radius:var(--r2)">${wGrandeMarcha('a', 'claro')}<div class="fila" style="align-items:flex-start;gap:var(--e3)">${wPeqMarcha('a', 'claro')}</div></div>
+      <div class="pila forzar-oscuro" style="background:var(--fondo);padding:var(--e3);border-radius:var(--r2)">${wGrandeMarcha('a', 'oscuro')}<div class="fila" style="align-items:flex-start;gap:var(--e3)">${wPeqMarcha('a', 'oscuro')}</div></div>
+      <p class="meta">La camiseta sigue siendo del color de la marca, igual que en la app. Las imágenes de claro y oscuro ya están hechas (D1). Sigue al tema del móvil.</p></section>
+    <section class="seccion"><h2>B · Fondo verde azulado y camiseta coral</h2>
+      <div class="pila" style="padding:var(--e3);border-radius:var(--r2);background:var(--capa-2)">${wGrandeMarcha('b', '', 'w-b')}<div class="fila" style="align-items:flex-start;gap:var(--e3)">${wPeqMarcha('b', '', 'w-b')}</div></div>
+      <p class="meta">El widget conserva el color de hoy. Pero la camiseta coral tendría que ser la de toda la app (si no, la persona cambia de ropa entre la app y el widget), y el coral compite con el ámbar de la zona que trabaja.</p></section>
   </div>` };
 
 /* Sistema */
@@ -613,7 +669,7 @@ P.sistema = { proto: true, titulo: 'Sistema de diseño', render: () => `${cab('S
     <section class="seccion"><h2>Controles</h2>${seg('demo', ['Suave', 'Normal', 'Fuerte'], 'Normal', 'Nivel')}<div class="fila">${paso('demo', 12, '', 'Repeticiones')}<span class="crece"></span>${inter('demo-sw', true, 'Interruptor de ejemplo')}</div><div class="chips"><button class="chip" aria-pressed="true">Core</button><button class="chip" aria-pressed="false">Glúteo</button><button class="chip" aria-pressed="false">Espalda</button></div></section>
     <section class="seccion"><h2>Estados de Strava</h2><div class="fila envuelve">${Object.keys(STRAVA).map(estado).join('')}</div></section>
     <section class="seccion"><h2>Origen de una sesión</h2><div class="fila envuelve" style="gap:var(--e4)">${Object.keys(ORIGEN).map(origen).join('')}</div></section>
-    <section class="seccion"><h2>Hueco de la figura</h2><div class="fila" style="align-items:flex-start"><div style="width:96px">${fig(ej('puente'))}</div><div class="crece">${fig(ej('puente'), true, true)}</div></div><p class="meta">Miniatura 1:1 sin etiquetas; grande 4:3 con la etiqueta de zona en ámbar. En el reproductor, sin caja y a toda pantalla.</p>
+    <section class="seccion"><h2>Figura</h2><div class="fila" style="align-items:flex-start"><div style="width:120px">${fig(ej('puente'))}</div><div class="crece">${fig(ej('puente'), 'grande')}</div></div><p class="meta">Figura 3D de D1, proporción 180:112. Miniatura quieta en la postura clave, sin etiquetas; grande en bucle con la zona que trabaja en ámbar. En el reproductor, sin caja y a toda pantalla (en los de pie se recortan los lados).</p>
     <h3 class="h2">Rayas de progreso</h3><div style="padding:var(--e2);background:var(--capa);border-radius:var(--r1)">${(() => { const g = (a, b) => `<span class="grupo" style="--n:${a + b}">${'<i class="hecho"></i>'.repeat(a)}${'<i></i>'.repeat(b)}</span>`; return `<div class="rayas"><span class="grupo" style="--n:7">${'<i class="hecho"></i>'.repeat(6)}<i class="desc hecho"></i></span><span class="grupo" style="--n:7"><i class="hecho"></i><i class="hecho"></i><i class="ahora"></i><i></i><i></i><i></i><i class="desc"></i></span><span class="grupo" style="--n:6">${'<i></i>'.repeat(6)}</span></div>`; })()}</div>
     <p class="meta">Un paquete por ronda, una raya por ejercicio y una más corta y hueca para el descanso. Hecho en verde azulado, el actual en ámbar.</p></section>
   </div>` };
@@ -631,7 +687,7 @@ const HOJAS = {
 /* ---------- Pintar ---------- */
 const TABS = [['entrenar', 'Entrenar'], ['ejercicios', 'Ejercicios'], ['historial', 'Historial'], ['tu', 'Tú']];
 const TAB_DE = { semana: 'entrenar', sesion: 'entrenar', core: 'entrenar', nueva: 'entrenar', elegir: 'entrenar', objetivo: 'entrenar', ficha: 'ejercicios', detalle: 'historial', marcas: 'historial',
-  peso: 'tu', material: 'tu', bandas: 'tu', sonido: 'tu', figura: 'tu', 'widget-conf': 'tu', copia: 'tu', conexiones: 'tu', claude: 'tu', strava: 'tu', polar: 'tu', pulso: 'tu' };
+  peso: 'tu', material: 'tu', bandas: 'tu', sonido: 'tu', figura: 'tu', personalizar: 'tu', 'widget-conf': 'tu', copia: 'tu', conexiones: 'tu', claude: 'tu', strava: 'tu', polar: 'tu', pulso: 'tu' };
 function rutaActual() { const h = location.hash.slice(1); return P[h] ? h : 'mapa'; }
 function pintar(scrollArriba = true) {
   const id = rutaActual(), p = P[id], movil = document.getElementById('movil');
@@ -645,6 +701,8 @@ function pintar(scrollArriba = true) {
   const nsc = movil.querySelector('.pantalla'); if (nsc) nsc.scrollTop = y;
   const hoja = movil.querySelector('.hoja'); if (hoja && !hoja.contains(document.activeElement)) { hoja.tabIndex = -1; hoja.focus(); }
   document.title = 'Rutina core · prototipo';
+  if (window.FIG) window.FIG.pintar(movil);
+  widgetAnim();
   if (scrollArriba) { const h = movil.querySelector('h1'); if (h) { h.tabIndex = -1; h.focus({ preventScroll: true }); } }
 }
 let toastT;
@@ -675,7 +733,10 @@ const A = {
   elegir: b => { const id = b.dataset.id; S.elegir = S.elegir.includes(id) ? S.elegir.filter(x => x !== id) : [...S.elegir, id]; },
   anadir: b => { if (!S.elegir.includes(b.dataset.id)) S.elegir.push(b.dataset.id); location.hash = 'nueva'; return 'nav'; },
   objdia: b => { const d = b.dataset.v; S.obj.dias = S.obj.dias.includes(d) ? S.obj.dias.filter(x => x !== d) : [...S.obj.dias, d]; },
-  figest: b => { S.fig.estilo = b.dataset.v; }, wconf: b => { S.widget = b.dataset.v; },
+  figsexo: b => { S.fig.sexo = b.dataset.v; }, figprev: b => { S.figPrev = b.dataset.v; },
+  look: b => { S.look[b.dataset.k] = b.dataset.v; window.FIG && window.FIG.look(S.look); },
+  lookcero: () => { S.look = { complexion: 0, musculo: 0, piel: '', pelo: '', top: '' }; window.FIG && window.FIG.look(S.look); },
+  wconf: b => { S.widget = b.dataset.v; },
   widgetfav: b => { const id = b.dataset.id, ya = FAVORITAS.find(f => f.id === id).widget; FAVORITAS = FAVORITAS.map(f => ({ ...f, widget: !ya && f.id === id })); toast(ya ? 'El widget empezará la sesión de hoy' : 'Esta es ahora la del widget'); return 'nada'; },
   toast: b => toast(b.dataset.msg), copiar: () => { try { navigator.clipboard.writeText('https://ejemplo.supabase.co/functions/v1/mcp').catch(() => {}); } catch (e) {} toast('Dirección copiada'); },
   hoja: b => { S.hoja = b.dataset.v; },
@@ -722,3 +783,4 @@ rEmpezar(0);
 document.documentElement.lang = 'es';
 setInterval(rTick, 1000);
 pintar();
+document.addEventListener('input', ev => { const t = ev.target; if (t.dataset && t.dataset.act === 'rango') { S.look[t.dataset.k] = +t.value; if (window.FIG) window.FIG.look(S.look); } });

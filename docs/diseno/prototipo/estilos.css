@@ -51,6 +51,9 @@
   color-scheme: dark;
 }
 
+.forzar-claro { --fondo: #EDF1F0; --capa: #FFFFFF; --capa-2: #E1E8E7; --tinta: #13292C; --tinta-2: #4A5F61; --linea: #C9D5D3; --accion: #1E6B74; --sobre-accion: #FFFFFF; --error: #B3261E; color: var(--tinta); }
+.forzar-oscuro { --fondo: #0E1A1C; --capa: #16262A; --capa-2: #1E3236; --tinta: #E4EEEC; --tinta-2: #9DB3B1; --linea: #2A4044; --accion: #5FB3BC; --sobre-accion: #06272B; --error: #F2B8B5; color: var(--tinta); }
+
 * { box-sizing: border-box; }
 html, body { height: 100%; }
 body {
@@ -176,14 +179,15 @@ a { color: var(--accion); }
 .campo label { font-size: var(--t1); font-weight: 700; color: var(--tinta-2); }
 .campo input { min-height: 52px; border-radius: var(--r1); border: 1px solid var(--linea); background: var(--capa); padding: 0 var(--e3); font-size: var(--t2); }
 
-/* Hueco de la figura (D1 la rellena) */
-.fig { position: relative; display: grid; place-items: center; background: var(--capa-2); border-radius: var(--r1); color: var(--tinta-2); overflow: hidden;
-  background-image: repeating-linear-gradient(135deg, transparent 0 10px, rgb(127 127 127 / .07) 10px 11px); aspect-ratio: 1; width: 100%; max-width: 100%; }
-.fig .fig-txt { font-size: var(--t1); text-align: center; line-height: 1.2; }
-.fig .fig-zona { position: absolute; left: var(--e2); bottom: var(--e2); background: var(--trabajo); color: var(--sobre-trabajo); font-size: var(--t1); font-weight: 700; letter-spacing: .06em; padding: 2px var(--e2); border-radius: var(--r1); }
-.fig.grande { aspect-ratio: 4 / 3; border-radius: var(--r2); }
-.fig.grande .fig-txt { font-size: var(--t2); }
-
+/* Figura 3D (D1). Proporción fija 180:112, la de figura3d.js. Fondo transparente: va sobre la capa */
+.fig { position: relative; display: grid; place-items: center; background: var(--capa); border-radius: var(--r1); color: var(--tinta-2); overflow: hidden; width: 100%; max-width: 100%; aspect-ratio: 180 / 112; }
+.fig canvas { display: block; width: 100%; height: auto; aspect-ratio: 180 / 112; grid-area: 1 / 1; }
+.fig .fig-txt, .fig .fig-falta { grid-area: 1 / 1; font-size: var(--t1); text-align: center; line-height: 1.2; padding: var(--e2); }
+.fig.lista .fig-txt, .fig .fig-falta, .fig.sin-figura .fig-txt { display: none; }
+.fig.sin-figura .fig-falta { display: block; }
+.fig.sin-figura { background-image: repeating-linear-gradient(135deg, transparent 0 10px, rgb(127 127 127 / .08) 10px 11px); }
+.fig.fig-grande { border-radius: var(--r2); }
+.lista .fig { background: transparent; }
 /* Cuadrícula de ejercicios */
 .rejilla { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--e4) var(--e3); }
 .miniatura { display: flex; flex-direction: column; gap: var(--e2); border: 0; background: none; padding: 0; text-align: left; cursor: pointer; position: relative; }
@@ -197,10 +201,12 @@ a { color: var(--accion); }
 .repro { position: relative; flex: 1; min-height: 0; display: flex; flex-direction: column; background: var(--capa); cursor: pointer; user-select: none; -webkit-user-select: none; touch-action: pan-y; }
 .repro:focus-visible { outline-offset: -4px; }
 .repro-figura { position: relative; flex: 1 1 auto; min-height: 0; }
-.repro-figura .fig.libre { position: absolute; inset: 0; aspect-ratio: auto; border-radius: 0; background-color: transparent; }
-.fig.libre .fig-txt { font-size: var(--t2); }
-.fig.libre .fig-zona { left: var(--e4); bottom: var(--e3); }
-.fig.libre.pequena { inset: 15% 20%; border-radius: var(--r2); }
+.repro-figura .fig.libre { position: absolute; inset: 64px 0 0; aspect-ratio: auto; border-radius: 0; background: transparent; display: block; }
+.fig.libre canvas { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 100%; height: auto; }
+/* de pie: la persona es alta y el encuadre apaisado; se recortan los lados para que salga más grande */
+.fig.libre.alto canvas { width: auto; height: 100%; max-width: 145%; }
+.fig.libre .fig-txt, .fig.libre .fig-falta { position: absolute; inset: 40% 0 auto; font-size: var(--t2); }
+.fig.libre.pequena { inset: 18% 12%; }
 .repro-arriba { position: absolute; top: var(--e2); left: var(--e2); right: var(--e3); display: flex; align-items: center; gap: var(--e2); }
 .repro-arriba .redondo { background: var(--capa-2); }
 .repro-pos { flex: 1; font-size: var(--t1); color: var(--tinta-2); font-weight: 700; }
@@ -256,7 +262,29 @@ a { color: var(--accion); }
 .w .w-btn { min-height: var(--toque); border-radius: var(--r3); border: 0; background: var(--accion); color: var(--sobre-accion); font-weight: 700; font-size: var(--t2); display: flex; align-items: center; justify-content: center; gap: var(--e2); cursor: pointer; }
 .w .w-btn svg { width: 20px; height: 20px; }
 .w .w-alt { background: var(--capa-2); color: var(--tinta); }
-.w .fig { width: 72px; flex: none; }
+.w-grande { width: 100%; max-width: 380px; }
+.w-arriba { display: flex; justify-content: space-between; gap: var(--e2); }
+.w-arriba .meta svg { width: 14px; height: 14px; color: var(--error); vertical-align: -2px; margin-right: 2px; }
+.w-cuerpo { align-items: center; }
+.w-fig { width: 46%; max-width: 168px; aspect-ratio: 400 / 249; flex: none; display: block; }
+.w-peq .w-fig { width: 100%; max-width: none; }
+.w-nombre { display: block; font-weight: 700; font-size: var(--t2); line-height: 1.25; }
+.w span.crece { display: flex; flex-direction: column; gap: 2px; }
+.w-corto { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+/* Hoy en el widget: fondo #1E6B74 (el de la app actual) y texto blanco. Se usa para enseñar el problema y la opción B */
+.w.w-b { background: #1E6B74; color: #FFFFFF; --linea: rgb(255 255 255 / .3); }
+.w.w-b .meta { color: rgb(255 255 255 / .85); }
+.w.w-b .w-btn { background: #FFFFFF; color: #1E6B74; }
+.w.w-b .w-btn.w-alt { background: rgb(255 255 255 / .16); color: #FFFFFF; }
+.w.w-b .rayas i.hecho { background: #FFFFFF; }
+.w.w-b .rayas i.desc { box-shadow: inset 0 0 0 1.5px rgb(255 255 255 / .7); }
+.w.w-b .w-arriba .meta svg { color: #FFB4A8; }
+
+/* Personalizar */
+.rango { accent-color: var(--accion); min-height: var(--toque); }
+.muestras { display: flex; flex-wrap: wrap; gap: var(--e2); }
+.muestra-c { min-width: var(--toque); height: var(--toque); border-radius: var(--r3); border: 2px solid var(--linea); background: var(--c); cursor: pointer; font-size: var(--t1); font-weight: 700; padding: 0 var(--e2); }
+.muestra-c[aria-pressed="true"] { border-color: var(--accion); box-shadow: 0 0 0 2px var(--capa), 0 0 0 4px var(--accion); }
 
 /* Mapa y sistema */
 .mapa-grupo { display: flex; flex-direction: column; gap: var(--e2); }
