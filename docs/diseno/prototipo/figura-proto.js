@@ -63,15 +63,40 @@ function dibujar(cv, k, t, clamp, etiquetas, g) {
   cv.closest('.fig')?.classList.add('lista');
 }
 
-/* ¿De pie? (la figura es más alta que ancha): en el reproductor se recortan los lados */
-const altos = {};
-function alto(k, g) {
-  const id = k + g; if (id in altos) return altos[id];
+/* Reproductor: encuadre por ejercicio. Se mide una vez qué parte del ancho ocupan la figura, el material y las etiquetas
+   durante todo el bucle, y la figura se agranda hasta que eso llena el ancho de la pantalla (sin pasar del alto).
+   Así los de pie salen más grandes sin cortar la etiqueta de la zona, la flecha ni la banda (antes se recortaba
+   un 15 % fijo por cada lado y se perdían «JUNTA ESCÁPULAS» o «GLÚTEO DE LADO»). */
+const anchos = {};
+function anchoUtil(k, g) {
+  const id = k + g + (oscuro() ? 'o' : 'c'); if (anchos[id]) return anchos[id];
+  const fiable = modelos[g] || !crear || !hayWebGL;           // con el 3D aún cargando no se guarda
+  const caja = document.createElement('div'); caja.style.cssText = 'position:absolute;left:-9999px;top:0;width:160px';
+  const cv = document.createElement('canvas'); cv.style.width = '160px'; caja.appendChild(cv); document.body.appendChild(caja);
+  let x0 = 1, x1 = 0;
   try {
-    const ex = D.exercises[k], { gm } = window.Figura.solve(ex, window.Figura.keyT(ex), true, { key: k, gender: g });
-    const P = Object.values(gm.p).filter(p => Array.isArray(p)), xs = P.map(p => p[0]), ys = P.map(p => p[1]);
-    return (altos[id] = (Math.max(...ys) - Math.min(...ys)) > (Math.max(...xs) - Math.min(...xs)) * 0.9);
-  } catch (e) { return (altos[id] = false); }
+    for (let t = 0; t < 6; t += 0.4) {
+      dibujar(cv, k, t, false, true, g);
+      const w = cv.width, h = cv.height, d = cv.getContext('2d').getImageData(0, 0, w, h).data;
+      for (let y = 0; y < h; y++) {
+        let n = 0, a = w, b = -1;
+        for (let x = 0; x < w; x++) if (d[(y * w + x) * 4 + 3] > 120) { n++; if (x < a) a = x; b = x; }
+        if (n > w * 0.8 || b < 0) continue;                    // la línea del suelo cruza todo: no cuenta
+        x0 = Math.min(x0, a / w); x1 = Math.max(x1, (b + 1) / w);
+      }
+    }
+  } catch (e) { x0 = 0; x1 = 1; }
+  caja.remove();
+  if (x1 <= x0) { x0 = 0; x1 = 1; }
+  const r = [Math.max(0, x0 - 0.02), Math.min(1, x1 + 0.02)];
+  if (fiable) anchos[id] = r;
+  return r;
+}
+function encuadrar(cv, k, g) {
+  const hueco = cv.closest('.fig'); if (!hueco || !hueco.clientWidth) return;
+  const W = hueco.clientWidth, H = hueco.clientHeight, [a, b] = anchoUtil(k, g);
+  const w = Math.min(H * 180 / 112, W / (b - a), W * 1.8), izq = W / 2 - (a + b) / 2 * w;
+  cv.style.width = w + 'px'; cv.style.left = Math.min(0, Math.max(W - w, izq)) + 'px';
 }
 
 /* Miniaturas: se dibujan una a una (no bloquean la página) y se guardan */
@@ -122,7 +147,7 @@ function pintar(raiz = document) {
   raiz.querySelectorAll('canvas[data-fig]').forEach(cv => {
     const k = cv.dataset.fig, fig = cv.closest('.fig');
     if (!D.exercises[k]) { fig?.classList.add('sin-figura'); return; }
-    if (cv.dataset.modo === 'libre') fig?.classList.toggle('alto', alto(k, generoDe(cv)));
+    if (cv.dataset.modo === 'libre') { const g = generoDe(cv); encuadrar(cv, k, g); if (!modelos[g] && crear && hayWebGL) modelo(g).then(() => encuadrar(cv, k, g), () => {}); }
     if (cv.dataset.modo === 'mini') {
       const key = claveMini(cv);
       if (cache.has(key)) copiar(cv, cache.get(key)); else cola.push(cv);

@@ -26,7 +26,7 @@
   --t2: 16px;   /* texto */
   --t3: 20px;   /* títulos de tarjeta y sección */
   --t4: 28px;   /* título de pantalla y cifras */
-    --p2: clamp(64px, min(24vw, 11vh), 104px); /* reproductor: cuántas (reps o segundos) */
+    --p2: clamp(72px, min(26vw, 12.5vh), 120px); /* reproductor: cuántas (reps o segundos); D3: más grande para leerla a 2 m */
 
   /* Espacios */
   --e1: 4px; --e2: 8px; --e3: 12px; --e4: 16px; --e5: 24px; --e6: 32px; --e7: 48px;
@@ -200,11 +200,13 @@ a { color: var(--accion); }
 /* Reproductor: la figura ocupa toda la pantalla, sin caja; la información abajo, donde no se pisa */
 .repro { position: relative; flex: 1; min-height: 0; display: flex; flex-direction: column; background: var(--capa); cursor: pointer; user-select: none; -webkit-user-select: none; touch-action: pan-y; }
 .repro:focus-visible { outline-offset: -4px; }
+/* Descanso y «Prepárate»: toda la pantalla cambia de fondo, para distinguirlos de la serie a 2 m (el texto no se lee de lejos) */
+.repro.descanso, .repro.prepara { background: var(--accion-suave); }
 .repro-figura { position: relative; flex: 1 1 auto; min-height: 0; }
 .repro-figura .fig.libre { position: absolute; inset: 64px 0 0; aspect-ratio: auto; border-radius: 0; background: transparent; display: block; }
-.fig.libre canvas { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 100%; height: auto; }
-/* de pie: la persona es alta y el encuadre apaisado; se recortan los lados para que salga más grande */
-.fig.libre.alto canvas { width: auto; height: 100%; max-width: 145%; }
+.fig.libre canvas { position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 100%; height: auto; }
+/* el ancho y la posición del lienzo los pone figura-proto.js por ejercicio: la figura y sus etiquetas llenan el ancho
+   sin cortarse; en los de pie la persona sale más grande (se recorta solo el aire de los lados) */
 .fig.libre .fig-txt, .fig.libre .fig-falta { position: absolute; inset: 40% 0 auto; font-size: var(--t2); }
 .fig.libre.pequena { inset: 18% 12%; }
 .repro-arriba { position: absolute; top: var(--e2); left: var(--e2); right: var(--e3); display: flex; align-items: center; gap: var(--e2); }
@@ -228,7 +230,7 @@ a { color: var(--accion); }
 .repro-pista { font-size: var(--t1); color: var(--accion); font-weight: 700; text-align: center; }
 .rayas { display: flex; gap: var(--e3); padding-block: var(--e1); }
 .rayas .grupo { flex: var(--n); display: flex; gap: 3px; }
-.rayas i { flex: 1; height: 6px; border-radius: 3px; background: var(--linea); }
+.rayas i { flex: 1; height: 8px; border-radius: 4px; background: var(--linea); }
 .rayas i.hecho { background: var(--accion); }
 .rayas i.ahora { background: var(--trabajo); box-shadow: inset 0 0 0 1px var(--aviso); }
 .rayas i.desc { flex: .5; background: transparent; box-shadow: inset 0 0 0 1.5px var(--tinta-2); }

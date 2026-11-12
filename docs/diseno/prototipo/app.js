@@ -334,7 +334,7 @@ P.reproductor = { sinPestanas: true, titulo: 'Reproductor', render: () => {
   const pulso = S.pulsoOn ? (S.sinSenal ? `<button class="pulso apagado" data-act="pulsopill">${ico('corazon')}Sin señal</button>` : `<button class="pulso" data-act="pulsopill" aria-label="Pulso 128, zona 3">${ico('corazon')}128 <span class="zona">Z3</span></button>`) : '';
   let cantidad, abajo;
   if (desc) { cantidad = `<span class="repro-cantidad acc">${mm(R.t)}</span>`; abajo = `<span class="repro-reloj">Toca para seguir ya</span>`; }
-  else if (R.fase === 'prepara') { cantidad = `<span class="repro-cantidad acc">${R.t}</span>`; abajo = `<span class="repro-reloj">Prepárate · ${x.secs} s</span>`; }
+  else if (R.fase === 'prepara') { cantidad = `<span class="repro-cantidad acc">${R.t}</span>`; abajo = `<span class="aviso-fase" aria-live="assertive">Prepárate · ${x.secs} s</span>`; }
   else if (x.reps) { cantidad = `<span class="repro-cantidad">${x.reps}<small>reps</small></span>`; abajo = `<span class="repro-reloj">${guia < x.reps ? `Ritmo ${guia} de ${x.reps}` : 'Toca al acabar'} · ${mm(R.t)}</span>`; }
   else { cantidad = `<span class="repro-cantidad">${mm(R.t)}</span>`; abajo = `<span class="repro-reloj">de ${mm(x.secs)}${x.sides ? ' por lado' : ''}</span>`; }
   return `<div class="repro ${R.fase}" data-act="tap">
