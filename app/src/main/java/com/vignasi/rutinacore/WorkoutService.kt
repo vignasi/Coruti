@@ -80,9 +80,15 @@ class WorkoutService : Service() {
         if (!Workout.active) {
             val cfg = Store.config(this)
             val data = Rutina.get(this)
-            val mods = activeModules(data, cfg, Store.lastDay(this))
-            Workout.start(buildSteps(data, cfg, Store.lastDay(this), Store.sessions(this)), cfg, dayType(mods))
-            Workout.rec = SessionRecorder("rutina", modsLabel(mods), dayType(mods), cfg.rounds)
+            val fav = if (Store.widgetSource(this) == Store.SRC_FAV) Store.widgetFav(this) else null
+            if (fav != null) {
+                Workout.start(buildFree(data, fav) { Store.bandOf(this, it) }, cfg, "", freeRounds = fav.rounds, series = !fav.isAlt)
+                Workout.rec = SessionRecorder("sueltos", fav.name, "", fav.rounds)
+            } else {
+                val mods = activeModules(data, cfg, Store.lastDay(this))
+                Workout.start(buildSteps(data, cfg, Store.lastDay(this), Store.sessions(this)), cfg, dayType(mods))
+                Workout.rec = SessionRecorder("rutina", modsLabel(mods), dayType(mods), cfg.rounds)
+            }
             resetCues()
             acquireWake()
             lastTick = SystemClock.elapsedRealtime()
@@ -179,9 +185,9 @@ class WorkoutService : Service() {
         Workout.idx = 0
         Workout.rec?.save(this, complete = true)
         Workout.rec = null
-        Store.markDone(this, rounds, day)
+        if (Workout.free) Store.markDay(this) else Store.markDone(this, rounds, day)
         beeper?.chime()
-        speak("Rutina terminada. Buen trabajo.")
+        speak(if (Workout.free) "Ejercicios terminados. Buen trabajo." else "Rutina terminada. Buen trabajo.")
         try {
             getSystemService(Vibrator::class.java)?.vibrate(
                 VibrationEffect.createWaveform(longArrayOf(0, 300, 150, 300, 150, 600), -1)
@@ -234,7 +240,7 @@ class WorkoutService : Service() {
             .setContentIntent(open)
         if (st != null && Workout.active) {
             val title = if (st.prep) "Prepárate: " + Rutina.get(this).ex(st.k).name else st.name
-            var text = "${fmt(Workout.leftSec())} · Ronda ${st.r}/${Workout.rounds}"
+            var text = "${fmt(Workout.leftSec())} · ${Workout.roundWord} ${st.r}/${Workout.rounds}"
             if (!st.prep && !st.rest && st.reps > 0) {
                 val n = minOf(st.reps, (Workout.elapsedInStep() / Rutina.get(this).ex(st.k).rep).toInt() + 1)
                 text += " · $n/${st.reps}"

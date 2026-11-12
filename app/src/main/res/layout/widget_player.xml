@@ -106,6 +106,48 @@
         android:progressBackgroundTint="#55FFFFFF"
         android:progressTint="#F0B04A" />
 
+    <!-- Qué hace el widget: la rutina completa o la favorita marcada con ★ en la app -->
+    <LinearLayout
+        android:id="@+id/src_box"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:orientation="horizontal"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/chip_src_rut"
+            android:layout_width="0dp"
+            android:layout_height="36dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="4dp"
+            android:background="@drawable/widget_btn_ghost"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:maxLines="1"
+            android:paddingStart="6dp"
+            android:paddingEnd="6dp"
+            android:text="Rutina"
+            android:textColor="#FFFFFF"
+            android:textSize="12sp"
+            android:textStyle="bold" />
+        <TextView
+            android:id="@+id/chip_src_fav"
+            android:layout_width="0dp"
+            android:layout_height="36dp"
+            android:layout_weight="2"
+            android:background="@drawable/widget_btn_ghost"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:maxLines="1"
+            android:paddingStart="6dp"
+            android:paddingEnd="6dp"
+            android:text="★ Favorita"
+            android:textColor="#FFFFFF"
+            android:textSize="12sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
     <LinearLayout
         android:id="@+id/config_box"
         android:layout_width="match_parent"
