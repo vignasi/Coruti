@@ -29,6 +29,23 @@ HEAD = {"Head", "HeadTop_End", "Neck"}
 SHOE_TOP, SOLE_TOP = 0.105, 0.022
 DEBUG = False
 XI, XS = 0.065, 0.105      # tirantes de ella: borde de dentro y de fuera (x)
+# Oreja: elipse (vista de lado) que la rodea con margen, respecto al centro de los ojos: (fondo y, alto z, radio y, radio z).
+# Medida en los modelos: la oreja entera es piel y el pelo la rodea por una curva suave (antes, una caja: muescas y media oreja con pelo)
+EAR = {"m": (0.09, -0.017, 0.03, 0.037), "f": (0.074, -0.018, 0.03, 0.036)}
+NAPE = -0.075              # el pelo acaba por debajo en esta altura (respecto a los ojos): borde recto en la nuca
+
+
+def ear_fn(g, eye):
+    """< 0 dentro de la elipse de la oreja (piel). Medida en metros, aproximada, a lo largo del radio en y."""
+    yc, zc, ry, rz = EAR[g]
+    return lambda c: (((c.y - eye.y - yc) / ry) ** 2 + ((c.z - eye.z - zc) / rz) ** 2) ** 0.5 * ry - ry
+
+
+def head_region(g, eye, hair, c):
+    """Pelo o piel en la cabeza: por encima de la línea del pelo, fuera de la oreja y por encima de la nuca."""
+    if abs(c.x) > 0.045 and ear_fn(g, eye)(c) < 0:
+        return "piel"
+    return "pelo" if hair(c) > 0 and c.z > eye.z + NAPE else "piel"
 
 
 def ref_points(h, rig, g):
@@ -69,8 +86,7 @@ def region(g, r, b, c):
     eye = r["eye"]
     x, y, z = c.x, c.y, c.z
     if b in HEAD and z > eye.z - 0.09:
-        ear = abs(x) > 0.068 and z < eye.z + 0.035 and y < eye.y + 0.07
-        return "pelo" if r["hair"](c) > 0 and not ear else "piel"
+        return head_region(g, eye, r["hair"], c)
     if (b in FEET or b in LEGS) and z < SHOE_TOP:
         return "suela" if z < SOLE_TOP else "zapa"
     armish = "Arm" in b or "Hand" in b
@@ -80,7 +96,7 @@ def region(g, r, b, c):
     if g == "m":
         if b in ("LeftArm", "RightArm"):                           # manga
             h0, d, L = r["arm" + s]
-            return "top" if (c - h0).dot(d) < 0.42 * L else "piel"
+            return "top" if (c - h0).dot(d) < 0.42 * L and r["neck"](c) < 0 else "piel"   # junto al cuello manda el escote
         if armish:
             return "piel"
         if z >= waist:                                             # camiseta (el cuello, piel)
@@ -112,12 +128,10 @@ def plane(co, no):
 def cuts(g, r):
     """(zona, función): se corta la malla por donde la función vale 0, solo en la zona de ese borde."""
     eye = r["eye"]
-    C = [(lambda b, c: b in HEAD and c.z > eye.z - 0.03, r["hair"])]
-    ear = lambda b, c: b in HEAD and abs(c.x) > 0.04 and eye.z - 0.09 < c.z < eye.z + 0.07 and c.y < eye.y + 0.1
-    for sx in (1, -1):
-        C.append((ear, plane(Vector((sx * 0.068, 0, 0)), Vector((1, 0, 0)))))
-    C.append((ear, plane(Vector((0, 0, eye.z + 0.035)), Vector((0, 0, 1)))))
-    C.append((ear, plane(Vector((0, eye.y + 0.07, 0)), Vector((0, 1, 0)))))
+    C = [(lambda b, c: b in HEAD and c.z > eye.z + NAPE - 0.02, r["hair"])]
+    ef = ear_fn(g, eye)
+    C.append((lambda b, c: b in HEAD and abs(c.x) > 0.045 and abs(ef(c)) < 0.02, ef))
+    C.append((lambda b, c: b in HEAD and abs(c.z - (eye.z + NAPE)) < 0.03, plane(Vector((0, 0, eye.z + NAPE)), Vector((0, 0, 1)))))
     low = lambda b, c: (b in FEET or b in LEGS) and c.z < 0.16
     C.append((low, plane(Vector((0, 0, SHOE_TOP)), Vector((0, 0, 1)))))
     C.append((low, plane(Vector((0, 0, SOLE_TOP)), Vector((0, 0, 1)))))
@@ -179,17 +193,37 @@ def cut(bm, faces, f, snap=0.04):
             on.add(nv)
     stat = [0, 0, 0]
     for fc in list({fc for v in on for fc in v.link_faces}):
-        vs = [v for v in fc.verts if v in on]
-        if len(vs) != 2 or any(e for e in fc.edges if set(e.verts) == set(vs)):
-            stat[1 if len(vs) == 2 else 2] += 1
+        vs = pair(fc, on, val)
+        if vs is None or any(e for e in fc.edges if set(e.verts) == set(vs)):
+            stat[1 if vs else 2] += 1
             continue
         bmesh.ops.connect_verts(bm, verts=vs)
         stat[0] += 1
     return stat
 
 
-def pulir(h, rig, g):
-    """Corta los bordes, reasigna la ropa de cada cara y ajusta el volumen solo donde la ropa ha cambiado."""
+def pair(fc, on, val):
+    """Los dos vértices del corte por donde hay que partir la cara: los que dejan a un lado solo valores >= 0 y al otro
+    solo <= 0. Con tres o más vértices sobre la curva (uno pegado a ella por el ajuste) antes no se partía: dientes en el borde."""
+    ring = list(fc.verts)
+    n = len(ring)
+    idx = [i for i, v in enumerate(ring) if v in on]
+    sgn = lambda v: 0.0 if v in on else val.get(v, 0.0)
+    for a in range(len(idx)):
+        for b in range(a + 1, len(idx)):
+            i, j = idx[a], idx[b]
+            c1 = [sgn(ring[k % n]) for k in range(i + 1, j)]
+            c2 = [sgn(ring[k % n]) for k in range(j + 1, i + n)]
+            if not c1 or not c2:
+                continue
+            if (max(c1) <= 0 <= min(c2) and min(c1) < 0 < max(c2)) or (max(c2) <= 0 <= min(c1) and min(c2) < 0 < max(c1)):
+                return [ring[i], ring[j]]
+    return None
+
+
+def pulir(h, rig, g, pushed=True):
+    """Corta los bordes, reasigna la ropa de cada cara y ajusta el volumen solo donde la ropa ha cambiado.
+    pushed=False (desde crear_modelos.py): la malla aún no tiene volumen y se le pone entero aquí."""
     me = h.data
     r = ref_points(h, rig, g)
     names = [m.name for m in me.materials]
@@ -208,7 +242,15 @@ def pulir(h, rig, g):
                 rr = n
         return rr
     for v in bm.verts:
-        v[pl] = PUSH.get(vregion(v), 0.0)
+        v[pl] = PUSH.get(vregion(v), 0.0) if pushed else 0.0
+
+    def vpush(v):
+        """Volumen de un vértice: el de la región con más volumen, pero en una esquina (la ropa o el pelo ocupan menos de
+        media vuelta a su alrededor) solo en proporción. Si no, el vértice de la punta sale como un pico (detrás de la oreja)."""
+        rr = vregion(v)
+        tot = sum(lp.calc_angle() for lp in v.link_loops) or 1.0
+        share = sum(lp.calc_angle() for lp in v.link_loops if names[lp.face.material_index] == rr) / tot
+        return PUSH.get(rr, 0.0) * min(1.0, 2.0 * share)
 
     def dom(f):
         acc = {}
@@ -222,6 +264,10 @@ def pulir(h, rig, g):
     for zone, fn in cuts(g, r):
         fs = [f for f in bm.faces if f.material_index not in keep and zone(dom(f), f.calc_center_median())]
         if fs:
+            # en triángulos, el corte cruza cada cara una sola vez (un cuadrado podía quedar cruzado dos veces y sin partir:
+            # eran los dientes del tirante). El .glb va en triángulos igualmente: no pesa más
+            bmesh.ops.triangulate(bm, faces=[f for f in fs if len(f.verts) > 3])
+            fs = [f for f in bm.faces if f.material_index not in keep and zone(dom(f), f.calc_center_median())]
             st = cut(bm, fs, fn)
             # segunda pasada: las caras que el primer corte no pudo partir (cruzadas por la curva más de una vez)
             fs = [f for f in bm.faces if f.material_index not in keep and zone(dom(f), f.calc_center_median())]
@@ -243,7 +289,7 @@ def pulir(h, rig, g):
     bm.normal_update()                           # las caras nuevas del corte aún no tienen normal
     delta = {}
     for v in bm.verts:
-        d = PUSH.get(vregion(v), 0.0) - v[pl]
+        d = vpush(v) - v[pl]
         if abs(d) < 1e-6:
             continue
         n = Vector()

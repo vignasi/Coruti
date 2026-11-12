@@ -167,10 +167,9 @@ def build(g):
     def rule(b, co):
         """Región de un punto del cuerpo según su hueso y su posición."""
         z, y, x = co.z, co.y, co.x
-        if b in ("Head", "HeadTop_End", "Neck") and z > eye.z - 0.09:
-            thr = eye.z + 0.045 - 0.62 * (y - (eye.y - 0.02))  # frente alta, nuca baja
-            ear = abs(x) > 0.068 and z < eye.z + 0.035 and y < eye.y + 0.07
-            return "pelo" if z > thr and not ear else "piel"
+        if b in ("Head", "HeadTop_End", "Neck") and z > eye.z - 0.09:   # la misma regla que el pulido: oreja y nuca sin pelo
+            hp, hn = Vector((0, eye.y - 0.02, eye.z + 0.045)), Vector((0, 0.62, 1)).normalized()  # frente alta, nuca baja
+            return pulir_ropa.head_region(g, eye, lambda c_: (c_ - hp).dot(hn), co)
         if b in ("LeftFoot", "RightFoot", "LeftToeBase", "RightToeBase") or (b in ("LeftLeg", "RightLeg") and z < 0.105):
             return "suela" if z < 0.022 else "zapa"
         torso = b in ("Spine", "Spine1", "Spine2", "LeftShoulder", "RightShoulder", "Neck", "Hips")
@@ -215,15 +214,6 @@ def build(g):
         bs = [vdom[i] for i in vs if i in vdom]
         b = max(set(bs), key=bs.count) if bs else ""
         fregion[p.index] = rule(b, sum((h.data.vertices[i].co for i in vs), Vector()) / len(vs))
-    region = {}
-    order = ["piel", "ojos", "abajo", "top", "suela", "zapa", "pelo"]   # un vértice de borde toma la región con más volumen
-    for p in h.data.polygons:
-        r = fregion.get(p.index)
-        if r is None:
-            continue
-        for i in p.vertices:
-            if i not in region or order.index(r) > order.index(region[i]):
-                region[i] = r
 
     # Brazos: cada deformación les llega con su propio factor
     for name, (_, _, armf) in MORPHS.items():
@@ -231,15 +221,7 @@ def build(g):
             morphs[name] = [final[i] + (c - final[i]) * (armf if ("Arm" in vdom.get(i, "") or "Hand" in vdom.get(i, "")) else 1.0)
                             for i, c in enumerate(morphs[name])]
 
-    # Volumen: la ropa y el pelo, un poco por fuera de la piel (lo mismo en todas las deformaciones)
-    push = {"top": 0.004, "abajo": 0.003, "zapa": 0.007, "suela": 0.006, "pelo": 0.009}
-    h.data.update()
-    offs = {v.index: v.normal * push[region[v.index]] for v in h.data.vertices if region.get(v.index) in push}
-    for v in h.data.vertices:
-        if v.index in offs:
-            v.co += offs[v.index]
-    for name in morphs:
-        morphs[name] = [c + offs.get(i, Vector()) for i, c in enumerate(morphs[name])]
+    # Volumen (la ropa y el pelo un poco por fuera de la piel): lo pone pulir_ropa.py, con los bordes ya cortados
 
     # Deformaciones para personalizar (morph targets)
     h.shape_key_add(name="Basis", from_mix=False)
@@ -273,7 +255,7 @@ def build(g):
         h.vertex_groups.remove(gr)
 
     # Bordes de la ropa y del pelo rectos: cortes por superficies suaves en vez de seguir las aristas (pulir_ropa.py)
-    pulir_ropa.pulir(h, rig, g)
+    pulir_ropa.pulir(h, rig, g, pushed=False)
 
     objs = [h, rig]
     if g == "f":
