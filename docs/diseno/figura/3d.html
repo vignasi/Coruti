@@ -1,106 +1,56 @@
-<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Figura 3D · prueba</title>
-<!-- Prueba (D1): la misma postura de rutina.json moviendo los huesos de un modelo 3D de persona.
-     Modelos: modelos/persona_m.glb y persona_f.glb (MakeHuman, CC0, hechos con modelos/crear_modelos.py).
-     Para comparar, Xbot y Michelle de los ejemplos de three.js (Mixamo; no están en el repo, se cargan de GitHub).
-     ?m=persona_m|persona_f|Xbot|Michelle &ex=a,b &all (todas las posturas) &c=columnas &three=URL de three (por defecto, jsDelivr) -->
-<style>body{margin:0;background:#EDF1F0;font:14px system-ui}#g{display:grid;grid-template-columns:repeat(var(--c,2),1fr);gap:6px;padding:6px}
-.t{background:#fff;border-radius:12px;padding:4px}.t canvas{width:100%;aspect-ratio:180/112;display:block}.t span{font-size:12px;padding:0 4px}</style>
-<div id="g"></div>
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Figura 3D · revisión</title>
+<!-- Revisión con capturas de la figura 3D (D1), como galeria.html para la dibujada.
+     Modelos: modelos/persona_m.glb y persona_f.glb (MakeHuman, CC0, hechos con modelos/crear_modelos.py). Código: figura3d.js.
+     ?g=m|f &size=big|mini &theme=dark &ex=a,b &mid (a mitad de cada movimiento) &c=columnas
+     &morph=complexion_mas:1,musculo_mas:.5 &piel=%238D5524 &pelo=%23C9A15A (prueba de personalización, P8)
+     &data=URL de rutina.json &three=URL de three (por defecto, la copia de three/) -->
+<style>
+:root{--bg:#EDF1F0;--surface:#FFFFFF;--ink:#17201E;--soft:#55625F}
+:root[data-theme="dark"]{--bg:#0F1513;--surface:#171F1D;--ink:#E4EBE8;--soft:#9AA9A5}
+*{box-sizing:border-box}
+body{margin:0;padding:12px;background:var(--bg);color:var(--ink);font:14px/1.35 system-ui,"Roboto",sans-serif}
+#out{display:grid;grid-template-columns:repeat(var(--c,1),minmax(0,1fr));gap:8px}
+.ex{background:var(--surface);border-radius:14px;padding:8px}
+.ex h2{font-size:14px;margin:0 0 4px}.ex h2 small{color:var(--soft);font-weight:400}
+.row{display:grid;gap:6px}
+canvas{width:100%;aspect-ratio:180/112;display:block}
+#out.minis{--c:3}.minis .ex{padding:5px}.minis .ex h2{font-size:12px;font-weight:500;margin:4px 0 0}
+</style>
+</head>
+<body>
+<div id="out"></div>
 <script src="figura.js"></script>
-<script>{const T=new URL(new URLSearchParams(location.search).get("three")||"https://cdn.jsdelivr.net/npm/three@0.160.0/",location.href).href;
-const s=document.createElement("script");s.type="importmap";s.textContent=JSON.stringify({imports:{three:T+"build/three.module.js","three/addons/":T+"examples/jsm/"}});document.currentScript.after(s);}</script>
+<script>{const T=new URL(new URLSearchParams(location.search).get("three")||"three/",location.href).href;
+const s=document.createElement("script");s.type="importmap";s.textContent=JSON.stringify({imports:{three:T+"build/three.module.min.js","three/addons/":T+"examples/jsm/"}});document.currentScript.after(s);}</script>
 <script type="module">
-import * as THREE from 'three';import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
-const q=new URLSearchParams(location.search),model=q.get('m')||'persona_m',gender=/Michelle|_f$/.test(model)?'f':'m';
-document.getElementById('g').style.setProperty('--c',q.get('c')||2);
-const D=await (await fetch(q.get('data')||'../../../app/src/main/assets/rutina.json')).json();
-const keys=(q.get('ex')||'puente,plancha_lat,curl_goma,flex').split(',');
-const gl=await new GLTFLoader().loadAsync((q.get('models')||(/^persona_/.test(model)?'modelos/':'https://raw.githubusercontent.com/mrdoob/three.js/r160/examples/models/gltf/'))+model+'.glb');const root=gl.scene;
-root.traverse(o=>{if(o.isMesh){o.castShadow=true;o.frustumCulled=false;if(model==='Xbot'){o.material=new THREE.MeshStandardMaterial({color:/Joints/.test(o.name)?0x1E6B74:0xCBD6D3,roughness:.55,metalness:0});}}});
-// Personalización (P8, prueba): &morph=complexion_mas:1,musculo_mas:.5 &piel=%238D5524 &pelo=%23C9A15A
-root.traverse(o=>{if(!o.isMesh)return;const d=o.morphTargetDictionary;
-  (q.get('morph')||'').split(',').filter(Boolean).forEach(kv=>{const [k,v]=kv.split(':');if(d&&d[k]!==undefined)o.morphTargetInfluences[d[k]]=+v;});
-  [].concat(o.material).forEach(m=>{if(m.name==='piel'&&q.get('piel'))m.color.set(q.get('piel'));if(m.name==='pelo'&&q.get('pelo'))m.color.set(q.get('pelo'));});});
-root.updateMatrixWorld(true);
-const B={};root.traverse(o=>{if(o.isBone)B[o.name.replace('mixamorig','')]=o;});
-const rest={};for(const n in B){const b=B[n];rest[n]={local:b.quaternion.clone(),world:b.getWorldQuaternion(new THREE.Quaternion()),pos:b.getWorldPosition(new THREE.Vector3())};}
-const restDir=(a,c)=>rest[c]?rest[c].pos.clone().sub(rest[a].pos).normalize():rest[a].pos.clone().sub(rest[B[a].parent.name.replace('mixamorig','')].pos).normalize();
-const thigh=rest.LeftLeg.pos.distanceTo(rest.LeftUpLeg.pos);
-// escena
-const scene=new THREE.Scene();scene.add(root);
-scene.add(new THREE.HemisphereLight(0xffffff,0x8a9a96,1.6));const sun=new THREE.DirectionalLight(0xffffff,2.2);sun.position.set(-1.5,3,2.5);sun.castShadow=true;
-sun.shadow.mapSize.set(1024,1024);Object.assign(sun.shadow.camera,{left:-2,right:2,top:2,bottom:-2});scene.add(sun);
-const floor=new THREE.Mesh(new THREE.PlaneGeometry(20,20),new THREE.ShadowMaterial({opacity:.18}));floor.rotation.x=-Math.PI/2;floor.receiveShadow=true;scene.add(floor);
-const line=new THREE.Mesh(new THREE.PlaneGeometry(20,.006),new THREE.MeshBasicMaterial({color:0xC3CFCB}));line.position.set(0,0.003,0);scene.add(line);
-const R=new THREE.WebGLRenderer({antialias:true,alpha:true,preserveDrawingBuffer:true});R.shadowMap.enabled=true;R.setPixelRatio(2);R.setSize(360,224);
-R.outputColorSpace=THREE.SRGBColorSpace;
-const cam=new THREE.PerspectiveCamera(24,180/112,.1,50);
-const v3=(a)=>new THREE.Vector3(a[0],-a[1],0);
-const d2=(a,b)=>v3([b[0]-a[0],b[1]-a[1]]).normalize();
-function basis(d,s){const y=d.clone().normalize(),x=s.clone().sub(y.clone().multiplyScalar(s.dot(y)));if(x.lengthSq()<1e-6)x.set(0,0,1);x.normalize();const z=new THREE.Vector3().crossVectors(x,y);return new THREE.Matrix4().makeBasis(x,y,z);}
-function aim(name,child,dir,sec,restSec){
-  const Br=basis(restDir(name,child),restSec),Bt=basis(dir,sec);const Rm=Bt.multiply(Br.transpose());
-  const wq=new THREE.Quaternion().setFromRotationMatrix(Rm).multiply(rest[name].world);
-  const b=B[name],pq=b.parent.getWorldQuaternion(new THREE.Quaternion());b.quaternion.copy(pq.invert().multiply(wq));b.updateMatrixWorld(true);
-}
-function pose(k,t){
-  const ex=D.exercises[k],{gm}=Figura.solve(ex,t,true,{key:k,gender}),p=gm.p,frente=gm.view==='frente';
-  for(const n in B)B[n].quaternion.copy(rest[n].local);root.position.set(0,0,0);root.updateMatrixWorld(true);
-  const up=d2(p.p,p.s),F=frente?new THREE.Vector3(0,0,1):v3(gm.front).normalize(),left=new THREE.Vector3().crossVectors(up,F).normalize();
-  const X=new THREE.Vector3(1,0,0),Y=new THREE.Vector3(0,1,0),Z=new THREE.Vector3(0,0,1);
-  // qué lado del cuerpo es el «1» (cercano en perfil)
-  const left2=[left.x,-left.y],one=frente?(((gm.root.p1[0]-p.p[0])*left2[0]+(gm.root.p1[1]-p.p[1])*left2[1])>0?'Left':'Right'):(left.z>0?'Left':'Right');
-  const other=one==='Left'?'Right':'Left',side={1:one,2:other};
-  aim('Hips','Spine',up,left,X);
-  aim('Spine','Spine1',d2(p.p,p.c),left,X);aim('Spine1','Spine2',d2(p.c,p.s),left,X);aim('Spine2','Neck',d2(p.c,p.s),left,X);
-  aim('Neck','Head',d2(p.s,p.h),left,X);aim('Head','HeadTop_End',d2(p.s,p.h),left,X);
-  for(const i of ['1','2']){const S=side[i],lat=S==='Left'?left:left.clone().negate();
-    const secA=frente?F:lat,restA=frente?Z:Y,secL=frente?F:left,restL=frente?Z:X;
-    aim(S+'Arm',S+'ForeArm',d2(p.s,p['e'+i]),secA,restA);aim(S+'ForeArm',S+'Hand',d2(p['e'+i],p['w'+i]),secA,restA);
-    const h=gm.hands[i];aim(S+'Hand',S+'HandMiddle1',v3(h.mode==='flat'?[h.dir[0],.25]:h.dir).normalize(),secA,restA);
-    aim(S+'UpLeg',S+'Leg',d2(gm.root['p'+i],p['k'+i]),secL,restL);aim(S+'Leg',S+'Foot',d2(p['k'+i],gm.feet[i].A),secL,restL);
-    const ft=gm.feet[i];if(!ft.front){aim(S+'Foot',S+'ToeBase',v3(ft.f).normalize(),secL,restL);aim(S+'ToeBase',S+'Toe_End',v3(ft.f).normalize(),secL,restL);}
-  }
-  root.updateMatrixWorld(true);
-  // colocar: escala del dibujo a metros por el muslo; luego apoyar lo más bajo en el suelo
-  const dt=Math.hypot(p.k1[0]-p.p[0],p.k1[1]-p.p[1])||30,kk=thigh/dt;
-  const hp=B.Hips.getWorldPosition(new THREE.Vector3());root.position.set((p.p[0]-90)*kk-hp.x,0,-hp.z);root.updateMatrixWorld(true);
-  const bb=()=>{const b=new THREE.Box3();for(const n in B){if(/Index|Middle|Ring|Pinky|Thumb|Eye/.test(n))continue;b.expandByPoint(B[n].getWorldPosition(new THREE.Vector3()));}
-    const hd=B.Head.getWorldPosition(new THREE.Vector3()),nk=B.Neck.getWorldPosition(new THREE.Vector3());b.expandByPoint(hd.clone().add(hd.clone().sub(nk).normalize().multiplyScalar(.2)));return b;};
-  let box=bb();root.position.y-=box.min.y-0.07;root.updateMatrixWorld(true);
-  // Contacto: si en el dibujo la mano o el pie se apoyan (suelo, silla, sofá), el brazo o la pierna se doblan lo justo para llegar
-  const GD=103.2,sup=pt=>{let y=GD;(ex.equip||[]).forEach(e=>{if(e.t!=='box')return;const [x,yy,w,h]=e.r;if(h<90&&pt[0]>=x-2&&pt[0]<=x+w+2&&yy>=pt[1]-1.5&&yy<y)y=yy;});return y;};
-  const toW=(pt,lift,from,ref)=>new THREE.Vector3(B[from].getWorldPosition(new THREE.Vector3()).x+(pt[0]-ref[0])*kk,(GD-sup(pt))*kk+lift,0); // x desde el hombro o la cadera del modelo
-  const wp=n=>B[n].getWorldPosition(new THREE.Vector3());
-  function ik(a,b,c,T,bend,secA,restA){const R=wp(a),L1=rest[a].pos.distanceTo(rest[b].pos),L2=rest[b].pos.distanceTo(rest[c].pos);
-    T=T.clone();T.z=R.z;let d=Math.min(R.distanceTo(T),L1+L2-1e-4);const u=T.clone().sub(R).normalize();T=R.clone().add(u.clone().multiplyScalar(d));
-    const x=(L1*L1-L2*L2+d*d)/(2*d),hh=Math.sqrt(Math.max(0,L1*L1-x*x));let n=bend.clone().sub(u.clone().multiplyScalar(bend.dot(u)));if(n.lengthSq()<1e-6)n.set(0,1,0);n.normalize();
-    const E=R.clone().add(u.multiplyScalar(x)).add(n.multiplyScalar(hh));aim(a,b,E.clone().sub(R).normalize(),secA,restA);aim(b,c,T.clone().sub(E).normalize(),secA,restA);}
-  for(const i of ['1','2']){const S=side[i],lat=S==='Left'?left:left.clone().negate(),secA=frente?F:lat,restA=frente?Z:Y,secL=frente?F:left,restL=frente?Z:X;
-    const W=p['w'+i],E=p['e'+i],A=gm.feet[i].A,K=p['k'+i];
-    const bendOf=(r,m,e)=>{const mid=[(r[0]+e[0])/2,(r[1]+e[1])/2];return v3([m[0]-mid[0],m[1]-mid[1]]);};
-    if(W[1]>sup(W)-4.5)ik(S+'Arm',S+'ForeArm',S+'Hand',toW(W,.035,S+'Arm',p.s),bendOf(p.s,E,W),secA,restA);
-    if(!frente&&A[1]>sup(A)-6)ik(S+'UpLeg',S+'Leg',S+'Foot',toW(A,.075,S+'UpLeg',p.p),bendOf(p.p,K,A).add(F.clone().multiplyScalar(.01)),secL,restL);
-    const ft=gm.feet[i];if(!ft.front){aim(S+'Foot',S+'ToeBase',v3(ft.f).normalize(),secL,restL);}
-    // mano: después del ajuste del brazo; apoyada, plana con los dedos estirados
-    const h=gm.hands[i],hd=v3(h.mode==='flat'?[h.dir[0],.12]:h.dir).normalize();aim(S+'Hand',S+'HandMiddle1',hd,secA,restA);
-    if(h.mode==='flat')for(const f of ['Index','Middle','Ring','Pinky'])for(const j of [1,2,3]){const n=S+'Hand'+f+j,c=S+'Hand'+f+(j+1);if(B[n])aim(n,B[c]?c:n,hd,secA,restA);}}
-  root.updateMatrixWorld(true);box=bb();box.expandByScalar(0.14);box.min.y=0;return box;
-}
-const props=new THREE.Group();scene.add(props);const propMat=new THREE.MeshStandardMaterial({color:0xDDE5E3,roughness:.9});
-function drawProps(ex,k){props.clear();const p0=ex.poses[0],dt=Math.hypot(p0.k1[0]-p0.p[0],p0.k1[1]-p0.p[1])||30,kk=thigh/dt,hx=B.Hips.getWorldPosition(new THREE.Vector3()).x;
-  const st=Figura.solve(ex,0,true,{key:k,gender}).gm.p;
-  (ex.equip||[]).forEach(e=>{if(e.t!=='box')return;const [x,y,w,h]=e.r,H=Math.min(h,103.2-y)*kk,W=w*kk,wall=h>=90;
-    const m=new THREE.Mesh(new THREE.BoxGeometry(W,H,wall?.04:.5),propMat);m.position.set(hx+(x+w/2-st.p[0])*kk,H/2,wall?-.3:0);m.receiveShadow=true;m.castShadow=true;props.add(m);});}
-const out=document.getElementById('g');
-for(const k of keys){const ex=D.exercises[k];
-  const phases=q.has('all')?ex.phases.map((_,i)=>i):[ex.phases.findIndex(x=>x.tone==='up')>=0?ex.phases.findIndex(x=>x.tone==='up'):ex.phases.length-1];
-  for(const ph of phases){
-  const box=pose(k,Figura.phaseT(ex,ph));drawProps(ex,k);const c=box.getCenter(new THREE.Vector3()),s=box.getSize(new THREE.Vector3());
-  const dist=Math.max(s.x/ (2*Math.tan(THREE.MathUtils.degToRad(12))*180/112),s.y/(2*Math.tan(THREE.MathUtils.degToRad(12))))*1.02+s.z*.5;
-  cam.position.set(c.x,c.y+dist*.1,c.z+dist);cam.lookAt(c.x,c.y,c.z);
-  R.render(scene,cam);const t=document.createElement('div');t.className='t';const cv=document.createElement('canvas');cv.width=720;cv.height=448;
-  cv.getContext('2d').drawImage(R.domElement,0,0,720,448);const sp=document.createElement('span');sp.textContent=ex.name+' · '+(ph+1);t.append(cv,sp);out.append(t);}}
-window.__done=true;
+import {crear} from './figura3d.js';
+const q=new URLSearchParams(location.search);
+if(q.get("theme"))document.documentElement.dataset.theme=q.get("theme");
+const out=document.getElementById("out");if(q.get("c"))out.style.setProperty("--c",q.get("c"));
+async function load(urls){for(const u of urls){try{const r=await fetch(u);if(r.ok)return r.json();}catch(e){}}throw new Error("sin datos");}
+const D=await load([q.get("data")||"../../../app/src/main/assets/rutina.json","rutina.json"]);
+const g=q.get("g")||"m",f3=await crear({modelo:"modelos/persona_"+g+".glb",gender:g});
+f3.scene.traverse(o=>{if(!o.isMesh)return;const d=o.morphTargetDictionary;
+  (q.get("morph")||"").split(",").filter(Boolean).forEach(kv=>{const [k,v]=kv.split(":");if(d&&d[k]!==undefined)o.morphTargetInfluences[d[k]]=+v;});
+  [].concat(o.material).forEach(m=>{if(m.name==="piel"&&q.get("piel"))m.color.set(q.get("piel"));if(m.name==="pelo"&&q.get("pelo"))m.color.set(q.get("pelo"));});});
+const keys=(q.get("ex")||Object.keys(D.exercises).join(",")).split(",").filter(k=>D.exercises[k]);
+const dark=document.documentElement.dataset.theme==="dark",big=q.get("size")!=="mini";
+if(!big)out.className="minis";
+const jobs=[];
+keys.forEach(k=>{const ex=D.exercises[k],box=document.createElement("div");box.className="ex";
+  const h=document.createElement("h2");h.innerHTML=ex.name+(big?" <small>"+k+"</small>":"");
+  if(big){box.append(h);const row=document.createElement("div");row.className="row";box.append(row);
+    ex.phases.forEach((ph,i)=>{const c=document.createElement("canvas");row.append(c);
+      jobs.push(()=>f3.draw(c,ex,Figura.phaseT(ex,i)-(q.has("mid")?ph.move/2:0),true,{key:k,labels:true,text:D.marks,pt:.26,dark}));});}
+  else{const c=document.createElement("canvas");box.append(c,h);jobs.push(()=>f3.draw(c,ex,Figura.keyT(ex),true,{key:k,dark}));}
+  out.append(box);});
+await new Promise(r=>requestAnimationFrame(r));
+for(const j of jobs)j();
+window.f3=f3;window.D=D;window.__done=true;
 </script>
+</body>
+</html>
