@@ -93,12 +93,21 @@ export async function crear({modelo,gender='m',loader}){
     const bb=()=>{const b=new THREE.Box3();for(const n in B){if(skip.test(n))continue;b.expandByPoint(wp(n));}
       const hd=wp('Head'),nk=wp('Neck');b.expandByPoint(hd.clone().add(hd.clone().sub(nk).normalize().multiplyScalar(.2)));return b;};
     let box=bb();root.position.y-=box.min.y-0.07;root.updateMatrixWorld(true);
+    // antebrazo apoyado (plancha sobre antebrazos): el cuerpo baja lo justo para que el codo llegue al suelo
+    const fore={};let low=0;
+    for(const i of ['1','2']){const E=p['e'+i],W=p['w'+i];if(!(E[1]>sup(E)-4.5&&W[1]>sup(W)-4.5))continue;
+      const S=side[i],sh=wp(S+'Arm'),L1=sh.distanceTo(wp(S+'ForeArm')),dx=(E[0]-p.s[0])*kk,ey=(GD-sup(E))*kk+.04;
+      fore[i]={dx,ey,dir:Math.sign(W[0]-E[0])||1};if(Math.abs(dx)<L1)low=Math.max(low,sh.y-(ey+Math.sqrt(L1*L1-dx*dx)));}
+    if(low>0){root.position.y-=low;root.updateMatrixWorld(true);}
     // contacto: mano o pie apoyados (suelo, silla, sofá) → el brazo o la pierna se doblan lo justo para llegar
     const toW=(pt,lift,from,ref)=>new THREE.Vector3(wp(from).x+(pt[0]-ref[0])*kk,(GD-sup(pt))*kk+lift,0);
     const bendOf=(r,m,e)=>{const mid=[(r[0]+e[0])/2,(r[1]+e[1])/2];return v3([m[0]-mid[0],m[1]-mid[1]]);};
     for(const i of ['1','2']){const {S,lat,secA,restA,secL,restL}=axes(i);
       const W=p['w'+i],E=p['e'+i],A=gm.feet[i].A,K=p['k'+i];
-      if(W[1]>sup(W)-4.5)ik(S+'Arm',S+'ForeArm',S+'Hand',toW(W,.035,S+'Arm',p.s),bendOf(p.s,E,W),secA,restA);
+      if(fore[i]){const f=fore[i],sh=wp(S+'Arm'),Ew=new THREE.Vector3(sh.x+f.dx,f.ey,sh.z);
+        aim(S+'Arm',S+'ForeArm',Ew.clone().sub(sh).normalize(),secA,restA);
+        aim(S+'ForeArm',S+'Hand',new THREE.Vector3(f.dir,-.04,0).normalize(),secA,restA);}
+      else if(W[1]>sup(W)-4.5)ik(S+'Arm',S+'ForeArm',S+'Hand',toW(W,.035,S+'Arm',p.s),bendOf(p.s,E,W),secA,restA);
       if(!frente&&A[1]>sup(A)-6)ik(S+'UpLeg',S+'Leg',S+'Foot',toW(A,.075,S+'UpLeg',p.p),bendOf(p.p,K,A).add(F.clone().multiplyScalar(.01)),secL,restL);
       const ft=gm.feet[i];if(!ft.front)aim(S+'Foot',S+'ToeBase',v3(ft.f).normalize(),secL,restL);
       // mano: apoyada, plana con los dedos estirados; si sujeta algo, cerrada alrededor del asa
@@ -163,14 +172,16 @@ export async function crear({modelo,gender='m',loader}){
     const R=pose(ex,k,0,true),p=R.gm.p,kk=R.kk,sup=R.sup,out=[];
     (ex.equip||[]).forEach(e=>{if(e.t!=='box')return;const [x,y,w,h]=e.r,wall=h>=90;let ref=null;
       if(!wall)for(const i of ['1','2']){const W=p['w'+i],A=R.gm.feet[i].A;
-        if(!ref&&W[1]>sup(W)-4.5&&W[0]>=x-2&&W[0]<=x+w+2)ref=[R.side[i]+'Arm',p.s];
-        if(!ref&&A[1]>sup(A)-6&&A[0]>=x-2&&A[0]<=x+w+2)ref=[R.side[i]+'UpLeg',p.p];}
+        if(!ref&&W[1]>sup(W)-4.5&&W[0]>=x-2&&W[0]<=x+w+2)ref=[R.side[i]+'Arm',p.s,R.side[i]+'Hand'];
+        if(!ref&&A[1]>sup(A)-6&&A[0]>=x-2&&A[0]<=x+w+2)ref=[R.side[i]+'UpLeg',p.p,R.side[i]+'Foot'];}
       if(!ref)ref=['Hips',p.p];
-      out.push({e,cx:wp(ref[0]).x+(x+w/2-ref[1][0])*kk,H:Math.min(h,GD-y)*kk,W:w*kk,wall});});
+      // de fondo: centrado en la mano o el pie que se apoya (así no se mete en el otro brazo, por ejemplo la mancuerna del remo)
+      const cz=ref[2]?wp(ref[2]).z:0;
+      out.push({e,cx:wp(ref[0]).x+(x+w/2-ref[1][0])*kk,cz,D:ref[2]?.4:.5,H:Math.min(h,GD-y)*kk,W:w*kk,wall});});
     PX.set(k,out);return out;}
   function drawProps(ex,k){props.clear();
-    propsAt(ex,k).forEach(({cx,H,W,wall})=>{const m=new THREE.Mesh(new THREE.BoxGeometry(W,H,wall?.04:.5),M.prop);
-      m.position.set(cx,H/2,wall?-.3:0);m.receiveShadow=true;m.castShadow=true;props.add(m);});}
+    propsAt(ex,k).forEach(({cx,cz,D,H,W,wall})=>{const m=new THREE.Mesh(new THREE.BoxGeometry(W,H,wall?.04:D),M.prop);
+      m.position.set(cx,H/2,wall?-.3:cz);m.receiveShadow=true;m.castShadow=true;props.add(m);});}
 
   /* Del dibujo al mundo: escala y desplazamiento ajustados a las articulaciones de esta postura (para flechas y correas) */
   function fitOf(R){const {gm,side}=R,p=gm.p,pairs=[];
