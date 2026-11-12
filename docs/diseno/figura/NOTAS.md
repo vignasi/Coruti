@@ -70,9 +70,9 @@ Resumen de la búsqueda de noviembre de 2026. Los precios salen sobre todo de ag
 ## Modelos 3D propios (hechos en D1)
 - `modelos/persona_m.glb` (1,4 MB) y `modelos/persona_f.glb` (1,7 MB). Salen de MakeHuman (MPFB2, **CC0**: se pueden meter en la app y en un repo público) con `modelos/crear_modelos.py`, que es reproducible: se ejecuta con Blender como módulo de Python, sin pantalla. Cómo, al principio del script.
 - Esqueleto con nombres de Mixamo: el mismo código de `3d.html` mueve estos modelos y los de prueba.
-- La ropa (camiseta o top, pantalón corto o mallas, zapatillas) está **pintada sobre el cuerpo** con algo de volumen. Sigue cualquier deformación y nunca lo atraviesa. Pelo: el cuero cabelludo con volumen y, en ella, una coleta unida a la cabeza.
+- La ropa (camiseta o camiseta de tirantes, pantalón corto o mallas, zapatillas) está **pintada sobre el cuerpo** con algo de volumen. Sigue cualquier deformación y nunca lo atraviesa. Pelo: el cuero cabelludo con volumen y, en ella, una coleta unida a la cabeza.
 - Colores en materiales separados (`piel`, `top`, `abajo`, `zapa`, `suela`, `pelo`, `ojos`): se cambian sin tocar la forma.
-- Deformaciones ya dentro, aún sin usar: `complexion_mas`, `complexion_menos`, `musculo_mas`, `musculo_menos`. Van ampliadas ×2,2 respecto a MakeHuman para que el recorrido 0→1 se note. Prueba: `3d.html?m=persona_f&morph=complexion_mas:1&piel=%238D5524&pelo=%23111111`.
+- Deformaciones ya dentro, aún sin usar: `complexion_mas`, `complexion_menos`, `musculo_mas`, `musculo_menos`. Cada una combina peso y músculo de MakeHuman, ampliados ×1,3–1,6 para que el recorrido 0→1 se note. A los brazos les llegan menos (si no, al adelgazar parecen de alambre), y «más delgado» también quita algo de músculo (si no, queda pecho de culturista con cintura fina). Prueba: `3d.html?m=persona_f&morph=complexion_mas:1&piel=%238D5524&pelo=%23111111`.
 - `3d.html`, además de las posturas:
   - dobla brazos y piernas lo justo para que manos y pies apoyados lleguen al suelo o a la silla (el cuerpo 3D tiene grosor y el dibujo no);
   - pone las manos planas al apoyarse;

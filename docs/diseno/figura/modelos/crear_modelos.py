@@ -2,7 +2,7 @@
 
 Qué sale: docs/diseno/figura/modelos/persona_m.glb y persona_f.glb
   - cuerpo de MakeHuman con esqueleto de nombres Mixamo (mixamorig:Hips, ...), el que mueve 3d.html
-  - ropa de deporte PINTADA sobre el propio cuerpo (camiseta o top, pantalón corto o mallas, zapatillas):
+  - ropa de deporte PINTADA sobre el propio cuerpo (camiseta o tirantes, pantalón corto o mallas, zapatillas):
     así sigue cualquier deformación del cuerpo y nunca lo atraviesa
   - pelo: el cuero cabelludo con volumen y, en ella, una coleta unida al hueso de la cabeza
   - deformaciones (morph targets) para personalizar más adelante (P8 del ROADMAP), sin usar todavía:
@@ -41,14 +41,20 @@ COL = {
 }
 # Cuerpo de partida de cada uno (escala 0–1 de MakeHuman). Edad 0.5 = unos 25 años
 BASE = {
-    "m": {"gender": 1.0, "age": 0.5, "muscle": 0.62, "weight": 0.48, "height": 0.5, "proportions": 0.7,
+    "m": {"gender": 1.0, "age": 0.5, "muscle": 0.56, "weight": 0.48, "height": 0.5, "proportions": 0.7,
           "african": 0.15, "asian": 0.15, "caucasian": 0.7},
     "f": {"gender": 0.0, "age": 0.5, "muscle": 0.56, "weight": 0.45, "height": 0.45, "proportions": 0.7,
           "cupsize": 0.55, "firmness": 0.6, "african": 0.15, "asian": 0.15, "caucasian": 0.7},
 }
-GAIN = 2.2
-MORPHS = {"complexion_mas": ("weight", 1.0), "complexion_menos": ("weight", 0.0),
-          "musculo_mas": ("muscle", 1.0), "musculo_menos": ("muscle", 0.0)}
+# Cada deformación: qué se cambia en MakeHuman, cuánto se amplía (MakeHuman cambia poco hasta el extremo)
+# y cuánto se aplica a los brazos (si adelgazan como el resto parecen de alambre).
+# Más delgado también pierde algo de músculo: si no, queda pecho de culturista con cintura y brazos finos.
+MORPHS = {
+    "complexion_mas":   ({"weight": 1.0}, 1.6, 0.9),
+    "complexion_menos": ({"weight": 0.15, "muscle": -0.2}, 1.3, 0.45),
+    "musculo_mas":      ({"muscle": 1.0}, 1.6, 1.0),
+    "musculo_menos":    ({"muscle": 0.25}, 1.3, 0.6),
+}
 
 
 def srgb(hexc):
@@ -90,10 +96,10 @@ def build(g):
     set_body(h, base)
     final = mix_coords(h)
     morphs = {}
-    for name, (prop, val) in MORPHS.items():
-        set_body(h, {**base, prop: val})
-        # MakeHuman cambia poco entre el cuerpo de partida y el extremo: se amplía para que 0→1 se note
-        morphs[name] = [f + (c - f) * GAIN for f, c in zip(final, mix_coords(h))]
+    for name, (change, gain, _) in MORPHS.items():
+        vals = {k: (base[k] + v if v < 0 else v) for k, v in change.items()}   # negativo = relativo al de partida
+        set_body(h, {**base, **vals})
+        morphs[name] = [f + (c - f) * gain for f, c in zip(final, mix_coords(h))]
     set_body(h, base)
     rig = HS.add_builtin_rig(h, "mixamo")
 
@@ -135,44 +141,72 @@ def build(g):
     knee = rig.data.bones["mixamorig:LeftLeg"].head_local.z
     WAIST = rig.data.bones["mixamorig:Spine"].head_local.z - 0.015      # cintura del pantalón
     UNDERBUST = rig.data.bones["mixamorig:Spine1"].head_local.z + 0.055  # borde del top de ella
-    region, delete = {}, set()
-    for v in h.data.vertices:
-        if w(v, "HelperGeometry") > 0 or w(v, "JointCubes") > 0:
-            if any(w(v, k) > 0 for k in keep_helper):
-                region[v.index] = "ojos"
-            else:
-                delete.add(v.index)
-            continue
-        b, z, y, x = dominant(v), v.co.z, v.co.y, v.co.x
-        r = "piel"
+    def rule(b, co):
+        """Región de un punto del cuerpo según su hueso y su posición."""
+        z, y, x = co.z, co.y, co.x
         if b in ("Head", "HeadTop_End", "Neck") and z > eye.z - 0.09:
             thr = eye.z + 0.045 - 0.62 * (y - (eye.y - 0.02))  # frente alta, nuca baja
             ear = abs(x) > 0.068 and z < eye.z + 0.035 and y < eye.y + 0.07
-            if z > thr and not ear:
-                r = "pelo"
-        elif b in ("LeftFoot", "RightFoot", "LeftToeBase", "RightToeBase") or (b in ("LeftLeg", "RightLeg") and z < 0.105):
-            r = "suela" if z < 0.022 else "zapa"
+            return "pelo" if z > thr and not ear else "piel"
+        if b in ("LeftFoot", "RightFoot", "LeftToeBase", "RightToeBase") or (b in ("LeftLeg", "RightLeg") and z < 0.105):
+            return "suela" if z < 0.022 else "zapa"
+        torso = b in ("Spine", "Spine1", "Spine2", "LeftShoulder", "RightShoulder", "Neck", "Hips")
+        legs = b in ("LeftUpLeg", "RightUpLeg", "LeftLeg", "RightLeg")
+        armish = "Arm" in b or "Hand" in b
+        torso = torso or (not armish and not legs and z < WAIST)   # la cintura, por altura y sin dientes
+        neck = eye.z - 0.205 - (0.025 if y < eye.y - 0.02 else 0)  # cuello redondo, algo más bajo delante
+        if g == "m":
+            if torso and WAIST <= z < neck:
+                return "top"
+            if b in ("LeftArm", "RightArm"):
+                a_ = rig.data.bones["mixamorig:" + b]
+                t = (co - a_.head_local).dot((a_.tail_local - a_.head_local).normalized()) / a_.length
+                return "top" if t < 0.42 else "piel"
+            if (torso and z < WAIST) or (legs and z > knee + 0.17):
+                return "abajo"
         else:
-            torso = b in ("Spine", "Spine1", "Spine2", "LeftShoulder", "RightShoulder", "Neck", "Hips")
-            legs = b in ("LeftUpLeg", "RightUpLeg", "LeftLeg", "RightLeg")
-            armish = "Arm" in b or "Hand" in b
-            torso = torso or (not armish and not legs and z < WAIST)   # la cintura, por altura y sin dientes
-            neck = eye.z - 0.205 - (0.025 if y < eye.y - 0.02 else 0)  # cuello redondo, algo más bajo delante
-            if g == "m":
-                if torso and WAIST <= z < neck:
-                    r = "top"
-                elif b in ("LeftArm", "RightArm"):
-                    a_ = rig.data.bones["mixamorig:" + b]
-                    t = (v.co - a_.head_local).dot((a_.tail_local - a_.head_local).normalized()) / a_.length
-                    r = "top" if t < 0.42 else "piel"
-                elif (torso and z < WAIST) or (legs and z > knee + 0.17):
-                    r = "abajo"
-            else:
-                if torso and UNDERBUST <= z < eye.z - 0.245:
-                    r = "top"
-                elif (torso and z < WAIST) or legs:
-                    r = "abajo"
-        region[v.index] = r
+            # camiseta de tirantes hasta la cintura: el borde de debajo del pecho salía dentado (malla irregular)
+            if torso and WAIST <= z < neck - 0.015:
+                return "top"
+            if b in ("Spine2", "Neck", "LeftShoulder", "RightShoulder") and 0.045 < abs(x) < 0.1 and z < eye.z - 0.16:
+                return "top"   # tirantes
+            if (torso and z < WAIST) or legs:
+                return "abajo"
+        return "piel"
+
+    vdom, delete, eyes = {}, set(), set()
+    for v in h.data.vertices:
+        if w(v, "HelperGeometry") > 0 or w(v, "JointCubes") > 0:
+            (eyes if any(w(v, k) > 0 for k in keep_helper) else delete).add(v.index)
+        else:
+            vdom[v.index] = dominant(v)
+    # La región se decide por cara, con su centro: los bordes de la ropa siguen una fila de la malla y salen rectos
+    fregion = {}
+    for p in h.data.polygons:
+        vs = list(p.vertices)
+        if any(i in delete for i in vs):
+            continue
+        if all(i in eyes for i in vs):
+            fregion[p.index] = "ojos"
+            continue
+        bs = [vdom[i] for i in vs if i in vdom]
+        b = max(set(bs), key=bs.count) if bs else ""
+        fregion[p.index] = rule(b, sum((h.data.vertices[i].co for i in vs), Vector()) / len(vs))
+    region = {}
+    order = ["piel", "ojos", "abajo", "top", "suela", "zapa", "pelo"]   # un vértice de borde toma la región con más volumen
+    for p in h.data.polygons:
+        r = fregion.get(p.index)
+        if r is None:
+            continue
+        for i in p.vertices:
+            if i not in region or order.index(r) > order.index(region[i]):
+                region[i] = r
+
+    # Brazos: cada deformación les llega con su propio factor
+    for name, (_, _, armf) in MORPHS.items():
+        if armf != 1.0:
+            morphs[name] = [final[i] + (c - final[i]) * (armf if ("Arm" in vdom.get(i, "") or "Hand" in vdom.get(i, "")) else 1.0)
+                            for i, c in enumerate(morphs[name])]
 
     # Volumen: la ropa y el pelo, un poco por fuera de la piel (lo mismo en todas las deformaciones)
     push = {"top": 0.004, "abajo": 0.003, "zapa": 0.007, "suela": 0.006, "pelo": 0.009}
@@ -198,10 +232,8 @@ def build(g):
         key = "piel_" + g if r == "piel" else "pelo_" + g if r == "pelo" else r
         mats[r] = len(h.data.materials)
         h.data.materials.append(material(r, COL[key], 0.55 if r == "piel" else 0.8 if r in ("top", "abajo") else 0.6))
-    prio = ["ojos", "pelo", "suela", "zapa", "top", "abajo", "piel"]
     for p in h.data.polygons:
-        rs = [region.get(i, "piel") for i in p.vertices]
-        p.material_index = mats[max(prio, key=lambda r: (rs.count(r), -prio.index(r)))]
+        p.material_index = mats[fregion.get(p.index, "piel")]
         p.use_smooth = True
 
     # Borrar la geometría de ayuda de MakeHuman (dientes, pestañas, cubos de articulaciones…)
