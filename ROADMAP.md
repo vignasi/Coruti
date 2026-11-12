@@ -75,6 +75,10 @@ La interfaz actual se hizo a base de añadidos: una sola página de ~33 pantalla
 y 9 tamaños en el widget. No se arregla lo que hay: se diseña de nuevo a partir de lo que tiene que hacer la app,
 con los colores de la marca actual (verde azulado `#1E6B74`, ámbar `#F0B04A`, fondo `#EDF1F0`) pero bien.
 - [ ] 1. **Funcionalidades:** lista de lo que hace la app y lo que necesitas en cada momento, sin mirar el diseño actual. La validas tú
+- [ ] 1b. **Figura humana:** persona con volumen, músculos y sombreado, **hombre o mujer a elegir**, sobre las mismas posturas.
+  Etiquetas como antes (punto en la zona, línea y texto: «BÍCEPS», «APRIETA EL CULO», «BANDA») solo en la vista grande;
+  las miniaturas sin marcas. Prueba en `docs/diseno/figura/` (abrir `index.html` con un servidor desde la raíz del repo).
+  Hecho: 9 ejercicios de prueba. Falta: pulir los ejercicios de pie (juntas en piernas y tronco), revisar todos los ejercicios
 - [ ] 2. **Sistema de diseño:** escala de letra corta (pocos tamaños), colores, espacios, botones y fichas, en app y widget
 - [ ] 3. **Pantallas:** prototipo navegable en el móvil (página web), pantalla a pantalla. Ideas ya decididas:
   pestañas abajo «Entrenar · Ejercicios · Historial»; al abrir, tus favoritas con Empezar; reproductor a pantalla completa
@@ -88,7 +92,9 @@ con los colores de la marca actual (verde azulado `#1E6B74`, ámbar `#F0B04A`, f
 
 ### Fase 2 · Supabase: datos en la nube y caja fuerte de claves
 - [ ] **Tú, antes:** crear el proyecto en supabase.com (gratis) y pasar la URL y la clave pública (`anon`)
-- [ ] Inicio de sesión con email (enlace mágico)
+- [ ] Inicio de sesión con email (enlace mágico). **La app queda abierta a más personas:** cada una con su cuenta y sus datos
+  separados (RLS); sin cuenta se puede seguir usando como ahora, solo en el móvil
+- [ ] Al iniciar sesión por primera vez, subir lo que ya hay en el móvil (historial, favoritas, bandas, ajustes, racha)
 - [ ] Tablas con seguridad por usuario (RLS) para el historial, las favoritas, las bandas y la configuración; sincronizar al terminar cada sesión y al abrir la app
 - [ ] Edge Function base para guardar secretos (la usarán Strava y la IA)
 - [ ] Hecho cuando: con otro móvil (o tras reinstalar) e iniciando sesión, aparece todo
