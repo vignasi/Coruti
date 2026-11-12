@@ -6,7 +6,8 @@
 <!-- Hace las imágenes del widget con la figura 3D (el widget de Android no puede mostrar 3D).
      Una imagen por fase de cada ejercicio (como hoy PoseRenderer.kt: render(ex, phaseIdx)), con el fondo transparente,
      sin etiquetas, en claro y en oscuro (la luz cambia: en oscuro lleva luz de contorno). Las guarda hacer_imagenes.js.
-     ?g=m|f &theme=dark &w=400 (ancho en píxeles; alto = ancho·112/180) &ex=a,b &q=0.8 (calidad WebP) -->
+     ?g=m|f &theme=dark &w=400 (ancho en píxeles; alto = ancho·112/180) &ex=a,b &q=0.8 (calidad WebP)
+     &top=%23RRGGBB (otro color de camiseta, para probar el fondo del widget en D2) -->
 <style>body{margin:0;background:#888;font:12px system-ui}canvas{display:block}#out{display:flex;flex-wrap:wrap;gap:4px}</style>
 </head>
 <body>
@@ -21,6 +22,7 @@ async function load(urls){for(const u of urls){try{const r=await fetch(u);if(r.o
 const D=await load([q.get("data")||"../../../../app/src/main/assets/rutina.json","../rutina.json"]);
 const g=q.get("g")||"m",dark=q.get("theme")==="dark",w=+(q.get("w")||400),Q=+(q.get("q")||0.8);
 const f3=await crear({modelo:"../modelos/persona_"+g+".glb",gender:g});
+if(q.get("top"))f3.scene.traverse(o=>{if(o.isMesh)[].concat(o.material).forEach(m=>{if(m.name==="top")m.color.set(q.get("top"));});});
 const keys=(q.get("ex")||Object.keys(D.exercises).join(",")).split(",").filter(k=>D.exercises[k]);
 const out=document.getElementById("out"),imgs={};
 for(const k of keys){const ex=D.exercises[k];
