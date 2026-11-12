@@ -92,7 +92,7 @@ B1 Cuentas y nube ────────────────────�
 Después: P1 Pulso · P2 Planes por objetivo · P3 Peso y medidas · P4 Carreras de Strava · P5 Cardio · P6 Coach por voz
 ```
 
-**Ahora mismo, a la vez:** D2 y B1 (D1 cerrado) (solo tocan `docs/diseno/` o el almacenamiento y el servidor, no la interfaz).
+**Ahora mismo:** tu visto bueno de D3 (D1 y D2 cerrados) y probar B1 en el móvil (solo tocan `docs/diseno/` o el almacenamiento y el servidor, no la interfaz).
 **Después, a la vez:** C1, B2 y S1.
 
 ### Bloque D · Diseño (antes de construir nada de interfaz)
@@ -128,7 +128,7 @@ Después: P1 Pulso · P2 Planes por objetivo · P3 Peso y medidas · P4 Carreras
 - Para D2 y C1/C2 (en `NOTAS.md`): el fondo actual del widget (`#1E6B74`) es el color de la camiseta y ella se pierde;
   lo que hay que pasar a `rutina.json`; peso de la figura 3D en la APK (5,3–6,1 MB: three.js, dos modelos e imágenes)
 
-#### D2 · Producto completo, sistema de diseño y prototipo ✅ (falta tu elección del fondo del widget)
+#### D2 · Producto completo, sistema de diseño y prototipo ✅
 - [x] Lista de funcionalidades (`docs/diseno/1-funcionalidades.md`)
 - [x] Ampliada con todo lo del plan: Claude (qué ve y qué hace), planes por objetivo, calendario de la semana, Strava y Polar,
   pulso, peso y medidas, varias personas, figura 3D hombre o mujer y su personalización más adelante
@@ -144,11 +144,21 @@ Después: P1 Pulso · P2 Planes por objetivo · P3 Peso y medidas · P4 Carreras
   como glTF en JSON y solo las imágenes del widget que usa)
 - Partió del D2 que no se había fusionado (rama `claude/vigilant-lovelace-hb4acy`): su revisión de validación (`3-validacion.md`)
   se hizo con la figura en un hueco y se rehace en D3. Esta rama incluye D1 (`claude/rutina-core-3d-models-vd7k7j`), que tampoco está en `main`
-- [ ] **Tú:** elegir el fondo del widget (A o B)
+- [x] **Tú:** elegido el fondo del widget: **A, el de la app (claro u oscuro)**
 
-#### D3 · Validación
-- [ ] Revisión con las skills de diseño (crítica heurística, accesibilidad, textos) y corrección hasta no tener fallos graves
-- [ ] Tu visto bueno en el móvil. Hecho cuando: das el diseño por cerrado
+#### D3 · Validación ✅ revisión hecha (falta tu visto bueno) — rama `claude/coruti-validacion-d3-h51513`, parte de D2
+- [x] Revisión con las skills de diseño (crítica heurística, accesibilidad WCAG 2.2 AA en claro y oscuro, textos) y corrección
+  hasta no tener fallos graves: `docs/diseno/3-validacion.md`. axe: 0 fallos en 43 pantallas y estados, en los dos temas
+- [x] Reproductor a 1–2 m: cantidad más grande (`p2` 72–120 sp, se lee a 2 m) y **fondo distinto en descanso y «Prepárate»**
+  (antes no se distinguían de lejos). El nombre no se lee desde el suelo: para C1, que la voz lo diga
+- [x] Figura de pie en el reproductor: el recorte fijo **cortaba la etiqueta de la zona** («JUNTA ESCÁPULAS», «GLÚTEO DE LADO»).
+  Ahora el encuadre se mide por ejercicio: nada cortado (comprobado con la 3D) y la persona hasta ×1,55 más grande
+- [x] Rendimiento: aquí no hay GPU (todo va lento, también D2), así que se añadió **«Rendimiento en este móvil»** al prototipo
+  para medirlo en el tuyo. Las miniaturas se dibujan una a una sin bloquear y se guardan
+- [x] Widget con el fondo A: hombre y mujer se ven en claro y oscuro; para C2, la persona de pie sale pequeña (recortar la imagen)
+- [x] Prototipo republicado en el mismo enlace
+- [ ] **Tú:** visto bueno en el móvil (lista en `3-validacion.md` → «Lo que falta»), con las cifras de «Rendimiento».
+  Hecho cuando: das el diseño por cerrado
 
 ### Bloque B · Base técnica
 
