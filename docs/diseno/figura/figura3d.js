@@ -98,6 +98,14 @@ export async function crear({modelo,gender='m',loader}){
     for(const i of ['1','2']){const E=p['e'+i],W=p['w'+i];if(!(E[1]>sup(E)-4.5&&W[1]>sup(W)-4.5))continue;
       const S=side[i],sh=wp(S+'Arm'),L1=sh.distanceTo(wp(S+'ForeArm')),dx=(E[0]-p.s[0])*kk,ey=(GD-sup(E))*kk+.04;
       fore[i]={dx,ey,dir:Math.sign(W[0]-E[0])||1};if(Math.abs(dx)<L1)low=Math.max(low,sh.y-(ey+Math.sqrt(L1*L1-dx*dx)));}
+    // manos apoyadas en una silla que no alcanzan (fondos): el cuerpo cuelga de ellas y baja; las piernas se doblan después
+    for(const i of ['1','2']){const W=p['w'+i];if(fore[i]||!(W[1]>sup(W)-4.5)||sup(W)>=GD)continue;
+      const bx=(PX.get(k)||[]).find(b=>{const [x,,w]=b.e.r;return !b.wall&&W[0]>=x-2&&W[0]<=x+w+2;});if(!bx)continue;
+      const S=side[i],sh=wp(S+'Arm'),L=sh.distanceTo(wp(S+'ForeArm'))+wp(S+'ForeArm').distanceTo(wp(S+'Hand'))-.01;
+      const tx=bx.cx+(W[0]-bx.xc)*kk,ty=(GD-sup(W))*kk+.035,dx=Math.abs(tx-sh.x);
+      if(dx<L&&Math.hypot(dx,sh.y-ty)>L)low=Math.max(low,sh.y-(ty+Math.sqrt(L*L-dx*dx)));
+      // fondos: manos en la silla junto a la cadera → la cadera, a la altura del dibujo respecto a la silla
+      if(Math.abs(W[0]-p.p[0])<15&&p.p[1]>sup(W))low=Math.max(low,wp('Hips').y-(GD-p.p[1])*kk);}
     if(low>0){root.position.y-=low;root.updateMatrixWorld(true);}
     // contacto: mano o pie apoyados (suelo, silla, sofá) → el brazo o la pierna se doblan lo justo para llegar
     const toW=(pt,lift,from,ref)=>new THREE.Vector3(wp(from).x+(pt[0]-ref[0])*kk,(GD-sup(pt))*kk+lift,0);
@@ -107,7 +115,9 @@ export async function crear({modelo,gender='m',loader}){
       if(fore[i]){const f=fore[i],sh=wp(S+'Arm'),Ew=new THREE.Vector3(sh.x+f.dx,f.ey,sh.z);
         aim(S+'Arm',S+'ForeArm',Ew.clone().sub(sh).normalize(),secA,restA);
         aim(S+'ForeArm',S+'Hand',new THREE.Vector3(f.dir,-.04,0).normalize(),secA,restA);}
-      else if(W[1]>sup(W)-4.5)ik(S+'Arm',S+'ForeArm',S+'Hand',toW(W,.035,S+'Arm',p.s),bendOf(p.s,E,W),secA,restA);
+      else if(W[1]>sup(W)-4.5){const T=toW(W,.035,S+'Arm',p.s),bx=(PX.get(k)||[]).find(b=>{const [x,,w]=b.e.r;return !b.wall&&W[0]>=x-2&&W[0]<=x+w+2;});
+        if(bx&&sup(W)<GD)T.x=bx.cx+(W[0]-bx.xc)*kk;     // la mano va a la silla, esté donde esté
+        ik(S+'Arm',S+'ForeArm',S+'Hand',T,bendOf(p.s,E,W),secA,restA);}
       if(!frente&&A[1]>sup(A)-6)ik(S+'UpLeg',S+'Leg',S+'Foot',toW(A,.075,S+'UpLeg',p.p),bendOf(p.p,K,A).add(F.clone().multiplyScalar(.01)),secL,restL);
       const ft=gm.feet[i];if(!ft.front)aim(S+'Foot',S+'ToeBase',v3(ft.f).normalize(),secL,restL);
       // mano: apoyada, plana con los dedos estirados; si sujeta algo, cerrada alrededor del asa
@@ -176,8 +186,12 @@ export async function crear({modelo,gender='m',loader}){
         if(!ref&&A[1]>sup(A)-6&&A[0]>=x-2&&A[0]<=x+w+2)ref=[R.side[i]+'UpLeg',p.p,R.side[i]+'Foot'];}
       if(!ref)ref=['Hips',p.p];
       // de fondo: centrado en la mano o el pie que se apoya (así no se mete en el otro brazo, por ejemplo la mancuerna del remo)
-      const cz=ref[2]?wp(ref[2]).z:0;
-      out.push({e,cx:wp(ref[0]).x+(x+w/2-ref[1][0])*kk,cz,D:ref[2]?.4:.5,H:Math.min(h,GD-y)*kk,W:w*kk,wall});});
+      const cz=ref[2]?wp(ref[2]).z:0,H=(wall?Math.min(h,GD-y):GD-y)*kk,W=w*kk;let cx=wp(ref[0]).x+(x+w/2-ref[1][0])*kk;   // hasta el suelo, como en el dibujo
+      // si la silla se mete en la cadera (fondos: las piernas 3D son más largas que las del dibujo), se aparta hacia atrás;
+      // las manos van a buscarla donde quede
+      if(!wall&&/Hand/.test(ref[2]||'')){let t=0;for(const ph of ex.phases){t+=ph.move;const hp=(pose(ex,k,t,true),wp('Hips'));t+=ph.hold;
+        const sg=Math.sign(cx-hp.x)||1;if(H>hp.y-.2&&Math.abs(cx-hp.x)<W/2+.13)cx=hp.x+sg*(W/2+.13);}}
+      out.push({e,cx,cz,D:ref[2]?.4:.5,H,W,wall,xc:x+w/2});});
     PX.set(k,out);return out;}
   function drawProps(ex,k){props.clear();
     propsAt(ex,k).forEach(({cx,cz,D,H,W,wall})=>{const m=new THREE.Mesh(new THREE.BoxGeometry(W,H,wall?.04:D),M.prop);
