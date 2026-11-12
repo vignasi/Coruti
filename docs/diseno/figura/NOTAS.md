@@ -4,6 +4,10 @@ Archivos:
 - `figura.js`: dibuja la figura. Lo usarán la app nueva (C1) y el prototipo (D2).
 - `index.html`: página para elegir el estilo y la figura (hombre o mujer). Tiene el movimiento en grande y todas las miniaturas.
 - `galeria.html`: revisión con capturas. Ejemplos: `?s=palos|redondo|persona&g=m|f&size=big|mini&theme=dark&ex=a,b&mid`.
+- `figura3d.js`: la figura 3D (opción D). `Figura3D.crear({modelo, gender})` y luego `draw(canvas, ejercicio, t, clamp, opciones)`, igual que `Figura.draw`.
+- `elegir.html`: página para elegir en el móvil entre la dibujada y la 3D (o verlas juntas), hombre o mujer.
+- `3d.html`: revisión con capturas de la 3D. Ejemplos: `?g=m|f&size=big|mini&theme=dark&ex=a,b&mid&c=2`.
+- `three/`: three.js r160 (MIT), solo lo que usa la figura 3D, para que funcione sin conexión.
 
 ## Cómo funciona
 
@@ -64,7 +68,6 @@ Resumen de la búsqueda de noviembre de 2026. Los precios salen sobre todo de ag
     - Mixamo: gratis con cuenta de Adobe; puede ir dentro de la app, pero no en un repo público.
     - Comprar un modelo con licencia comercial.
   - El widget de Android no puede usar 3D: necesitaría imágenes renderizadas antes.
-  - Faltan por hacer en 3D el material (bandas, mancuernas, silla) y las etiquetas.
 - Claude no genera imágenes ni vídeo por sí mismo: cualquiera de estas opciones necesita una cuenta en el servicio externo.
 
 ## Modelos 3D propios (hechos en D1)
@@ -77,11 +80,28 @@ Resumen de la búsqueda de noviembre de 2026. Los precios salen sobre todo de ag
   - dobla brazos y piernas lo justo para que manos y pies apoyados lleguen al suelo o a la silla (el cuerpo 3D tiene grosor y el dibujo no);
   - pone las manos planas al apoyarse;
   - dibuja sillas, sofá y pared.
-- Falta para la app:
-  - el material de mano (bandas, mancuernas, toalla) y las etiquetas en 3D;
-  - pulir los bordes de la ropa: siguen la malla y en algunos sitios salen dentados;
-  - abdominales marcados (con un mapa de relieve);
-  - imágenes renderizadas para el widget, que no puede mostrar 3D.
+- Bordes de la ropa y del pelo: `modelos/pulir_ropa.py` corta la malla por superficies suaves (escote, mangas, cintura, bajo del
+  pantalón, zapatillas, tirantes, nacimiento del pelo) y decide cada cara con esas mismas superficies. `crear_modelos.py` lo llama
+  antes de exportar; también se puede pasar sobre los .glb ya hechos (solo necesita `pip install bpy==5.3.0`). Quedan dos o tres
+  muescas pequeñas en el borde de fuera del tirante de ella y alrededor de las orejas, que solo se ven muy de cerca.
+- Ojo: `crear_modelos.py` con el pulido no se ha podido ejecutar entero aquí (MakeHuman/MPFB no se pudo instalar en la sesión);
+  los .glb actuales salen de pasar `pulir_ropa.py` a los anteriores. La próxima vez que se genere desde cero, revisar con `3d.html`.
+
+## Figura 3D completa (D1)
+- **Material:** banda grande como bucle cerrado de la mano al pie (o por debajo de la espalda en el press), mini banda plana
+  alrededor de los dos muslos sobre las rodillas, mancuernas con el asa en el plano del dibujo (como la dibujada), toalla retorcida
+  bajo el pie, correas (se quitan en C1), y sillas, sofá y pared.
+- **Manos:** cerradas alrededor del asa al sujetar; planas al apoyarse.
+- **Contactos:** la mano o el pie apoyados llegan a su sitio (con los largos reales de los huesos); antebrazos planos en la plancha;
+  cada mueble se coloca respecto a lo que se apoya en él y de fondo centrado en esa mano o pie. En fondos el cuerpo cuelga de las manos:
+  la cadera queda a la altura del dibujo respecto a la silla y las piernas se doblan para llegar al suelo.
+- **Etiquetas** (solo en grande): las mismas de la dibujada (`Figura.labels`), pegadas a los puntos del cuerpo 3D.
+- **Encuadre** fijo por ejercicio (no salta al animar), con el mismo tamaño de figura que la dibujada.
+- **Oscuro:** luz de contorno para que la ropa oscura no se pierda en el fondo.
+- **Remo a una mano** (también en la dibujada): las rodillas casi rectas y un poco hacia atrás en los datos decidían hacia dónde mira
+  la persona y salía boca arriba con los pies al revés. Ahora deciden las manos y la rodilla se dibuja un poco doblada.
+  Para C1: en `rutina.json`, poner `k1` y `k2` de `remo_db` unos 4 puntos más adelante (x menor).
+- Falta para la app: abdominales marcados (mapa de relieve) e imágenes hechas antes para el widget, que no puede mostrar 3D.
 
 ## Idea para más adelante: que cada persona personalice su figura (solo con 3D)
 Se podrían cambiar la complexión, lo marcado del músculo y del abdomen, el color de piel, el pelo y la ropa.

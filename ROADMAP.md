@@ -99,14 +99,28 @@ Después: P1 Pulso · P2 Planes por objetivo · P3 Peso y medidas · P4 Carreras
 
 #### D1 · Figura del ejercicio (sesión muy fina) — en paralelo con D2
 - [x] Prueba de persona con volumen, hombre o mujer, y etiquetas de zona solo en grande (`docs/diseno/figura/`)
-- [ ] **Tres estilos a elegir en Ajustes:** muñeco de palos (el de ahora, mejorado), muñeco redondeado y persona
-- [ ] Persona: sin juntas visibles, **pies y zapatillas bien orientados** (en el puente están girados al revés), cara, manos;
-  bien de pie, tumbado y de lado; bien en miniatura y en grande
-- [ ] Todos los ejercicios de `rutina.json` revisados con capturas, en los tres estilos y en hombre y mujer
-- [ ] Investigar (solo investigar y decidir contigo): imágenes o vídeos generados con un servicio externo de IA,
-  uno de ida y otro de vuelta por ejercicio. Coste, peso en la APK y si la persona se mantiene igual en todos.
-  Claude no genera imágenes ni vídeo por sí mismo
-- [ ] Hecho cuando: eliges estilo viendo todos los ejercicios en el móvil y no queda ningún fallo visible
+- [x] **Tres estilos a elegir:** muñeco de palos (el de ahora, mejorado: pies, manos, cuello, lo de detrás en gris),
+  muñeco redondeado y persona; los tres sobre la misma geometría (`figura.js`). Página para elegir: `docs/diseno/figura/index.html`
+- [x] Persona: sin juntas visibles, **pies y zapatillas bien orientados** (apoyados en el suelo o la silla, de puntillas en plancha,
+  sobre el empeine en gato y psoas), cara (también de frente), manos planas al apoyarse o cerradas al sujetar;
+  bien de pie, tumbado y de lado (vista de frente en paso lateral, ángel, plancha lateral y almeja); bien en miniatura y en grande
+- [x] Todos los ejercicios de `rutina.json` (34) revisados con capturas a ancho de móvil, en los tres estilos, hombre y mujer,
+  claro y oscuro, en las posturas y a mitad de movimiento (`galeria.html`). Lo que hay que pasar a `rutina.json` en C1, en `NOTAS.md`
+- [x] Investigado (sin decidir): imágenes o vídeos generados con un servicio externo de IA. Coste, peso en la APK
+  y si la persona se mantiene igual: resumen y opciones A/B/C en `docs/diseno/figura/NOTAS.md`
+- [x] Prueba de figura 3D con las mismas posturas (`docs/diseno/figura/3d.html`, opción D de `NOTAS.md`)
+- [x] Modelos 3D propios, hombre y mujer (MakeHuman, CC0), con ropa de deporte, pelo y deformaciones para personalizar
+  más adelante (complexión y músculo; piel, ropa y pelo como colores aparte): `docs/diseno/figura/modelos/`
+- [x] Figura 3D completa (`figura3d.js`): material (bandas grandes en bucle, mini banda en los muslos, mancuernas, toalla, correas,
+  sillas, sofá y pared), manos cerradas al sujetar, antebrazos apoyados en plancha, fondos con la cadera por debajo del asiento
+  y etiquetas de zona solo en grande, como en la dibujada. «Remo a una mano» corregido (salía boca arriba y con los pies al revés,
+  también en la dibujada). three.js incluido en `three/`
+- [x] Bordes de la ropa y del pelo pulidos (`modelos/pulir_ropa.py`, lo usa `crear_modelos.py`); modelos regenerados
+- [x] Página para elegir en el móvil: figura dibujada, 3D o las dos, hombre o mujer, con todos los ejercicios (`elegir.html`, publicada)
+- [x] Los 34 ejercicios revisados en 3D con capturas a ancho de móvil: hombre y mujer, en grande (final y mitad de cada movimiento),
+  en miniatura, claro y oscuro (`3d.html`)
+- [ ] **Tú:** abrir la página en el móvil, elegir estilo y decidir entre figura dibujada, imágenes o vídeo generados, o modelo 3D (opciones A–D de `NOTAS.md`).
+  Hecho cuando: eliges estilo viendo todos los ejercicios en el móvil y no queda ningún fallo visible
 
 #### D2 · Producto completo, sistema de diseño y prototipo — en paralelo con D1
 - [x] Lista de funcionalidades (`docs/diseno/1-funcionalidades.md`)
