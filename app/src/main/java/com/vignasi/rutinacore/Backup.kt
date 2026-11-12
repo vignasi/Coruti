@@ -97,8 +97,8 @@ object Backup {
             .put("free", free)
     }
 
-    /** Guarda en el móvil un estado completo (el resultado de [merge]). */
-    fun apply(c: Context, s: JSONObject) {
+    /** Guarda en el móvil un estado completo (el resultado de [merge]); sin [withHistory], todo menos el historial (lo usa la nube). */
+    fun apply(c: Context, s: JSONObject, withHistory: Boolean = true) {
         val e = Store.prefs(c).edit()
             .putStringSet("days", strings(s.optJSONArray("days")).toHashSet())
             .putString("lastDay", s.optString("lastDay", ""))
@@ -110,7 +110,7 @@ object Backup {
         e.putString("free.widgetFav", free.optString("widgetFav", ""))
         e.apply()
         s.optJSONObject("config")?.let { Store.setConfigJson(c, it.toString()) }
-        History.replaceAll(c, s.optJSONArray("history") ?: JSONArray())
+        if (withHistory) History.replaceAll(c, s.optJSONArray("history") ?: JSONArray())
     }
 
     /** Importa [text] y devuelve un resumen para mostrar. */

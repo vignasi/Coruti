@@ -49,6 +49,7 @@ object History {
         }
         out.put(s)
         write(c, sorted(out))
+        Cloud.syncSoon(c)
         true
     }
 
@@ -57,9 +58,12 @@ object History {
         val a = all(c)
         for (i in 0 until a.length()) {
             val o = a.optJSONObject(i) ?: continue
-            if (o.optString("id") == id) { o.put("fb", fb); write(c, a); return@synchronized }
+            if (o.optString("id") == id) { o.put("fb", fb); write(c, a); Cloud.syncSoon(c); return@synchronized }
         }
     }
+
+    /** Cambia el historial de una vez, sin que se cuele una sesión guardada a la vez (lo usa la nube al bajar sesiones). */
+    fun update(c: Context, f: (JSONArray) -> JSONArray) = synchronized(lock) { write(c, sorted(f(all(c)))) }
 
     /** Sustituye todo el historial (lo usa la copia de seguridad, que antes lo ha combinado). */
     fun replaceAll(c: Context, a: JSONArray) = synchronized(lock) { write(c, sorted(a)) }
