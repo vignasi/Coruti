@@ -56,4 +56,13 @@ Resumen de la búsqueda de noviembre de 2026. Los precios salen sobre todo de ag
   - **B.** Dos imágenes generadas por ejercicio y sexo, alternadas con el ritmo actual. Es la opción más barata y ligera de las generadas.
   - **C.** Vídeo en bucle hecho a partir de las imágenes de B. Cuesta y pesa 3–5 veces más, y tiene más riesgo de deformaciones.
   - Probar B o C con 3–5 ejercicios antes de comprometerse.
+- **D. Modelo 3D de persona movido por la app.** La prueba está en `3d.html` y usa `Figura.solve`. Los huesos del modelo se colocan con las mismas posturas de `rutina.json`, con los pies y las manos ya resueltos. Funciona con los 34 ejercicios sin tocar los datos. La anatomía es correcta siempre, es la misma persona en todo, la luz y la sombra son reales, y el ritmo lo sigue marcando la app.
+  - Coste: three.js pesa ~0,7 MB y cada modelo 1–4 MB (menos comprimido).
+  - Los modelos de la prueba (Xbot y Michelle de Mixamo, tomados de los ejemplos de three.js) **no sirven para la app**: el maniquí no es una persona y Michelle es una bailarina de dibujos. Además, Mixamo no deja redistribuir sus modelos sueltos, por eso no están en el repo.
+  - Para la app haría falta un hombre y una mujer con ropa de deporte. Opciones:
+    - MakeHuman: gratis, lo exportado es CC0. Hay que crearlos en su programa de escritorio.
+    - Mixamo: gratis con cuenta de Adobe; puede ir dentro de la app, pero no en un repo público.
+    - Comprar un modelo con licencia comercial.
+  - El widget de Android no puede usar 3D: necesitaría imágenes renderizadas antes.
+  - Faltan por hacer en 3D el material (bandas, mancuernas, silla) y las etiquetas.
 - Claude no genera imágenes ni vídeo por sí mismo: cualquiera de estas opciones necesita una cuenta en el servicio externo.

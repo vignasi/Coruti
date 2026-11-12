@@ -108,7 +108,8 @@ Después: P1 Pulso · P2 Planes por objetivo · P3 Peso y medidas · P4 Carreras
   claro y oscuro, en las posturas y a mitad de movimiento (`galeria.html`). Lo que hay que pasar a `rutina.json` en C1, en `NOTAS.md`
 - [x] Investigado (sin decidir): imágenes o vídeos generados con un servicio externo de IA. Coste, peso en la APK
   y si la persona se mantiene igual: resumen y opciones A/B/C en `docs/diseno/figura/NOTAS.md`
-- [ ] **Tú:** abrir la página en el móvil, elegir estilo (y si se prueban imágenes generadas: opción A, B o C de `NOTAS.md`).
+- [x] Prueba de figura 3D con las mismas posturas (`docs/diseno/figura/3d.html`, opción D de `NOTAS.md`); modelos solo de prueba
+- [ ] **Tú:** abrir la página en el móvil, elegir estilo y decidir entre figura dibujada, imágenes o vídeo generados, o modelo 3D (opciones A–D de `NOTAS.md`).
   Hecho cuando: eliges estilo viendo todos los ejercicios en el móvil y no queda ningún fallo visible
 
 #### D2 · Producto completo, sistema de diseño y prototipo — en paralelo con D1
