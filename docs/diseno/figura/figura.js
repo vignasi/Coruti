@@ -88,7 +88,7 @@ function geom(ex,p0,o){
   const view=viewOf(ex,o.key),B=o.B;
   const p={};for(const k in p0)p[k]=p0[k].slice();
   const u=nrm(sub(p.p,p.s));                          // de hombros a pelvis
-  const front=view==="frente"?[0,0]:mul(perp(u),frontSign(ex));
+  const front=view==="frente"?[0,0]:mul(perp(mul(u,-1)),frontSign(ex)); // mismo criterio que frontSign: normal de p→s
   const lat=perp(u),sd=view==="frente"?sidesOf(ex):null;
   const root={s1:p.s,s2:p.s,p1:p.p,p2:p.p};
   if(sd){root.s1=add(add(p.s,mul(lat,sd.arm*(B.shF-2.6))),mul(u,1.6));root.s2=add(add(p.s,mul(lat,-sd.arm*(B.shF-2.6))),mul(u,1.6));
@@ -139,7 +139,9 @@ const ell=(c,rx,ry,rot)=>{const pa=new Path2D();pa.ellipse(c[0],c[1],rx,ry,rot,0
 /* Tubo por una línea central C: grosor rf(t) hacia ref y rb(t) hacia el otro lado. Extremos redondos o planos (dobladillo) */
 function tube(C,rf,rb,ref,capA=true,capB=true){
   const N=C.length-1,F=[],Bk=[],nn=[];
-  for(let i=0;i<=N;i++){const a=C[Math.max(0,i-1)],b=C[Math.min(N,i+1)];const n=side(perp(nrm(sub(b,a))),ref);nn.push(n);
+  // el lado «delante» se decide una vez (en el centro) y luego cada normal sigue a la anterior: sin zigzag si ref es casi paralelo
+  const mid=Math.floor(N/2),n0=side(perp(nrm(sub(C[Math.min(N,mid+1)],C[Math.max(0,mid-1)]))),ref);let prev=null;
+  for(let i=0;i<=N;i++){const a=C[Math.max(0,i-1)],b=C[Math.min(N,i+1)];const n=side(perp(nrm(sub(b,a))),prev||n0);prev=n;nn.push(n);
     F.push(add(C[i],mul(n,rf(i/N))));Bk.push(add(C[i],mul(n,-rb(i/N))));}
   const cap=(i,from,to)=>{const n=nn[i],c=add(C[i],mul(n,(rf(i/N)-rb(i/N))/2)),r=(rf(i/N)+rb(i/N))/2,o=[];
     const a0=Math.atan2(from[1]-c[1],from[0]-c[0]);let a1=Math.atan2(to[1]-c[1],to[0]-c[0]);
@@ -207,7 +209,7 @@ function drawGear(ctx,ex,gm,C,ow,which){
 /* ---------- Medidas y colores ---------- */
 const BODY={ // unidades del dibujo (180 × 112)
   m:{sh:8.4,chest:2.2,waist:6.0,hip:6.3,glute:1.6,arm:[3.5,2.9,2.2],biceps:1.0,thigh:[5.6,4.0],quad:1.1,shin:[4.0,2.5],calf:1.1,neck:2.8,shF:9.6,waistF:6.8,hipF:4.6,hipFw:8.6,head:6.1},
-  f:{sh:7.2,chest:2.6,waist:5.1,hip:7.0,glute:2.2,arm:[3.0,2.5,1.9],biceps:.5,thigh:[6.0,3.9],quad:.8,shin:[3.8,2.3],calf:1.0,neck:2.4,shF:8.4,waistF:5.6,hipF:4.8,hipFw:9.2,head:5.8}};
+  f:{sh:7.2,chest:2.6,waist:5.1,hip:7.0,glute:2.2,arm:[3.0,2.5,1.9],biceps:.5,thigh:[6.0,3.9],quad:.8,shin:[3.8,2.3],calf:1.0,neck:2.4,shF:8.4,waistF:5.6,hipF:4.6,hipFw:9.6,head:5.8}};
 const SKIN={m:{fill:"#D9A57E",far:"#BE8A63",line:"#7E5236"},f:{fill:"#E6B898",far:"#C99878",line:"#8C5E42"}};
 const HAIR={m:"#2E211B",f:"#4A2C1F"};
 const CLOTH={top:"#1E6B74",topFar:"#17545B",topLine:"#0E3237",bottom:"#323E3B",bottomFar:"#242E2C",bottomLine:"#0D1413",
@@ -252,7 +254,7 @@ function persona(ctx,ex,gm,o,C,ow,detail){
     const thF=t=>lin(t0,t1)(t)+B.quad*bump(t,.15,.9),thB=t=>lin(t0,t1)(t)+.4*B.quad*bump(t,0,.6);
     const shinRef=frente?gm.lat:(ft.f?mul(ft.f,1):ref);
     const shF=lin(s0,s1),shB=t=>lin(s0,s1)(t)+B.calf*bump(t,.05,.6);
-    const thigh=tube(seg(P,K),thF,thB,frente?gm.lat:ref),shin=tube(seg(K,A),shF,shB,shinRef);
+    const thigh=frente?tube(seg(P,K),t=>lin(t0,t1)(t)*.86,t=>lin(t0,t1)(t)*.86,gm.lat):tube(seg(P,K),thF,thB,ref),shin=tube(seg(K,A),shF,shB,shinRef);
     const out=[];
     if(g==="f"){const bg=bot(far);bg.items.push(thigh,shin);out.push(bg);}
     else{const sg=skin(far);sg.items.push(thigh,shin);const bg=bot(far);bg.items.push(tube(slice(seg(P,K),0,.5),t=>thF(t*.5)+.55,t=>thB(t*.5)+.55,frente?gm.lat:ref,true,false));out.push(sg,bg);}
@@ -262,16 +264,16 @@ function persona(ctx,ex,gm,o,C,ow,detail){
   function soleLines(s){ctx.lineCap="round";ctx.strokeStyle=CLOTH.sole;ctx.lineWidth=1.1;ctx.beginPath();ctx.moveTo(...s.sole[0]);ctx.lineTo(...s.sole[1]);ctx.stroke();
     if(s.lace){ctx.strokeStyle=CLOTH.lace;ctx.lineWidth=.7;ctx.beginPath();ctx.moveTo(...s.lace[0]);ctx.lineTo(...s.lace[1]);ctx.stroke();}}
   // tronco
-  const TC=quad(p.s,p.c,p.p);
+  const TC=frente?quad(add(p.s,mul(gm.u,1.2)),p.c,p.p):quad(p.s,p.c,p.p); // de frente, hombros rectos (sin cúpula alrededor del cuello)
   let wf,wb,ref;
   if(frente){const w=t=>t<.25?B.shF-(B.shF-B.shF*.86)*(t/.25):t<.62?B.shF*.86-(B.shF*.86-B.waistF)*((t-.25)/.37):B.waistF+(B.hipFw-B.waistF)*((t-.62)/.38);
     wf=w;wb=w;ref=gm.lat;}
   else{const base=t=>t<.3?B.sh-(B.sh-B.waist)*(t/.3)*.4:t<.65?B.sh*.88-(B.sh*.88-B.waist)*((t-.3)/.35):B.waist+(B.hip-B.waist)*((t-.65)/.35);
     wf=t=>base(t)+B.chest*bump(t,.05,.5)+(g==="f"?.6*bump(t,.12,.42):0);wb=t=>base(t)+B.glute*bump(t,.7,1.15);ref=fr;}
   const cut=g==="f"?.74:.8,topEnd=g==="f"?.56:cut;
-  const torsoTop=tube(slice(TC,0,topEnd),rng(wf,0,topEnd),rng(wb,0,topEnd),ref,true,false);
+  const torsoTop=tube(slice(TC,0,topEnd),rng(wf,0,topEnd),rng(wb,0,topEnd),ref,!frente,false);
   const torsoBot=tube(slice(TC,cut,1),t=>rng(wf,cut,1)(t)+.25,t=>rng(wb,cut,1)(t)+.25,ref,false,true);
-  const torsoSkin=tube(TC,wf,wb,ref);
+  const torsoSkin=tube(TC,wf,wb,ref,!frente,true);
   const near=frente?null:"1";
   // capas: brazo lejano, pierna lejana, tronco y cabeza, pierna cercana, brazo cercano (de frente: piernas, tronco, cabeza, brazos)
   drawGear(ctx,ex,gm,C,ow,"back");
@@ -301,10 +303,12 @@ function head(ctx,gm,B,g,sk,ow,detail){
       ell(add(p.h,mul(lat,R*.98)),1.2,1.7,Math.atan2(up[1],up[0])),ell(add(p.h,mul(lat,-R*.98)),1.2,1.7,Math.atan2(up[1],up[0])),
       tube(seg(lerp(p.s,p.h,.3),p.h,4),()=>B.neck,()=>B.neck,lat));
     paint(ctx,[s],ow);
-    ctx.save();ctx.clip(circ(p.h,R+.2));ctx.fillStyle=HAIR[g];ctx.beginPath();const c=add(p.h,mul(up,g==="f"?2.0:2.6));
-    ctx.ellipse(c[0],c[1],R*1.02,R*(g==="f"?.9:.78),Math.atan2(lat[1],lat[0]),0,Math.PI*2);ctx.fill();ctx.restore();
+    ctx.save();ctx.clip(circ(p.h,R+.2));ctx.fillStyle=HAIR[g];ctx.beginPath();const c=add(p.h,mul(up,g==="f"?3.6:4.4));
+    ctx.ellipse(c[0],c[1],R*1.08,R*(g==="f"?.78:.62),Math.atan2(lat[1],lat[0]),0,Math.PI*2);ctx.fill();ctx.restore();
     if(g==="f"){ctx.fillStyle=HAIR.f;const t=add(p.h,mul(up,R*.95));ctx.beginPath();ctx.arc(t[0],t[1],2.3,0,7);ctx.fill();}
-    if(detail){ctx.fillStyle="#2B1D17";[-1,1].forEach(k=>{const e=add(add(p.h,mul(up,-.9)),mul(lat,2.2*k));ctx.beginPath();ctx.ellipse(e[0],e[1],.55,.7,0,0,7);ctx.fill();});}
+    // de frente la cara siempre lleva ojos y boca: sin ellos parece que la persona está de espaldas
+    ctx.fillStyle="#2B1D17";[-1,1].forEach(k=>{const e=add(add(p.h,mul(up,-.7)),mul(lat,2.2*k));ctx.beginPath();ctx.ellipse(e[0],e[1],.6,.75,0,0,7);ctx.fill();});
+    ctx.strokeStyle=sk.line;ctx.lineWidth=.55;ctx.beginPath();const m0=add(p.h,mul(up,-3.7));ctx.moveTo(...add(m0,mul(lat,-1.2)));ctx.quadraticCurveTo(...add(m0,mul(up,-.5)),...add(m0,mul(lat,1.2)));ctx.stroke();
     return;
   }
   const fr=gm.front,back=mul(fr,-1);
@@ -315,8 +319,10 @@ function head(ctx,gm,B,g,sk,ow,detail){
   s.items.push(circ(p.h,R),ell(add(p.h,add(mul(fr,2.3),mul(up,-3.0))),R*.58,R*.44,Math.atan2(fr[1],fr[0])),circ(add(p.h,add(mul(fr,R-.1),mul(up,-.4))),1.15),
     tube(seg(lerp(p.s,p.h,.3),add(p.h,mul(up,-1)),4),()=>B.neck,()=>B.neck,fr));
   paint(ctx,[s],ow);
-  ctx.save();ctx.clip(circ(p.h,R+.25));ctx.fillStyle=HAIR[g];ctx.beginPath();
-  const c=add(p.h,add(mul(up,g==="f"?1.5:2.1),mul(back,g==="f"?1.9:1.5)));ctx.arc(c[0],c[1],g==="f"?R*.98:R*.9,0,Math.PI*2);ctx.fill();ctx.restore();
+  // pelo: arriba y detrás, con la línea de la frente y la nuca (coordenadas de la cabeza: x hacia la cara, y hacia arriba)
+  const H=([x,y])=>add(p.h,add(mul(fr,x*R),mul(up,y*R)));
+  const hair=g==="f"?[[.62,.42],[.9,1.4],[-1.5,1.5],[-1.5,-.95],[-.55,-.62],[-.2,.02],[.25,.3]]:[[.6,.5],[.9,1.4],[-1.5,1.5],[-1.5,-.62],[-.58,-.42],[-.25,.08],[.22,.34]];
+  ctx.save();ctx.clip(circ(p.h,R+.25));ctx.fillStyle=HAIR[g];ctx.beginPath();hair.map(H).forEach((q,i)=>ctx[i?"lineTo":"moveTo"](...q));ctx.closePath();ctx.fill();ctx.restore();
   const ear=add(p.h,add(mul(back,.5),mul(up,-.7)));ctx.fillStyle=sk.far;ctx.beginPath();ctx.ellipse(ear[0],ear[1],1.1,1.6,Math.atan2(up[1],up[0]),0,7);ctx.fill();
   if(detail){const e=add(p.h,add(mul(fr,R*.55),mul(up,.2)));ctx.fillStyle="#2B1D17";ctx.beginPath();ctx.ellipse(e[0],e[1],.5,.65,0,0,7);ctx.fill();}
 }
