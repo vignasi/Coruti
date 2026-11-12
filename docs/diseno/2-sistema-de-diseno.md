@@ -69,7 +69,7 @@ Cinco tamaños en total; no se inventan otros. Interlineado 1,4 en texto y 1,1�
 | Origen | De dónde viene una sesión | Icono + texto: Plan de Claude · Plan por objetivo · Hecha por ti · Favorita |
 | Hoja inferior | Confirmar parar, elegir banda, cambiar de persona, apuntar peso | Se cierra con Atrás/Escape o tocando fuera |
 | Aviso breve (toast) | Confirmar una acción | 2 s, abajo, sin botones |
-| Hueco de la figura | Miniatura 1:1 sin etiquetas; grande 4:3 con etiqueta de zona en ámbar | D1 lo rellena |
+| Figura | Miniatura quieta (postura clave), sin etiquetas; grande en bucle con las etiquetas de `figura.js` | Figura 3D de D1, proporción **180:112**, fondo transparente sobre `capa`; radio 8 (mini) y 16 (grande) |
 
 ### Navegación
 Cuatro pestañas abajo: **Entrenar · Ejercicios · Historial · Tú** («Tú» junta perfil, peso, cuenta, Ajustes y Conexiones).
@@ -77,7 +77,10 @@ El reproductor, el final de sesión y la pantalla de entrar van sin pestañas. L
 
 ### Reproductor
 Inspirado en lo que te gusta de Freeletics: pantalla limpia, la persona enorme y la información pequeña abajo.
-- **La figura ocupa toda la pantalla**, sin caja ni marco, sobre fondo `capa` (blanco en claro). Etiqueta de zona en ámbar en su esquina.
+- **La figura ocupa toda la pantalla**, sin caja ni marco, sobre fondo `capa` (blanco en claro), por debajo de la fila de arriba.
+  En los ejercicios de pie (la figura es más alta que ancha) se recortan los lados del encuadre para que la persona salga más grande;
+  los tumbados se ven enteros a lo ancho. Las etiquetas (zona en ámbar, flecha, BANDA) las pone la propia figura.
+- En el descanso, el siguiente ejercicio en pequeño, en bucle y sin etiquetas.
 - **Arriba, encima de la figura y pequeño:** pausa (48 dp), «Ronda x de y · ejercicio x de y» y el pulso (o «Sin señal»).
 - **Abajo, donde no se pisa**, de arriba abajo: la clave corta («Manos debajo de los hombros»), el nombre y **la cantidad en grande**
   (`12 reps` o `0:30`), una línea pequeña (ritmo y tiempo que llevas, o «Prepárate»), banda o kilos si el ejercicio los usa,
@@ -93,13 +96,24 @@ Inspirado en lo que te gusta de Freeletics: pantalla limpia, la persona enorme y
 
 ## Widget
 Mismos tokens; Android limita lo que se puede dibujar, así que:
-- Fondo `capa`, radio del sistema (Android 12+), padding 16 dp (12 en el pequeño).
-- Letra: `t1` para datos, `t2`/`t3` para el nombre, `t4` para el tiempo. Atkinson en el widget solo si el `RemoteViews`
+- **Fondo: `capa` de la app, claro (`#FFFFFF`) u oscuro (`#16262A`), siguiendo al tema del móvil** (opción A, propuesta).
+  El fondo de hoy (`#1E6B74`) es el color de la camiseta de la figura y ella desaparece. Las dos opciones, con las imágenes reales,
+  en el prototipo («Fondo: dos opciones»):
+  - **A · Fondo de la app** (propuesta): la figura se ve en los dos temas, la camiseta sigue siendo del color de la marca como en la app,
+    y las imágenes de claro y oscuro ya están hechas (`figura/widget/`). Se pierde el verde del widget de hoy.
+  - **B · Fondo `#1E6B74` y camiseta coral (`#D9634C`)**: conserva el aspecto de hoy, pero la ropa tendría que cambiar en toda la app
+    (si no, la persona cambia de ropa entre la app y el widget), el coral compite con el ámbar de la zona que trabaja y hay que rehacer las 284 imágenes.
+    Imágenes de prueba en `prototipo/widget-ropa-coral/` (`figura/widget/hacer.html?top=%23D9634C`).
+- Radio del sistema (Android 12+), padding 16 dp (12 en el pequeño).
+- **Figura:** imagen WebP de la fase actual (`widget/{m,f}/{claro,oscuro}/<ejercicio>_<fase>.webp`, 400 × 249), sin etiquetas,
+  alternando fases al ritmo del ejercicio; la de la persona y el tema elegidos. En el grande, a la izquierda (~45 % del ancho);
+  en el pequeño, arriba a todo el ancho.
+- Letra: `t1` para datos, `t2` para el nombre, `t4` para la cantidad. Atkinson en el widget solo si el `RemoteViews`
   lo permite (Android 12+ con `fontFamily` de recurso); si no, la del sistema: es lo único que cambia.
-- Botones de 48 dp: Empezar/Pausa en `accion`; Parar y Saltar en `capa-2`.
-- **Grande, antes de empezar:** segmentos Hoy · ★ Favorita · Core, nombre y origen de la sesión, duración, rondas (− / +), Empezar.
-- **Grande, en marcha:** miniatura de la figura, ejercicio, cantidad, ronda y siguiente, rayas de progreso, Pausa y **Hecho**.
-- **Pequeño:** antes, «Hoy · 19 min», nombre y Empezar; en marcha, ejercicio, cantidad y Hecho.
+- Botones de 48 dp: Empezar y Hecho en `accion`; Pausa en `capa-2`.
+- **Grande, antes de empezar:** segmentos Hoy · ★ Favorita · Core, figura del primer ejercicio, nombre y origen de la sesión, duración, rondas (− / +), Empezar.
+- **Grande, en marcha:** ronda y pulso arriba; figura, ejercicio, cantidad, banda y siguiente; rayas de progreso; Pausa y **Hecho**.
+- **Pequeño:** antes, figura, «Hoy · 19 min» y Empezar; en marcha, figura, ejercicio, cantidad y Hecho.
 
 ## Textos
 - Tuteo, frases cortas, verbos en los botones (Empezar, Enviar a Strava, Crear plan, Guardar y volver).
