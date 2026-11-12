@@ -58,6 +58,18 @@ Base de todo lo demás (Strava, nube, planes). Cada serie se guarda con su hora 
 - [ ] **Tú:** Hecho cuando: una sesión aparece en el historial al terminar (desde la app y desde el widget),
   y exportar → desinstalar → importar lo recupera todo
 
+### Fase 1b · Favorita en el widget ✅ (hecho, va en la misma rama que la Fase 1)
+Para cuando la mayoría de ejercicios los haces con otra app y aquí solo quieres un par de ejercicios sueltos.
+- [x] En la app, ★ en una favorita: es la que sale en el widget (solo una; otro toque la quita). Se guarda en la copia de seguridad
+- [x] Widget grande: fila «Rutina / ★ favorita» para cambiar con un toque sin abrir la app (solo sale si hay una favorita marcada).
+  Con la favorita: Empezar la hace, − / + cambian sus rondas, y se ocultan módulos, A/B e intensidad
+- [x] Widget pequeño: Empezar hace lo elegido en el grande
+- [x] Desde el widget, la favorita se guarda en el historial como «Ejercicios sueltos» y cuenta para la racha sin cambiar la alternancia A/B
+- [x] El widget monta los ejercicios sueltos en Kotlin igual que la app (`Free.kt`; `FreePlanTest` deja 400 favoritas al azar
+  para compararlas con `buildFree` de `index.html`: iguales)
+- [ ] **Tú:** Hecho cuando: marcas ★ en una favorita, el widget la muestra, Empezar la hace con sus ejercicios, rondas y descanso,
+  y aparece en el historial
+
 ### Fase 2 · Supabase: datos en la nube y caja fuerte de claves
 - [ ] **Tú, antes:** crear el proyecto en supabase.com (gratis) y pasar la URL y la clave pública (`anon`)
 - [ ] Inicio de sesión con email (enlace mágico)
