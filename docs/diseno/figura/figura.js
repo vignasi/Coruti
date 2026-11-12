@@ -436,5 +436,7 @@ function draw(cv,ex,t,clamp,o={}){
   if(o.labels)labels(ctx,ex,st,gm,o.pt??t,o.text||{},q=>[bx.tx+bx.sc*q[0],bx.ty+bx.sc*q[1]],sc,C,bx);
   return st;
 }
-window.Figura={draw,keyT,phaseT,state,styles:["palos","redondo","persona"]};
+/* Postura ya resuelta (pies, manos, vista) para otros dibujantes, por ejemplo una prueba en 3D */
+function solve(ex,t,clamp,o={}){const st=state(ex,t,clamp);return {st,gm:geom(ex,st.pose,{key:o.key,B:BODY[o.gender==="f"?"f":"m"]})};}
+window.Figura={draw,keyT,phaseT,state,solve,styles:["palos","redondo","persona"]};
 })();
