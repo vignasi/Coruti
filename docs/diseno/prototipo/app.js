@@ -700,7 +700,7 @@ function pintar(scrollArriba = true) {
     (S.toast ? `<div class="aviso-toast" role="status">${ico('check').replace('<svg', '<svg style="width:20px;height:20px;flex:none"')}${S.toast}</div>` : '');
   const nsc = movil.querySelector('.pantalla'); if (nsc) nsc.scrollTop = y;
   const hoja = movil.querySelector('.hoja'); if (hoja && !hoja.contains(document.activeElement)) { hoja.tabIndex = -1; hoja.focus(); }
-  document.title = 'Rutina core · prototipo';
+  document.title = 'Prototipo Rutina core';
   if (window.FIG) window.FIG.pintar(movil);
   widgetAnim();
   if (scrollArriba) { const h = movil.querySelector('h1'); if (h) { h.tabIndex = -1; h.focus({ preventScroll: true }); } }

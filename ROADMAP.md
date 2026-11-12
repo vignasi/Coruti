@@ -128,16 +128,23 @@ Después: P1 Pulso · P2 Planes por objetivo · P3 Peso y medidas · P4 Carreras
 - Para D2 y C1/C2 (en `NOTAS.md`): el fondo actual del widget (`#1E6B74`) es el color de la camiseta y ella se pierde;
   lo que hay que pasar a `rutina.json`; peso de la figura 3D en la APK (5,3–6,1 MB: three.js, dos modelos e imágenes)
 
-#### D2 · Producto completo, sistema de diseño y prototipo — en paralelo con D1
+#### D2 · Producto completo, sistema de diseño y prototipo ✅ (falta tu elección del fondo del widget)
 - [x] Lista de funcionalidades (`docs/diseno/1-funcionalidades.md`)
-- [ ] Ampliar la lista con todo lo de este plan (Claude, planes, calendario, Strava, pulso, peso, usuarios, estilo de figura)
-- [ ] Sistema de diseño: pocos tamaños de letra, colores de la marca (`#1E6B74`, `#F0B04A`, `#EDF1F0` y oscuro),
-  espacios, componentes; también para el widget
-- [ ] Prototipo navegable desde cero de **todas** las pantallas, también las de lo que viene: Entrenar (hoy, plan de la semana,
-  favoritas), Ejercicios (cuadrícula de miniaturas → ficha con el movimiento), reproductor a pantalla completa, final de sesión,
-  Historial (con estado de Strava y pulso), Perfil (cuenta, peso y medidas, objetivo), Ajustes (material, bandas, voz, estilo
-  y sexo de la figura, conexiones: Claude, Strava, Polar), widget grande y pequeño. La figura va en un hueco fijo hasta que D1 termine
-- [ ] Publicado para abrirlo en el móvil
+- [x] Ampliada con todo lo del plan: Claude (qué ve y qué hace), planes por objetivo, calendario de la semana, Strava y Polar,
+  pulso, peso y medidas, varias personas, figura 3D hombre o mujer y su personalización más adelante
+- [x] Sistema de diseño (`docs/diseno/2-sistema-de-diseno.md`): 4 tamaños de letra más uno solo para el reproductor,
+  colores de la marca (`#1E6B74`, `#F0B04A`, `#EDF1F0`) y oscuro, espacios, componentes y widget
+- [x] Prototipo navegable de todas las pantallas (`docs/diseno/prototipo/`) con la **figura 3D real** de D1: miniaturas en la
+  cuadrícula y las listas, movimiento con etiquetas en la ficha, a toda pantalla en el reproductor (en los de pie se recortan los lados),
+  el siguiente durante el descanso, hombre o mujer en Tú → Figura y una prueba de personalización (complexión, músculo, piel, pelo, camiseta)
+- [x] Widget grande y pequeño con las imágenes WebP de D1 (alternan las fases)
+- [x] **Fondo del widget:** el de hoy (`#1E6B74`) es el color de la camiseta. Pantalla «Fondo: dos opciones» con las imágenes reales:
+  A, fondo de la app claro u oscuro (propuesta); B, fondo de hoy y camiseta coral (imágenes de prueba en `prototipo/widget-ropa-coral/`)
+- [x] Publicado para abrirlo en el móvil: https://claude.ai/artifact/SozxjV2P1cQ8F2uUFU8rpL (privado; la copia publicada lleva los modelos
+  como glTF en JSON y solo las imágenes del widget que usa)
+- Partió del D2 que no se había fusionado (rama `claude/vigilant-lovelace-hb4acy`): su revisión de validación (`3-validacion.md`)
+  se hizo con la figura en un hueco y se rehace en D3. Esta rama incluye D1 (`claude/rutina-core-3d-models-vd7k7j`), que tampoco está en `main`
+- [ ] **Tú:** elegir el fondo del widget (A o B)
 
 #### D3 · Validación
 - [ ] Revisión con las skills de diseño (crítica heurística, accesibilidad, textos) y corrección hasta no tener fallos graves
