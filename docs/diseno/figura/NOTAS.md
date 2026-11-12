@@ -66,3 +66,12 @@ Resumen de la búsqueda de noviembre de 2026. Los precios salen sobre todo de ag
   - El widget de Android no puede usar 3D: necesitaría imágenes renderizadas antes.
   - Faltan por hacer en 3D el material (bandas, mancuernas, silla) y las etiquetas.
 - Claude no genera imágenes ni vídeo por sí mismo: cualquiera de estas opciones necesita una cuenta en el servicio externo.
+
+## Idea para más adelante: que cada persona personalice su figura (solo con 3D)
+Se podrían cambiar la complexión, lo marcado del músculo y del abdomen, el color de piel, el pelo y la ropa.
+- **Cómo:** con *morph targets* (deformaciones guardadas en el modelo) y deslizadores; color de piel y ropa cambiando el material; pelo cambiando una pieza por otra.
+- **Peso:** cada deformación ocupa poco (del orden de 100 KB) [estimado].
+- **Condición que hay que fijar ya, al elegir el modelo de D:** que sea un modelo con deformaciones exportables, como MakeHuman o MPFB en Blender. Con un modelo cerrado (Mixamo) esta idea no se puede hacer.
+- **Riesgo técnico:** la ropa tiene que deformarse igual que el cuerpo, si no lo atraviesa.
+- **Widget:** se haría guardando imágenes de la figura personalizada al cambiarla.
+- **Textos:** neutros y sin juicio («complexión», no «gordito»). Es opcional y no está ligado al peso real salvo que la persona lo pida.

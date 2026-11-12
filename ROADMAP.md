@@ -185,6 +185,8 @@ Después: P1 Pulso · P2 Planes por objetivo · P3 Peso y medidas · P4 Carreras
 - **P4 · Traer de Strava carreras y otras actividades** (antes: Fase 6) y mostrarlas en el historial
 - **P5 · Modos de cardio** EMOM, Tabata y AMRAP con el mismo reproductor (antes: Fase 7)
 - **P6 · Coach por voz** con claves de técnica a mitad de serie (antes: Fase 8)
+- **P8 · Personalizar la figura 3D** (si se elige 3D en D1): complexión, músculo y abdomen marcados, piel, pelo y ropa, en Ajustes.
+  Requisito desde ya: el modelo 3D elegido tiene que admitir deformaciones (MakeHuman/MPFB, no Mixamo). Detalles en `docs/diseno/figura/NOTAS.md`
 - **P7 · Freeletics** (antes: Fase 5): con el conector de Claude probablemente ya no hace falta la foto
   (le dices a Claude qué has hecho y lo apunta). Se decide después de B2
 
