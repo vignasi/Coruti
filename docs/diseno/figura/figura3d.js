@@ -143,7 +143,7 @@ export async function crear({modelo,gender='m',loader}){
     const fore={},recto={};let low=0,sube=0;
     for(const i of ['1','2']){const E=p['e'+i],W=p['w'+i];if(!(E[1]>sup(E)-4.5&&W[1]>sup(W)-4.5))continue;
       const S=side[i],sh=wp(S+'Arm'),L1=sh.distanceTo(wp(S+'ForeArm')),dx=(E[0]-p.s[0])*kk,ey=(GD-sup(E))*kk+.04;
-      fore[i]={dx,ey,dir:Math.sign(W[0]-E[0])||1};if(Math.abs(dx)<L1&&!apoyado)low=Math.max(low,sh.y-(ey+Math.sqrt(L1*L1-dx*dx)));}
+      fore[i]={dx,ey,dir:Math.sign(W[0]-E[0])||1,fz:((W[2]||0)-(E[2]||0))/(Math.hypot(W[0]-E[0],(W[2]||0)-(E[2]||0))||1),fx:(W[0]-E[0])/(Math.hypot(W[0]-E[0],(W[2]||0)-(E[2]||0))||1)};if(Math.abs(dx)<L1&&!apoyado)low=Math.max(low,sh.y-(ey+Math.sqrt(L1*L1-dx*dx)));}
     // manos apoyadas en una silla que no alcanzan (fondos): el cuerpo cuelga de ellas y baja; las piernas se doblan después
     // brazo recto en el dibujo con la mano apoyada (flexiones arriba, a cuatro patas, fondos arriba)
     for(const i of ['1','2']){const W=p['w'+i],E=p['e'+i];if(fore[i]||!(W[1]>sup(W)-4.5))continue;
@@ -172,7 +172,7 @@ export async function crear({modelo,gender='m',loader}){
         const hx=dy<L1?Math.max(Math.abs(f.dx),Math.sqrt(L1*L1-Math.max(0,dy)*Math.max(0,dy))):Math.abs(f.dx);
         const Ew=new THREE.Vector3(sh.x+(Math.sign(f.dx)||1)*hx,f.ey,sh.z);
         aim(S+'Arm',S+'ForeArm',Ew.clone().sub(sh).normalize(),secA,restA);
-        aim(S+'ForeArm',S+'Hand',new THREE.Vector3(f.dir,-.04,0).normalize(),secA,restA);}
+        aim(S+'ForeArm',S+'Hand',new THREE.Vector3(f.fx,-.04,f.fz).normalize(),secA,restA);}   // antebrazo por el suelo (con z: hacia delante)
       else if(W[1]>sup(W)-4.5){const T=toW(W,.035,S+'Arm',p.s),bx=(PX.get(k)||[]).find(b=>{const [x,,w]=b.e.r;return !b.wall&&W[0]>=x-2&&W[0]<=x+w+2;});
         if(bx&&sup(W)<GD)T.x=bx.cx+(W[0]-bx.xc)*kk;     // la mano va a la silla, esté donde esté
         const bend=bendOf(p.s,E,W);ik(S+'Arm',S+'ForeArm',S+'Hand',T,bend,secA,restA);
