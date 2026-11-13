@@ -1,0 +1,1 @@
+three.js r160 (MIT), solo lo que usa la figura 3D. Copiado de npm three@0.160.0.

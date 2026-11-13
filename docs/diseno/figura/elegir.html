@@ -1,0 +1,136 @@
+<meta charset="utf-8">
+<title>Figura dibujada o 3D</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<!-- D1: página para elegir en el móvil entre la figura dibujada (figura.js, estilo «persona») y la figura 3D (figura3d.js),
+     hombre o mujer, viendo todos los ejercicios: el movimiento en grande con las etiquetas y todas las miniaturas.
+     ?f=dibujada|3d|dos &g=m|f &ex=clave &still (sin animar) &data=URL de rutina.json -->
+<style>
+/* Layout: una columna de móvil; arriba los selectores y el movimiento en grande, debajo todas las miniaturas. Mismos tokens que index.html */
+:root{
+  --bg:#EDF1F0;--surface:#FFFFFF;--ink:#17201E;--soft:#55625F;--line:#CFD9D6;
+  --accent:#1E6B74;--accent-ink:#FFFFFF;--hl:#D98E1F;
+  --font:"Inter",system-ui,"Roboto",sans-serif;--display:"Space Grotesk","Inter",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#0F1513;--surface:#171F1D;--ink:#E4EBE8;--soft:#9AA9A5;--line:#2B3633;--accent:#62B8C1;--accent-ink:#0B1513;--hl:#F0B04A;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0F1513;--surface:#171F1D;--ink:#E4EBE8;--soft:#9AA9A5;--line:#2B3633;--accent:#62B8C1;--accent-ink:#0B1513;--hl:#F0B04A;color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 var(--font);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px 32px}
+main{max-width:560px;margin:0 auto;display:grid;gap:14px}
+h1{font:700 1.45rem/1.15 var(--display);margin:0;text-wrap:balance}
+.sub{margin:4px 0 0;color:var(--soft);font-size:.92rem;max-width:62ch}
+.controls{display:flex;flex-wrap:wrap;gap:10px}
+.seg{display:inline-flex;border:1.5px solid var(--line);border-radius:999px;overflow:hidden;background:var(--surface)}
+.seg button{border:0;background:transparent;color:var(--ink);font:600 .95rem var(--font);padding:0 15px;min-height:48px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+button:focus-visible{outline:3px solid var(--hl);outline-offset:2px}
+.stage{background:var(--surface);border-radius:20px;padding:10px 12px 14px;display:grid;gap:6px}
+.stage .top{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.stage b{font:700 1.08rem/1.25 var(--display);min-width:0}
+.step{font-variant-numeric:tabular-nums;color:var(--soft);font-size:.85rem;white-space:nowrap}
+.view{display:grid;gap:2px;position:relative}
+.view canvas{width:100%;max-width:100%;aspect-ratio:180/112;display:block}
+.tag{font:600 .7rem var(--font);letter-spacing:.06em;text-transform:uppercase;color:var(--soft)}
+.wait{position:absolute;inset:auto 0 45% 0;text-align:center;color:var(--soft);font-size:.9rem}
+.cap{margin:0;color:var(--ink);font-size:.95rem;min-height:2.9em}
+.play{justify-self:start;border:1.5px solid var(--line);background:transparent;color:var(--ink);border-radius:999px;font:600 .9rem var(--font);padding:0 14px;min-height:44px;cursor:pointer}
+h2{font:600 .8rem var(--font);letter-spacing:.06em;text-transform:uppercase;color:var(--soft);margin:8px 0 0}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.tile{background:var(--surface);border:2px solid transparent;border-radius:14px;padding:5px 5px 8px;text-align:left;color:var(--ink);font:inherit;cursor:pointer;display:grid;gap:2px;min-width:0;align-content:start}
+.tile[aria-current="true"]{border-color:var(--accent)}
+.tile canvas{width:100%;max-width:100%;aspect-ratio:180/112;display:block}
+.tile span{font-size:.8rem;line-height:1.25;overflow-wrap:anywhere}
+.tile i{font-style:normal;font-size:.7rem;color:var(--soft)}
+.note{color:var(--soft);font-size:.85rem;margin:0}
+</style>
+<script type="importmap">{"imports":{"three":"./three/build/three.module.min.js","three/addons/":"./three/examples/jsm/"}}</script>
+<main>
+  <header>
+    <h1>Figura dibujada o 3D</h1>
+    <p class="sub">Compara la figura dibujada con la figura 3D en todos los ejercicios. Toca uno para verlo en grande, con lo que trabaja señalado.</p>
+  </header>
+  <div class="controls">
+    <div class="seg" role="group" aria-label="Figura">
+      <button id="f-dibujada" data-f="dibujada">Dibujada</button><button id="f-3d" data-f="3d">3D</button><button id="f-dos" data-f="dos">Las dos</button>
+    </div>
+    <div class="seg" role="group" aria-label="Persona">
+      <button id="g-m" data-g="m">Hombre</button><button id="g-f" data-g="f">Mujer</button>
+    </div>
+  </div>
+  <section class="stage" aria-live="polite">
+    <div class="top"><b id="name">Cargando…</b><span class="step" id="step"></span></div>
+    <div class="view" id="v-2d"><span class="tag" id="t-2d">Dibujada</span><canvas id="big2d" aria-label="Movimiento del ejercicio, figura dibujada"></canvas></div>
+    <div class="view" id="v-3d"><span class="tag" id="t-3d">3D</span><canvas id="big3d" aria-label="Movimiento del ejercicio, figura 3D"></canvas><span class="wait" id="wait">Cargando la figura 3D…</span></div>
+    <p class="cap" id="cap"></p>
+    <button class="play" id="play">Pausa</button>
+  </section>
+  <h2 id="count">Ejercicios</h2>
+  <div class="grid" id="grid"></div>
+  <p class="note">La figura 3D usa modelos propios hechos con MakeHuman (licencia CC0) y three.js. El widget no puede mostrar 3D: usaría imágenes hechas antes.</p>
+</main>
+<script src="figura.js"></script>
+<script type="module">
+import {crear} from "./figura3d.js";
+const q=new URLSearchParams(location.search);
+const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+let fig=q.get("f")||store.get("fig-cmp")||"3d",gender=q.get("g")||store.get("fig-gender")||"m";
+const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;let playing=!reduce&&!q.has("still");
+const TRX=["press_trx","remo_trx","curl_trx","ext_trx"];
+const $=id=>document.getElementById(id);
+async function load(urls){for(const u of urls){try{const r=await fetch(u);if(r.ok)return await r.json();}catch(e){}}throw new Error("sin datos");}
+let D;
+try{D=await load([q.get("data")||"../../../app/src/main/assets/rutina.json","rutina.json"]);}
+catch(e){$("name").textContent="No se han podido cargar los ejercicios";throw e;}
+const keys=Object.keys(D.exercises);let cur=q.get("ex")&&D.exercises[q.get("ex")]?q.get("ex"):"puente",t0=performance.now();
+const models={},loading={};
+function model(g){if(models[g])return Promise.resolve(models[g]);
+  // .glb en el repo; en la página publicada, el mismo modelo como glTF en JSON (allí no se sirven .glb)
+  const one=ext=>crear({modelo:"modelos/persona_"+g+ext,gender:g});
+  return loading[g]||(loading[g]=one(".glb").catch(()=>one(".gltf.json")).then(m=>{models[g]=m;return m;}));}
+const opts=()=>{const cs=getComputedStyle(document.documentElement);
+  return {style:"persona",gender,bg:cs.getPropertyValue("--surface").trim(),dark:cs.getPropertyValue("color-scheme").trim()==="dark",text:D.marks};};
+const show2d=()=>fig!=="3d",show3d=()=>fig!=="dibujada";
+$("count").textContent=keys.length+" ejercicios";
+const tiles=keys.map(k=>{const b=document.createElement("button");b.className="tile";b.id="t-"+k;
+  const c2=document.createElement("canvas"),c3=document.createElement("canvas"),s=document.createElement("span");
+  c2.setAttribute("aria-hidden","true");c3.setAttribute("aria-hidden","true");s.textContent=D.exercises[k].name;b.append(c2,c3,s);
+  if(TRX.includes(k)){const i=document.createElement("i");i.textContent="Con correas: se quita";b.append(i);}
+  b.onclick=()=>{select(k);document.querySelector(".stage").scrollIntoView({behavior:reduce?"auto":"smooth",block:"start"});};
+  $("grid").append(b);return {k,c2,c3,b};});
+// miniaturas 3D poco a poco, para no bloquear la página
+let job=0;
+async function drawTiles(){const my=++job,o=opts();
+  tiles.forEach(({k,c2,c3})=>{c2.hidden=!show2d();c3.hidden=!show3d();if(show2d())Figura.draw(c2,D.exercises[k],Figura.keyT(D.exercises[k]),true,{...o,key:k});});
+  if(!show3d())return;const m=await model(gender);
+  for(const {k,c3} of tiles){if(my!==job)return;m.draw(c3,D.exercises[k],Figura.keyT(D.exercises[k]),true,{...o,key:k});
+    await new Promise(r=>setTimeout(r,0));}
+  if(my===job)window.__done=true;}
+function select(k){cur=k;$("name").textContent=D.exercises[k].name;last="";
+  tiles.forEach(({k:kk,b})=>b.setAttribute("aria-current",kk===k));t0=performance.now();}
+let last="",raf=0;
+function frame(now){raf=0;const ex=D.exercises[cur],t=playing?(now-t0)/1000:Figura.keyT(ex),o=opts();
+  let st=null;
+  if(show2d())st=Figura.draw($("big2d"),ex,t,!playing,{...o,key:cur,labels:true,pt:playing?t:.26});
+  const m=models[gender];
+  if(show3d()&&m){st=m.draw($("big3d"),ex,t,!playing,{...o,key:cur,labels:true,pt:playing?t:.26});$("wait").hidden=true;}
+  else if(show3d()){$("wait").hidden=false;const c=$("big3d");if(c.getContext)c.getContext("2d").clearRect(0,0,c.width,c.height);model(gender).then(()=>request());}
+  st=st||Figura.state(ex,t,!playing);
+  const key=cur+st.idx;if(key!==last){last=key;$("cap").textContent=st.phase.cap||"";$("step").textContent=(st.idx+1)+" de "+st.n;}
+  if(playing)request();}
+const request=()=>{if(!raf)raf=requestAnimationFrame(frame);};
+function setUI(){document.querySelectorAll("[data-f]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.f===fig));
+  document.querySelectorAll("[data-g]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.g===gender));
+  $("v-2d").hidden=!show2d();$("v-3d").hidden=!show3d();$("t-2d").hidden=$("t-3d").hidden=fig!=="dos";
+  $("grid").style.gridTemplateColumns=fig==="dos"?"repeat(2,minmax(0,1fr))":"";
+  $("play").textContent=playing?"Pausa":"Ver el movimiento";}
+const redraw=()=>{setUI();drawTiles();request();};
+document.querySelectorAll("[data-f]").forEach(b=>b.onclick=()=>{fig=b.dataset.f;store.set("fig-cmp",fig);redraw();});
+document.querySelectorAll("[data-g]").forEach(b=>b.onclick=()=>{gender=b.dataset.g;store.set("fig-gender",gender);redraw();});
+$("play").onclick=()=>{playing=!playing;if(playing)t0=performance.now();setUI();request();};
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change",()=>{drawTiles();request();});
+let rz=0;addEventListener("resize",()=>{clearTimeout(rz);rz=setTimeout(()=>{drawTiles();request();},150);});
+select(cur);redraw();
+if(!show3d())window.__done=true;
+model(gender==="m"?"f":"m");   // el otro modelo, en segundo plano, para que el cambio sea rápido
+</script>

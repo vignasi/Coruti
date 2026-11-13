@@ -8,7 +8,7 @@ import android.graphics.Path
 import android.graphics.RectF
 import android.graphics.Typeface
 
-/** Dibuja la figura del ejercicio (misma lógica que draw() en index.html) para el widget. */
+/** Dibuja la figura del ejercicio (la figura de palos de la app 1.0; la app nueva usa docs/diseno/figura) para el widget. */
 object PoseRenderer {
     private const val BG = 0xFF1E6B74.toInt()
     private const val INK = 0xFFFFFFFF.toInt()
@@ -84,6 +84,14 @@ object PoseRenderer {
         // lado cercano
         limb("p", "k1", INK, 5f); limb("k1", "a1", INK, 4.5f)
         limb("s", "e1", INK, 4.5f); limb("e1", "w1", INK, 4f)
+        // de puntillas (plancha, flexiones): en rutina.json el tobillo va ~5 por encima del suelo; el pie llega hasta él
+        for (i in listOf("2", "1")) {
+            val a = pt("a$i"); val k = pt("k$i")
+            if (a[1] in 90f..99f && kotlin.math.abs(k[1] - a[1]) < 15f && a[0] > k[0]) {
+                line.color = INK; line.strokeWidth = 3.5f
+                c.drawLine(a[0], a[1], a[0] + 3f, 101.5f, line)
+            }
+        }
 
         fill.color = INK
         val h = pt("h")

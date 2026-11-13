@@ -42,6 +42,18 @@ android {
     kotlinOptions { jvmTarget = "17" }
 }
 
+// La figura 3D (three.js, modelos) y la dibujada viven en docs/diseno/figura/ (D1): se copian al APK al compilar,
+// así hay una sola copia en el repo. La página las carga en https://appassets.androidplatform.net/figura/…
+val figuraAssets = layout.buildDirectory.dir("generated/figura-assets")
+val copiarFigura by tasks.registering(Copy::class) {
+    from(rootProject.file("docs/diseno/figura")) {
+        include("figura.js", "figura3d.js", "three/**", "modelos/*.glb")
+    }
+    into(figuraAssets.map { it.dir("figura") })
+}
+android.sourceSets.getByName("main").assets.srcDir(figuraAssets)
+tasks.named("preBuild") { dependsOn(copiarFigura) }
+
 dependencies {
     // Solo para las pruebas en el ordenador (gradle testReleaseUnitTest); no entran en el APK
     testImplementation("junit:junit:4.13.2")

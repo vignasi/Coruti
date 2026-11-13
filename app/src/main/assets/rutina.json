@@ -100,8 +100,8 @@
       ],
       "marks": {"gl":{"at":["p"],"off":[2,-7],"lab":[135,40]},"ab":{"at":["c"],"off":[0,7],"lab":[36,40]}},
       "poses": [
-        {"h":[28,68],"s":[42,73],"c":[71,86],"p":[100,83],"k1":[128,92],"a1":[156,100],"k2":[129,93],"a2":[157,100],"e1":[42,100],"w1":[22,100],"e2":[44,100],"w2":[24,100]},
-        {"h":[28,68],"s":[42,73],"c":[71,73],"p":[100,74],"k1":[128,88],"a1":[156,100],"k2":[129,89],"a2":[157,100],"e1":[42,100],"w1":[22,100],"e2":[44,100],"w2":[24,100]}
+        {"h":[28,68],"s":[42,73],"c":[71,86],"p":[100,83],"k1":[128,92],"a1":[156,95],"k2":[129,93],"a2":[157,95],"e1":[42,100],"w1":[22,100],"e2":[44,100],"w2":[24,100]},
+        {"h":[28,68],"s":[42,73],"c":[71,73],"p":[100,74],"k1":[128,88],"a1":[156,95],"k2":[129,89],"a2":[157,95],"e1":[42,100],"w1":[22,100],"e2":[44,100],"w2":[24,100]}
       ],
       "phases": [
         {"pose":0,"move":1,"hold":1.4,"cap":"Así NO: la lumbar se hunde"},
@@ -172,6 +172,7 @@
       ]
     },
     "plancha_lat": {
+      "view": "frente",
       "name": "Plancha lateral",
       "hold": true,
       "vid": "plancha lateral técnica correcta",
@@ -204,8 +205,8 @@
       ],
       "marks": {"pe":{"at":["s"],"off":[6,7],"lab":[30,30]},"gl":{"at":["p"],"off":[2,-7],"lab":[135,50]}},
       "poses": [
-        {"h":[28,60],"s":[40,66],"c":[70,74],"p":[100,82],"k1":[129,91],"a1":[158,100],"k2":[130,92],"a2":[159,100],"e1":[41,83],"w1":[42,100],"e2":[43,83],"w2":[44,100]},
-        {"h":[27,86],"s":[40,90],"c":[70,92],"p":[100,94],"k1":[129,97],"a1":[158,100],"k2":[130,97],"a2":[159,100],"e1":[55,84],"w1":[42,100],"e2":[57,84],"w2":[44,100]}
+        {"h":[28,60],"s":[40,66],"c":[70,74],"p":[100,82],"k1":[129,91],"a1":[158,95],"k2":[130,92],"a2":[159,95],"e1":[41,83],"w1":[42,100],"e2":[43,83],"w2":[44,100]},
+        {"h":[27,86],"s":[40,90],"c":[70,92],"p":[100,94],"k1":[129,97],"a1":[158,95],"k2":[130,97],"a2":[159,95],"e1":[55,84],"w1":[42,100],"e2":[57,84],"w2":[44,100]}
       ],
       "phases": [
         {"pose":1,"move":1.5,"hold":0.5,"tone":"down","sq":["gl"],"cap":"Baja en bloque (2 s): costillas abajo, culo apretado"},
@@ -234,29 +235,8 @@
         {"pose":0,"move":1.5,"hold":0.5,"tone":"down","cap":"Baja (2 s) hasta apoyar los codos en el suelo"}
       ]
     },
-    "press_trx": {
-      "name": "Press en correas",
-      "rep": 4,
-      "unit": "Repetición",
-      "vid": "press pecho TRX técnica",
-      "cues": [
-        "De espaldas al anclaje, correas a la altura del pecho",
-        "Cuerpo en bloque: culo apretado, costillas abajo",
-        "Baja el pecho entre las manos con los codos a 45°",
-        "Cuanto más inclinado, más difícil"
-      ],
-      "marks": {"pe":{"at":["s"],"off":[-5,7],"lab":[30,84]},"gl":{"at":["p"],"off":[5,-2],"lab":[152,52]}},
-      "equip": [{"t":"strap","at":"w1","from":[176,0]},{"t":"strap","at":"w2","from":[176,0]}],
-      "poses": [
-        {"a1":[125,100],"k1":[116,82],"p":[108,64],"c":[100,48],"s":[93,32],"h":[88,20],"k2":[118,82],"a2":[127,100],"e1":[76,36],"w1":[60,40],"e2":[78,36],"w2":[62,40]},
-        {"a1":[125,100],"k1":[112,85],"p":[99,69],"c":[88,56],"s":[77,43],"h":[68,33],"k2":[114,85],"a2":[127,100],"e1":[86,57],"w1":[64,52],"e2":[88,57],"w2":[66,52]}
-      ],
-      "phases": [
-        {"pose":1,"move":1.5,"hold":0.5,"tone":"down","sq":["gl"],"cap":"Baja el pecho hacia las manos (2 s), cuerpo en bloque"},
-        {"pose":0,"move":1.5,"hold":0.5,"tone":"up","sq":["pe"],"arrow":[52,62,40,46],"cap":"Empuja las correas y vuelve arriba"}
-      ]
-    },
     "angel": {
+      "view": "frente",
       "name": "Ángel en pared",
       "rep": 4,
       "unit": "Repetición",
@@ -279,28 +259,6 @@
         {"pose":0,"move":1.6,"hold":0.4,"tone":"down","sq":["esc"],"cap":"Baja en W juntando las escápulas"}
       ]
     },
-    "remo_trx": {
-      "name": "Remo en correas",
-      "rep": 4,
-      "unit": "Repetición",
-      "vid": "remo TRX técnica correcta",
-      "cues": [
-        "De cara al anclaje, brazos estirados, cuerpo inclinado atrás",
-        "Cuerpo recto: culo apretado, sin sacar barriga",
-        "Tira llevando el pecho a las manos y junta las escápulas",
-        "Cuanto más horizontal, más difícil"
-      ],
-      "marks": {"esp":{"at":["s"],"off":[7,4],"lab":[152,18]},"gl":{"at":["p"],"off":[6,0],"lab":[152,70]}},
-      "equip": [{"t":"strap","at":"w1","from":[4,0]},{"t":"strap","at":"w2","from":[4,0]}],
-      "poses": [
-        {"a1":[70,100],"k1":[78,82],"p":[87,64],"c":[95,48],"s":[102,32],"h":[107,20],"k2":[80,82],"a2":[72,100],"e1":[86,26],"w1":[70,21],"e2":[88,26],"w2":[72,21]},
-        {"a1":[70,100],"k1":[74,80],"p":[77,61],"c":[80,44],"s":[83,26],"h":[85,13],"k2":[76,80],"a2":[72,100],"e1":[94,36],"w1":[74,30],"e2":[96,36],"w2":[76,30]}
-      ],
-      "phases": [
-        {"pose":1,"move":1.5,"hold":0.5,"tone":"up","sq":["esp"],"arrow":[118,50,104,34],"cap":"Tira: pecho a las manos, junta las escápulas"},
-        {"pose":0,"move":1.5,"hold":0.5,"tone":"down","sq":["gl"],"cap":"Vuelve despacio (2 s) con el cuerpo recto"}
-      ]
-    },
     "remo_db": {
       "name": "Remo a una mano con mancuerna",
       "rep": 4,
@@ -315,8 +273,8 @@
       "marks": {"esp":{"at":["c"],"off":[0,-6],"lab":[100,14]}},
       "equip": [{"t":"box","r":[14,66,36,34],"label":"SILLA"},{"t":"db","at":"w1"}],
       "poses": [
-        {"h":[40,36],"s":[52,42],"c":[76,42],"p":[100,46],"k1":[104,72],"a1":[102,100],"k2":[110,72],"a2":[114,100],"e2":[46,54],"w2":[40,66],"e1":[54,59],"w1":[56,76]},
-        {"h":[40,36],"s":[52,42],"c":[76,42],"p":[100,46],"k1":[104,72],"a1":[102,100],"k2":[110,72],"a2":[114,100],"e2":[46,54],"w2":[40,66],"e1":[72,34],"w1":[68,50]}
+        {"h":[40,36],"s":[52,42],"c":[76,42],"p":[100,46],"k1":[100,72],"a1":[102,100],"k2":[106,72],"a2":[114,100],"e2":[46,54],"w2":[40,66],"e1":[54,59],"w1":[56,76]},
+        {"h":[40,36],"s":[52,42],"c":[76,42],"p":[100,46],"k1":[100,72],"a1":[102,100],"k2":[106,72],"a2":[114,100],"e2":[46,54],"w2":[40,66],"e1":[72,34],"w1":[68,50]}
       ],
       "phases": [
         {"pose":1,"move":1.5,"hold":0.5,"tone":"up","sq":["esp"],"arrow":[64,84,68,58],"cap":"Tira del codo hacia la cadera, espalda recta"},
@@ -343,28 +301,6 @@
       "phases": [
         {"pose":1,"move":1.5,"hold":0.5,"tone":"up","sq":["bi"],"arrow":[70,60,68,36],"cap":"Sube doblando el codo; el codo no se mueve"},
         {"pose":0,"move":1.5,"hold":0.5,"tone":"down","sq":["gl"],"cap":"Baja despacio (2 s), culo apretado, sin balancear"}
-      ]
-    },
-    "curl_trx": {
-      "name": "Curl en correas",
-      "rep": 4,
-      "unit": "Repetición",
-      "vid": "curl bíceps TRX técnica",
-      "cues": [
-        "De cara al anclaje, palmas hacia arriba",
-        "Inclínate hacia atrás con el cuerpo recto",
-        "Dobla los codos llevando las manos a la frente",
-        "Los codos se quedan altos, apuntando al anclaje"
-      ],
-      "marks": {"bi":{"at":["s","e1"],"off":[0,4],"lab":[40,60]}},
-      "equip": [{"t":"strap","at":"w1","from":[4,0]},{"t":"strap","at":"w2","from":[4,0]}],
-      "poses": [
-        {"a1":[70,100],"k1":[78,82],"p":[87,64],"c":[95,48],"s":[102,32],"h":[107,20],"k2":[80,82],"a2":[72,100],"e1":[86,26],"w1":[70,21],"e2":[88,26],"w2":[72,21]},
-        {"a1":[70,100],"k1":[74,80],"p":[77,61],"c":[80,44],"s":[83,26],"h":[85,13],"k2":[76,80],"a2":[72,100],"e1":[66,22],"w1":[78,8],"e2":[68,22],"w2":[80,8]}
-      ],
-      "phases": [
-        {"pose":1,"move":1.5,"hold":0.5,"tone":"up","sq":["bi"],"arrow":[118,50,104,34],"cap":"Dobla los codos: manos a la frente"},
-        {"pose":0,"move":1.5,"hold":0.5,"tone":"down","cap":"Estira los brazos despacio (2 s), cuerpo recto"}
       ]
     },
     "curl_toalla": {
@@ -408,28 +344,6 @@
       "phases": [
         {"pose":1,"move":1.5,"hold":0.5,"tone":"down","sq":["tri"],"cap":"Dobla los codos: mancuernas junto a la cabeza (2 s)"},
         {"pose":0,"move":1.5,"hold":0.5,"tone":"up","sq":["tri"],"arrow":[58,84,58,62],"cap":"Estira los brazos; los codos apuntan al techo"}
-      ]
-    },
-    "ext_trx": {
-      "name": "Extensión de tríceps en correas",
-      "rep": 4,
-      "unit": "Repetición",
-      "vid": "extensión tríceps TRX técnica",
-      "cues": [
-        "De espaldas al anclaje, brazos estirados al frente",
-        "Dobla los codos llevando las manos a la frente",
-        "Estira los brazos sin bajar los codos",
-        "Cuerpo en bloque, culo apretado"
-      ],
-      "marks": {"tri":{"at":["s","e1"],"off":[0,5],"lab":[30,84]}},
-      "equip": [{"t":"strap","at":"w1","from":[176,0]},{"t":"strap","at":"w2","from":[176,0]}],
-      "poses": [
-        {"a1":[125,100],"k1":[116,82],"p":[108,64],"c":[100,48],"s":[93,32],"h":[88,20],"k2":[118,82],"a2":[127,100],"e1":[76,36],"w1":[60,40],"e2":[78,36],"w2":[62,40]},
-        {"a1":[125,100],"k1":[112,85],"p":[99,69],"c":[88,56],"s":[77,43],"h":[68,33],"k2":[114,85],"a2":[127,100],"e1":[60,42],"w1":[62,25],"e2":[62,42],"w2":[64,25]}
-      ],
-      "phases": [
-        {"pose":1,"move":1.5,"hold":0.5,"tone":"down","cap":"Dobla los codos: manos a la frente (2 s)"},
-        {"pose":0,"move":1.5,"hold":0.5,"tone":"up","sq":["tri"],"arrow":[52,62,40,46],"cap":"Estira los brazos sin bajar los codos"}
       ]
     },
     "fondos": {
@@ -495,6 +409,7 @@
       ]
     },
     "plancha_lat_k": {
+      "view": "frente",
       "name": "Plancha lateral con rodillas",
       "hold": true,
       "vid": "plancha lateral rodillas apoyadas",
@@ -528,8 +443,8 @@
       "marks": {"pe":{"at":["s"],"off":[6,7],"lab":[86,22]},"gl":{"at":["p"],"off":[2,-7],"lab":[140,50]}},
       "equip": [{"t":"box","r":[8,70,46,30],"label":"SOFÁ"}],
       "poses": [
-        {"h":[31,35],"s":[42,42],"c":[70,57],"p":[100,73],"k1":[125,86.6],"a1":[150,100],"k2":[126,87],"a2":[151,100],"e1":[41,56],"w1":[40,70],"e2":[43,56],"w2":[42,70]},
-        {"h":[34,53],"s":[46,60],"c":[72,70],"p":[100,81],"k1":[125,90],"a1":[150,100],"k2":[126,91],"a2":[151,100],"e1":[59,60],"w1":[40,70],"e2":[61,60],"w2":[42,70]}
+        {"h":[31,35],"s":[42,42],"c":[70,57],"p":[100,73],"k1":[125,86.6],"a1":[150,95],"k2":[126,87],"a2":[151,95],"e1":[41,56],"w1":[40,70],"e2":[43,56],"w2":[42,70]},
+        {"h":[34,53],"s":[46,60],"c":[72,70],"p":[100,81],"k1":[125,90],"a1":[150,95],"k2":[126,91],"a2":[151,95],"e1":[59,60],"w1":[40,70],"e2":[61,60],"w2":[42,70]}
       ],
       "phases": [
         {"pose":1,"move":1.5,"hold":0.5,"tone":"down","sq":["gl"],"cap":"Baja el pecho al borde (2 s), culo apretado"},
@@ -571,8 +486,8 @@
       ],
       "marks": {"tri":{"at":["s","e1"],"off":[0,-5],"lab":[30,30]},"gl":{"at":["p"],"off":[2,-7],"lab":[135,50]}},
       "poses": [
-        {"h":[28,60],"s":[40,66],"c":[70,74],"p":[100,82],"k1":[129,91],"a1":[158,100],"k2":[130,92],"a2":[159,100],"e1":[41,83],"w1":[42,100],"e2":[43,83],"w2":[44,100]},
-        {"h":[27,86],"s":[40,90],"c":[70,92],"p":[100,94],"k1":[129,97],"a1":[158,100],"k2":[130,97],"a2":[159,100],"e1":[55,84],"w1":[42,100],"e2":[57,84],"w2":[44,100]}
+        {"h":[28,60],"s":[40,66],"c":[70,74],"p":[100,82],"k1":[129,91],"a1":[158,95],"k2":[130,92],"a2":[159,95],"e1":[41,83],"w1":[42,100],"e2":[43,83],"w2":[44,100]},
+        {"h":[27,86],"s":[40,90],"c":[70,92],"p":[100,94],"k1":[129,97],"a1":[158,95],"k2":[130,97],"a2":[159,95],"e1":[55,84],"w1":[42,100],"e2":[57,84],"w2":[44,100]}
       ],
       "phases": [
         {"pose":1,"move":1.5,"hold":0.5,"tone":"down","sq":["gl"],"cap":"Baja con los codos pegados (2 s)"},
@@ -691,6 +606,7 @@
       ]
     },
     "paso_lateral": {
+      "view": "frente",
       "name": "Paso lateral con banda",
       "rep": 2,
       "unit": "Paso",
@@ -714,6 +630,7 @@
       ]
     },
     "almeja": {
+      "view": "frente",
       "name": "Almeja",
       "rep": 3,
       "unit": "Repetición",
@@ -759,7 +676,7 @@
   },
   "catalog": {
     "zones": ["Core","Glúteo","Espalda","Pecho","Brazos","Movilidad"],
-    "needs": {"gomas":"Bandas grandes","banda":"Mini banda","mancuernas":"Mancuernas","correas":"Correas"},
+    "needs": {"gomas":"Bandas grandes","banda":"Mini banda","mancuernas":"Mancuernas"},
     "ex": {
       "psoas": {"zone":"Movilidad","secs":30,"sides":["Rodilla izquierda en el suelo","Rodilla derecha en el suelo"]},
       "puente": {"zone":"Glúteo","reps":15},
@@ -777,18 +694,14 @@
       "flex_pies": {"zone":"Pecho","reps":10},
       "press_db": {"zone":"Pecho","needs":"mancuernas","reps":10,"kg":[8,10]},
       "press_goma": {"zone":"Pecho","needs":"gomas","reps":12},
-      "press_trx": {"zone":"Pecho","needs":"correas","reps":10},
       "angel": {"zone":"Espalda","reps":10},
       "remo_incl_banda": {"zone":"Espalda","needs":"gomas","reps":12},
       "remo_goma": {"zone":"Espalda","needs":"gomas","reps":15},
-      "remo_trx": {"zone":"Espalda","needs":"correas","reps":12},
       "remo_db": {"zone":"Espalda","needs":"mancuernas","reps":10,"kg":[8,12],"sides":["Brazo derecho","Brazo izquierdo"]},
       "curl_goma": {"zone":"Brazos","needs":"gomas","reps":12},
       "curl_db": {"zone":"Brazos","needs":"mancuernas","reps":12,"kg":[6,8]},
-      "curl_trx": {"zone":"Brazos","needs":"correas","reps":12},
       "curl_toalla": {"zone":"Brazos","secs":25},
       "ext_db": {"zone":"Brazos","needs":"mancuernas","reps":12,"kg":[6,8]},
-      "ext_trx": {"zone":"Brazos","needs":"correas","reps":12},
       "fondos": {"zone":"Brazos","reps":8},
       "flex_cerr": {"zone":"Brazos","reps":8},
       "puente_banda": {"zone":"Glúteo","needs":"banda","reps":15},
@@ -868,8 +781,7 @@
         {
           "variants": [
             {"ex":"press_db","needs":"mancuernas","S":{"reps":10,"kg":[6,8]},"N":{"reps":10,"kg":[8,10]},"F":{"reps":10,"kg":[10,14]}},
-            {"ex":"press_goma","needs":"gomas","S":{"reps":10},"N":{"reps":12},"F":{"reps":15,"note":"Banda más dura"}},
-            {"ex":"press_trx","needs":"correas","S":{"reps":8,"note":"Cuerpo más vertical"},"N":{"reps":10},"F":{"reps":12,"note":"Más inclinado"}}
+            {"ex":"press_goma","needs":"gomas","S":{"reps":10},"N":{"reps":12},"F":{"reps":15,"note":"Banda más dura"}}
           ]
         }
       ]
@@ -882,7 +794,6 @@
         {"variants":[{"ex":"angel","S":{"reps":8},"N":{"reps":10},"F":{"reps":12}}]},
         {
           "variants": [
-            {"ex":"remo_trx","needs":"correas","S":{"reps":10,"note":"Cuerpo vertical"},"N":{"reps":12},"F":{"reps":12,"note":"Más horizontal"}},
             {"ex":"remo_goma","needs":"gomas","S":{"reps":12},"N":{"reps":15},"F":{"reps":15,"note":"Banda más dura"}},
             {
               "ex": "remo_db",
@@ -905,14 +816,12 @@
           "variants": [
             {"ex":"curl_db","needs":"mancuernas","S":{"reps":10,"kg":[4,6]},"N":{"reps":12,"kg":[6,8]},"F":{"reps":12,"kg":[8,10]}},
             {"ex":"curl_goma","needs":"gomas","S":{"reps":12},"N":{"reps":15},"F":{"reps":15,"note":"Banda más dura"}},
-            {"ex":"curl_trx","needs":"correas","S":{"reps":10,"note":"Cuerpo vertical"},"N":{"reps":12},"F":{"reps":12,"note":"Más inclinado"}},
             {"ex":"curl_toalla","S":{"secs":15},"N":{"secs":25},"F":{"secs":35}}
           ]
         },
         {
           "variants": [
             {"ex":"ext_db","needs":"mancuernas","S":{"reps":10,"kg":[4,6]},"N":{"reps":12,"kg":[6,8]},"F":{"reps":12,"kg":[8,10]}},
-            {"ex":"ext_trx","needs":"correas","S":{"reps":10,"note":"Cuerpo vertical"},"N":{"reps":12},"F":{"reps":12,"note":"Más inclinado"}},
             {"ex":"fondos","S":{"reps":6,"note":"Rango corto"},"N":{"reps":8,"note":"Rango corto"}},
             {"ex":"flex_cerr","F":{"reps":8}}
           ]

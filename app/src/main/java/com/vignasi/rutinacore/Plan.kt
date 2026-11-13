@@ -2,7 +2,7 @@ package com.vignasi.rutinacore
 
 import org.json.JSONObject
 
-/* Plan de la sesión. Misma lógica que buildPlan() en assets/index.html: si cambias una, cambia la otra. */
+/* Plan de la sesión. Misma lógica que buildPlan() en assets/app/motor.js: si cambias una, cambia la otra. */
 
 val INTENSITIES = listOf("S", "N", "F")
 val INT_NAME = mapOf("S" to "Suave", "N" to "Normal", "F" to "Fuerte")
@@ -19,7 +19,9 @@ class Config(
     var count: Boolean = true,
     var taper: Boolean = false,
     /** Nivel de cada módulo: sube o baja según cómo te haya ido al terminar. */
-    val lv: MutableMap<String, String> = linkedMapOf()
+    val lv: MutableMap<String, String> = linkedMapOf(),
+    /** Ajustes que solo usa la página (figura hombre o mujer, sonido, rutina de core en favoritas): se guardan tal cual. */
+    var app: JSONObject = JSONObject()
 ) {
     fun level(mod: String): String = lv[mod]?.takeIf { it in INTENSITIES } ?: intensity
 
@@ -49,7 +51,7 @@ class Config(
         return JSONObject()
             .put("v", 2).put("mods", m).put("lv", l).put("auto", auto).put("int", intensity)
             .put("correas", correas).put("mancuernas", mancuernas).put("gomas", gomas).put("banda", banda)
-            .put("rounds", rounds).put("count", count).put("taper", taper)
+            .put("rounds", rounds).put("count", count).put("taper", taper).put("app", app)
             .toString()
     }
 
@@ -70,6 +72,7 @@ class Config(
                 c.count = o.optBoolean("count", true)
                 // Hasta la versión 2 el volumen bajaba en cada ronda por defecto: ahora es opcional
                 c.taper = if (o.optInt("v", 1) < 2) false else o.optBoolean("taper", false)
+                c.app = o.optJSONObject("app") ?: JSONObject()
                 val l = o.optJSONObject("lv")
                 for (k in c.mods.keys) c.lv[k] = l?.optString(k, "")?.takeIf { it in INTENSITIES } ?: c.intensity
                 c

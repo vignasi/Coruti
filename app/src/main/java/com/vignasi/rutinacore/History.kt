@@ -15,7 +15,7 @@ import java.io.File
  * secs y planSecs (0 en los de repeticiones), kg, band, mod y skipped (si se saltó antes de acabar).
  * Opcionales al terminar: rpe (esfuerzo 1–10), feel ("mal" | "regular" | "bien" | "muybien") y st (false = no enviar a Strava).
  * Solo los escribe la nube (S1): strava { s: waiting|uploading|done|error|duplicate, id, err } y hr { avg, max } del reloj.
- * La misma forma la escriben la página (index.html) y el servicio del widget (SessionRecorder).
+ * La misma forma la escriben la página (assets/app/app.js) y el servicio del widget (SessionRecorder).
  */
 object History {
     private const val FILE = "history.json"

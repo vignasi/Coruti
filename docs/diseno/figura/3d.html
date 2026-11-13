@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Figura 3D · revisión</title>
+<!-- Revisión con capturas de la figura 3D (D1), como galeria.html para la dibujada.
+     Modelos: modelos/persona_m.glb y persona_f.glb (MakeHuman, CC0, hechos con modelos/crear_modelos.py). Código: figura3d.js.
+     ?g=m|f &size=big|mini &theme=dark &ex=a,b &mid (a mitad de cada movimiento) &c=columnas
+     &morph=complexion_mas:1,musculo_mas:.5 &piel=%238D5524 &pelo=%23C9A15A (prueba de personalización, P8)
+     &data=URL de rutina.json &three=URL de three (por defecto, la copia de three/) -->
+<style>
+:root{--bg:#EDF1F0;--surface:#FFFFFF;--ink:#17201E;--soft:#55625F}
+:root[data-theme="dark"]{--bg:#0F1513;--surface:#171F1D;--ink:#E4EBE8;--soft:#9AA9A5}
+*{box-sizing:border-box}
+body{margin:0;padding:12px;background:var(--bg);color:var(--ink);font:14px/1.35 system-ui,"Roboto",sans-serif}
+#out{display:grid;grid-template-columns:repeat(var(--c,1),minmax(0,1fr));gap:8px}
+.ex{background:var(--surface);border-radius:14px;padding:8px}
+.ex h2{font-size:14px;margin:0 0 4px}.ex h2 small{color:var(--soft);font-weight:400}
+.row{display:grid;gap:6px}
+canvas{width:100%;aspect-ratio:180/112;display:block}
+#out.minis{--c:3}.minis .ex{padding:5px}.minis .ex h2{font-size:12px;font-weight:500;margin:4px 0 0}
+</style>
+</head>
+<body>
+<div id="out"></div>
+<script src="figura.js"></script>
+<script>{const T=new URL(new URLSearchParams(location.search).get("three")||"three/",location.href).href;
+const s=document.createElement("script");s.type="importmap";s.textContent=JSON.stringify({imports:{three:T+"build/three.module.min.js","three/addons/":T+"examples/jsm/"}});document.currentScript.after(s);}</script>
+<script type="module">
+import {crear} from './figura3d.js';
+const q=new URLSearchParams(location.search);
+if(q.get("theme"))document.documentElement.dataset.theme=q.get("theme");
+const out=document.getElementById("out");if(q.get("c"))out.style.setProperty("--c",q.get("c"));
+async function load(urls){for(const u of urls){try{const r=await fetch(u);if(r.ok)return r.json();}catch(e){}}throw new Error("sin datos");}
+const D=await load([q.get("data")||"../../../app/src/main/assets/rutina.json","rutina.json"]);
+const g=q.get("g")||"m",f3=await crear({modelo:"modelos/persona_"+g+".glb",gender:g});
+f3.scene.traverse(o=>{if(!o.isMesh)return;const d=o.morphTargetDictionary;
+  (q.get("morph")||"").split(",").filter(Boolean).forEach(kv=>{const [k,v]=kv.split(":");if(d&&d[k]!==undefined)o.morphTargetInfluences[d[k]]=+v;});
+  [].concat(o.material).forEach(m=>{if(m.name==="piel"&&q.get("piel"))m.color.set(q.get("piel"));if(m.name==="pelo"&&q.get("pelo"))m.color.set(q.get("pelo"));});});
+const keys=(q.get("ex")||Object.keys(D.exercises).join(",")).split(",").filter(k=>D.exercises[k]);
+const dark=document.documentElement.dataset.theme==="dark",big=q.get("size")!=="mini";
+if(!big)out.className="minis";
+const jobs=[];
+keys.forEach(k=>{const ex=D.exercises[k],box=document.createElement("div");box.className="ex";
+  const h=document.createElement("h2");h.innerHTML=ex.name+(big?" <small>"+k+"</small>":"");
+  if(big){box.append(h);const row=document.createElement("div");row.className="row";box.append(row);
+    ex.phases.forEach((ph,i)=>{const c=document.createElement("canvas");row.append(c);
+      jobs.push(()=>f3.draw(c,ex,Figura.phaseT(ex,i)-(q.has("mid")?ph.move/2:0),true,{key:k,labels:true,text:D.marks,pt:.26,dark}));});}
+  else{const c=document.createElement("canvas");box.append(c,h);jobs.push(()=>f3.draw(c,ex,Figura.keyT(ex),true,{key:k,dark}));}
+  out.append(box);});
+await new Promise(r=>requestAnimationFrame(r));
+for(const j of jobs)j();
+window.f3=f3;window.D=D;window.__done=true;
+</script>
+</body>
+</html>
