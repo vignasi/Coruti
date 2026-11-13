@@ -51,8 +51,8 @@ añade estos cuatro (nombre exacto):
 Las claves solo están ahí: ni en el APK ni en el repositorio.
 
 ### 4. Conectar desde la app
-1. Instala el APK de la rama y entra con tu cuenta (Historial → Cuenta).
-2. Historial → **Conexiones** → Strava → **Conectar**. Se abre Strava; deja marcado «Subir actividades» y acepta.
+1. Instala el APK de la rama y entra con tu cuenta (Tú → Entrar).
+2. Tú → **Conexiones** → Strava → **Conectar con Strava**. Se abre Strava; deja marcado «Subir actividades» y acepta.
    Vuelves a la app con «Strava conectado».
 3. Lo mismo con **Polar**. La primera vez que alguien conecta Polar, el servidor crea solo el aviso de Polar.
 
@@ -65,7 +65,7 @@ Hazlo **después** del paso 4 para no perder nada.
   - **Si deja:** deja solo carrera, trail, caminata y senderismo (y bici o natación, si haces). Quita fuerza,
     circuito, core, funcional, movilidad y el resto.
   - **Si no deja:** desconecta Strava en Polar Flow y en la app marca **«Reenviar también carreras y paseos»**
-    (Historial → Conexiones). Entonces el servidor sube también las carreras, con el archivo del reloj tal cual.
+    (Tú → Conexiones → Strava). Entonces el servidor sube también las carreras, con el archivo del reloj tal cual.
 - Polar Flow sigue recibiéndolo todo del reloj en los dos casos.
 
 ### 6. En el reloj
