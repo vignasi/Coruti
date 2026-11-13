@@ -75,6 +75,12 @@
      1,
      2
     ]
+   },
+   {
+    "quieto": {
+     "parte": "tobillo",
+     "cm": 5
+    }
    }
   ],
   "no_medible": []
@@ -140,6 +146,15 @@
      "tol": 12
     },
     "fase": 0
+   },
+   {
+    "separados": {
+     "partes": [
+      "pie_izq",
+      "pie_der"
+     ],
+     "cm": 5
+    }
    }
   ],
   "no_medible": []
@@ -1085,7 +1100,7 @@
   ],
   "no_medible": [
    "Pisa el centro de una toalla: el material no se comprueba",
-   "Codos pegados al cuerpo: es la distancia del codo al costado, que no se mide"
+   "pegados al cuerpo: es la distancia del codo al costado, que no se mide"
   ]
  },
  "ext_db": {
@@ -2267,7 +2282,6 @@
    }
   ],
   "no_medible": [
-   "si es corta, pisa con un pie y tira a un brazo: es otra variante",
    "pegados al cuerpo: es la distancia del codo al costado, que no se mide"
   ]
  }
