@@ -6,7 +6,7 @@ import org.json.JSONObject
 import java.util.TimeZone
 
 /**
- * Apunta la sesión hecha desde el widget con la misma forma que recStart/recClose/recSave en index.html:
+ * Apunta la sesión hecha desde el widget con la misma forma que recStart/recClose/recSave en assets/app/app.js:
  * cada serie con su hora de inicio y fin, lo hecho si se saltó, los kilos y la banda.
  */
 class SessionRecorder(private val type: String, private val title: String, private val day: String, private val rounds: Int) {

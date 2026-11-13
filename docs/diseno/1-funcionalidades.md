@@ -1,7 +1,7 @@
 # Rediseño · 1. Funcionalidades
 
 Qué tiene que hacer Rutina core y qué necesitas en cada momento. **No describe el diseño actual**: es la base
-para diseñar las pantallas desde cero (Fase 1c del ROADMAP). Si algo falta o sobra, se corrige aquí antes de dibujar nada.
+para diseñar las pantallas desde cero (paso D2 del ROADMAP; el diseño está en `2-sistema-de-diseno.md` y `prototipo/`). Si algo falta o sobra, se corrige aquí antes de dibujar nada.
 
 ## Para quién y en qué situación
 
@@ -28,10 +28,13 @@ para diseñar las pantallas desde cero (Fase 1c del ROADMAP). Si algo falta o so
 1. **Qué hago ahora: el movimiento es lo principal de la pantalla.** Se ve a una **persona** haciendo el ejercicio
    (no un muñeco de palitos), en bucle, con el paso actual («Sube las manos a los hombros; los codos no se mueven»)
    y el nombre del ejercicio. Tiene que entenderse a 1–2 m.
-2. **Cuánto falta:** tiempo de la serie (lo más grande de la pantalla), repetición actual de cuántas,
-   ronda o serie de cuántas, barra de progreso.
+2. **Cuánto:** las repeticiones o los segundos, en grande debajo de la figura. Las repeticiones no tienen tiempo fijo:
+   la app marca el ritmo como guía pero **no pasa al siguiente hasta que tocas la pantalla** (cada uno tarda lo suyo y a veces
+   hay que parar 2 s). Los segundos y descansos sí cuentan atrás y pasan solos. Progreso en rayas: un paquete por ronda,
+   una raya por ejercicio y una para el descanso.
 3. **Lo que viene:** «Prepárate» antes de cada ejercicio con su nombre; siguiente ejercicio y tiempo total que queda.
-4. **Controles:** pausa / seguir, saltar, parar. Grandes y difíciles de tocar sin querer.
+4. **Controles:** toda la pantalla es «hecho, siguiente»; deslizar a la derecha vuelve al anterior. Un botón pequeño de pausa
+   con Seguir, Ejercicio anterior y Parar (con confirmación). Sin botones de parar ni saltar a la vista.
 5. **Ajustes en marcha** (solo si el ejercicio los usa): kilos usados (± medio kilo) y qué banda llevas.
    Se recuerdan para la próxima vez.
 6. Sonido: tono agudo al subir, grave al bajar, cuenta en voz alta opcional, «mitad» y pitidos finales.
@@ -66,57 +69,91 @@ de una sesión o hacer solos.
 2. **Mis bandas grandes:** nombres (color o dureza).
 3. Sonido: contar en voz alta. Volumen: menos volumen en cada ronda (opcional).
 4. **Copia de seguridad:** exportar e importar.
-5. Qué hace el widget: rutina completa o una favorita (★).
+5. Qué hace el widget: sesión de hoy, rutina completa o una favorita (★).
+6. Figura: hombre o mujer (ver M).
 
 ### G. Widget en la pantalla de inicio
-1. Empezar sin abrir la app lo elegido (rutina o favorita), y cambiar entre las dos.
-2. Durante la sesión: ejercicio, dibujo, tiempo, repetición, ronda; pausa, saltar, parar.
+1. Empezar sin abrir la app lo elegido (sesión de hoy, favorita o rutina de core), y cambiar entre ellas.
+2. Durante la sesión: figura del ejercicio, nombre, cantidad, ronda, siguiente, pulso; Pausa y Hecho (como tocar la pantalla en la app).
 3. Antes de empezar: rondas (− / +) y, en la rutina, módulos, A/B e intensidad.
-4. Widget pequeño: empezar / pausa y lo mínimo (ejercicio, tiempo).
+4. Widget pequeño: figura, empezar o hecho y lo mínimo (ejercicio, cantidad).
 
 ## También entra en el diseño (aunque se construya más tarde)
 El diseño se hace una vez y completo. Estas pantallas y piezas tienen que existir ya en el prototipo:
 
-### H. Claude como entrenador (conector propio)
-1. En **Entrenar**: «Hoy» con la sesión del día, venga del plan de Claude, de un plan por objetivo o de una favorita.
-2. **Plan de la semana** (calendario): qué toca cada día (fuerza de cuerpo entero, descanso, carrera…), quién lo creó
-   (Claude, un plan por objetivo o tú) y si está hecho.
-3. Sesiones creadas por Claude: listas para empezar con un toque; se ve de dónde vienen y cuándo se cambiaron.
-4. En **Ajustes → Conexiones**: Claude conectado o no, y cómo conectarlo (instrucciones cortas).
+### H. Claude como entrenador (conector propio, B2)
+1. **Conectar:** en Tú → Conexiones → Claude, el estado (conectado o no, cuándo leyó por última vez) y tres pasos cortos:
+   añadir conector personalizado en Claude, pegar la dirección (botón Copiar) y entrar con el email de la cuenta.
+   Avisa de que hace falta un plan de Claude con conectores personalizados y de que sin él la app funciona igual (planes por objetivo).
+2. **Qué ve Claude:** perfil y objetivo, peso y medidas, historial con series, kilos, bandas, pulso y «fácil / justo / demasiado»,
+   favoritas, plan actual y el catálogo con el material que tienes.
+3. **Qué hace Claude:** crear o cambiar sesiones (ejercicios, reps, rondas, descanso, bandas), el plan de la semana, favoritas,
+   y apuntar peso o medidas.
+4. **En la app:** «Hoy» con la sesión de Claude lista para empezar con un toque; en la sesión, el origen («Plan de Claude»),
+   cuándo la cambió y su **nota** («Hoy subo 2 reps el remo: el lunes lo marcaste como fácil»).
+5. Desconectar en una hoja con confirmación. Lo que Claude cambia llega en la siguiente sincronización.
 
-### I. Planes por objetivo (sin Claude)
-Elegir objetivo (fuerza, músculo, cardio, movilidad), semanas y días; el plan se va adaptando con el historial y el
-«fácil / justo / demasiado». Cada vez que repites, una sesión distinta.
+### I. Planes por objetivo (P2, sin Claude)
+1. Elegir objetivo (fuerza, músculo, cardio, movilidad), semanas (4, 6 u 8) y qué días; con el material que tienes.
+2. La app prepara cada sesión y la ajusta con el historial y el «fácil / justo / demasiado». **Cada vez que repites, una sesión distinta.**
+3. Sustituye al de Claude si lo hay (se puede volver). Origen visible en cada sesión: Plan de Claude · Plan por objetivo · Hecha por ti · Favorita.
 
-### J. Perfil y cuentas
-1. Entrar con email (enlace mágico) o seguir sin cuenta, solo en el móvil.
-2. Perfil: nombre, objetivo, peso y medidas (a mano, archivo de la báscula o desde Claude) con su gráfica.
-3. Varias personas (tú, tu mujer…), cada una con sus datos.
+### I2. Calendario (plan de la semana)
+1. En Entrenar, tira de la semana: hecho, hoy, pendiente, descanso y carrera (con su icono).
+2. Pantalla «Plan de la semana»: cada día con su sesión, quién la creó y si está hecha. Las carreras dicen que se graban con el reloj
+   y llegan desde Strava.
+3. Tocar un día: hacerla hoy, cambiarla por una favorita o dejarlo de descanso. Un día pasado abre su sesión del historial.
 
-### K. Strava y Polar
-1. En cada sesión del historial: subida a Strava (hecha, pendiente, error, duplicado) y botón «Enviar a Strava».
-2. En Ajustes → Conexiones: Strava y Polar conectados o no.
-3. Al terminar una sesión: esfuerzo y cómo te has sentido (se suben a Strava).
+### J. Perfil, cuentas y varias personas (B1)
+1. Entrar con email y un código de 6 cifras (decidido en B1) o seguir sin cuenta, solo en el móvil. Salir deja los datos en el móvil.
+2. Perfil: nombre y objetivo en palabras («ganar fuerza sin dolor de espalda»).
+3. **Varias personas** (tú, tu mujer…), cada una con su cuenta y solo sus datos: historial, favoritas, bandas, plan, peso y figura.
+   En el mismo móvil se cambia de persona desde Tú (hoja «¿Quién entrena?»); si queda algo de la anterior sin subir, no deja cambiar.
+4. Copia de seguridad: en la nube con la cuenta; y a un archivo (exportar e importar, combina sin duplicar).
 
-### L. Pulso
-1. Pulso grande y zona en el reproductor cuando el reloj está conectado; estado de la conexión discreto.
-2. Pulso medio y máximo por ejercicio en el historial. Pantalla «Probar pulso».
+### J2. Peso y medidas (P3)
+1. Peso y cintura (y otras medidas opcionales) con fecha y origen: a mano, archivo de la báscula o desde Claude.
+2. Gráfica en Tú (pequeña) y pantalla propia con la gráfica grande, la tabla y «Apuntar».
+3. Sin juicios en los textos: se muestra el cambio («−1,2 kg en 8 semanas»), no si está bien o mal.
 
-### M. Figura del ejercicio
-Estilo a elegir en Ajustes: muñeco de palos, muñeco redondeado o persona; hombre o mujer.
-Etiquetas de zona («BÍCEPS», «APRIETA EL CULO», «BANDA») solo en la vista grande.
+### K. Strava y Polar (S1)
+1. En cada sesión del historial, estado de Strava con texto e icono: En Strava · Pendiente · No se pudo subir · Ya estaba en Strava · De Strava.
+   Botón «Enviar a Strava» en las no subidas; el detalle de un error dice qué pasó y qué hacer (Reintentar, Subirla igualmente).
+2. En Tú → Conexiones: Strava (subir al terminar, traer carreras) y Polar (cuenta de Polar Flow, para el archivo con el pulso).
+3. Al terminar una sesión: esfuerzo (1–10) y cómo te has sentido; van a Strava con los ejercicios, series, kilos y pulso.
+4. Recordatorio del reloj: guardar la grabación como «Entrenamiento en circuito».
+
+### L. Pulso (P1)
+1. En el reproductor, arriba y pequeño: pulso y zona (Z1–Z5); «Sin señal» en gris si se corta (sin alarmas).
+2. Pulso medio y máximo por sesión y por ejercicio en el historial.
+3. Pantalla «Probar pulso» con los pasos para que el reloj emita (Compartir FC → visible para todos) y un interruptor para usarlo o no.
+
+### M. Figura del ejercicio (D1, cerrado)
+1. **Figura 3D** (modelos propios de MakeHuman, CC0), la misma en toda la app: miniatura quieta en la postura clave (cuadrícula y listas),
+   movimiento en bucle en la ficha y a toda pantalla en el reproductor.
+2. **Hombre o mujer**, a elegir en Tú → Figura; cada persona de la cuenta tiene la suya. Vista previa en grande.
+3. Etiquetas solo en grande: punto ámbar en la zona que trabaja, flecha del movimiento, «AQUÍ ESTIRA», «BANDA».
+4. Si el móvil no tiene WebGL, sale la figura dibujada (`figura.js`), que es el respaldo.
+5. **Personalización (más adelante):** complexión y músculo (deformaciones que ya lleva el modelo), color de piel, pelo y camiseta.
+   Opcional, con textos neutros («complexión», nunca «gordito») y sin ligarla al peso real salvo que se pida.
+   El widget necesitaría rehacer sus imágenes en el móvil al cambiarla. En el prototipo ya funciona (pantalla «Personalizar»).
+
+### G2. Widget con la figura
+El widget no puede mostrar 3D: usa imágenes WebP hechas antes, una por fase (71 por sexo, claro y oscuro), y las alterna.
+Fondo: ver `2-sistema-de-diseno.md` → Widget (el fondo de hoy es del color de la camiseta).
 
 ### Más adelante (dejar sitio, sin pantalla propia todavía)
-Modos de cardio EMOM, Tabata y AMRAP; coach por voz; carreras traídas de Strava en el historial.
+Modos de cardio EMOM, Tabata y AMRAP; coach por voz; carreras traídas de Strava en el historial (ya salen como ejemplo).
 
 ## Decisiones tomadas
-- **Personas, no muñecos:** figura humana dibujada con volumen (cuerpo, ropa de deporte, cara sin detalles),
-  animada por la propia app. Sin conexión, mismo estilo en todos los ejercicios y sin coste. Se valida el estilo
-  con unos pocos ejercicios antes de hacer el resto.
+- **Figura 3D, hombre y mujer** (D1, noviembre de 2026), en vez de la dibujada; la dibujada queda como respaldo.
+  Sin conexión, igual en todos los ejercicios y sin coste. Pesa unos 5–6 MB en la APK (three.js, dos modelos e imágenes del widget).
 - Material real: bandas grandes, mini banda, rodillo de espuma; mancuernas más adelante; sin correas TRX.
+- Reproductor: tocar la pantalla = hecho; deslizar a la derecha = anterior; pausa con Seguir, Anterior y Parar (confirmado).
+- Entrar con código de 6 cifras por email (B1).
 
 ## Requisitos que el diseño tiene que respetar
-- Funciona sin conexión; todo va dentro del APK.
+- Funciona sin conexión; todo va dentro del APK (también la figura 3D). Con cuenta, se sincroniza al volver la conexión.
 - Modo claro y oscuro (sigue al móvil).
 - Todo lo tocable de al menos 48 dp; durante la sesión, más grande.
 - Lo importante en la sesión, legible a 1–2 m; el resto, sin texto de ayuda permanente

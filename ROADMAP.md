@@ -92,36 +92,74 @@ B1 Cuentas y nube ────────────────────�
 Después: P1 Pulso · P2 Planes por objetivo · P3 Peso y medidas · P4 Carreras de Strava · P5 Cardio · P6 Coach por voz
 ```
 
-**Ahora mismo, a la vez:** D1, D2 y B1 (solo tocan `docs/diseno/` o el almacenamiento y el servidor, no la interfaz).
+**Ahora mismo:** tu visto bueno de D3 (D1 y D2 cerrados) y probar B1 en el móvil.
 **Después, a la vez:** C1, B2 y S1.
 
 ### Bloque D · Diseño (antes de construir nada de interfaz)
 
-#### D1 · Figura del ejercicio (sesión muy fina) — en paralelo con D2
+#### D1 · Figura del ejercicio (sesión muy fina) ✅ cerrado: figura 3D, hombre y mujer (se elige en Ajustes)
 - [x] Prueba de persona con volumen, hombre o mujer, y etiquetas de zona solo en grande (`docs/diseno/figura/`)
-- [ ] **Tres estilos a elegir en Ajustes:** muñeco de palos (el de ahora, mejorado), muñeco redondeado y persona
-- [ ] Persona: sin juntas visibles, **pies y zapatillas bien orientados** (en el puente están girados al revés), cara, manos;
-  bien de pie, tumbado y de lado; bien en miniatura y en grande
-- [ ] Todos los ejercicios de `rutina.json` revisados con capturas, en los tres estilos y en hombre y mujer
-- [ ] Investigar (solo investigar y decidir contigo): imágenes o vídeos generados con un servicio externo de IA,
-  uno de ida y otro de vuelta por ejercicio. Coste, peso en la APK y si la persona se mantiene igual en todos.
-  Claude no genera imágenes ni vídeo por sí mismo
-- [ ] Hecho cuando: eliges estilo viendo todos los ejercicios en el móvil y no queda ningún fallo visible
+- [x] **Tres estilos a elegir:** muñeco de palos (el de ahora, mejorado: pies, manos, cuello, lo de detrás en gris),
+  muñeco redondeado y persona; los tres sobre la misma geometría (`figura.js`). Página para elegir: `docs/diseno/figura/index.html`
+- [x] Persona: sin juntas visibles, **pies y zapatillas bien orientados** (apoyados en el suelo o la silla, de puntillas en plancha,
+  sobre el empeine en gato y psoas), cara (también de frente), manos planas al apoyarse o cerradas al sujetar;
+  bien de pie, tumbado y de lado (vista de frente en paso lateral, ángel, plancha lateral y almeja); bien en miniatura y en grande
+- [x] Todos los ejercicios de `rutina.json` (34) revisados con capturas a ancho de móvil, en los tres estilos, hombre y mujer,
+  claro y oscuro, en las posturas y a mitad de movimiento (`galeria.html`). Lo que hay que pasar a `rutina.json` en C1, en `NOTAS.md`
+- [x] Investigado (sin decidir): imágenes o vídeos generados con un servicio externo de IA. Coste, peso en la APK
+  y si la persona se mantiene igual: resumen y opciones A/B/C en `docs/diseno/figura/NOTAS.md`
+- [x] Prueba de figura 3D con las mismas posturas (`docs/diseno/figura/3d.html`, opción D de `NOTAS.md`)
+- [x] Modelos 3D propios, hombre y mujer (MakeHuman, CC0), con ropa de deporte, pelo y deformaciones para personalizar
+  más adelante (complexión y músculo; piel, ropa y pelo como colores aparte): `docs/diseno/figura/modelos/`
+- [x] Figura 3D completa (`figura3d.js`): material (bandas grandes en bucle, mini banda en los muslos, mancuernas, toalla, correas,
+  sillas, sofá y pared), manos cerradas al sujetar, antebrazos apoyados en plancha, fondos con la cadera por debajo del asiento
+  y etiquetas de zona solo en grande, como en la dibujada. «Remo a una mano» corregido (salía boca arriba y con los pies al revés,
+  también en la dibujada). three.js incluido en `three/`
+- [x] Bordes de la ropa y del pelo pulidos (`modelos/pulir_ropa.py`, lo usa `crear_modelos.py`); modelos regenerados
+- [x] Página para elegir en el móvil: figura dibujada, 3D o las dos, hombre o mujer, con todos los ejercicios (`elegir.html`, publicada)
+- [x] Los 34 ejercicios revisados en 3D con capturas a ancho de móvil: hombre y mujer, en grande (final y mitad de cada movimiento),
+  en miniatura, claro y oscuro (`3d.html`)
+- [x] **Tú:** elegida en el móvil la **figura 3D (opción D), con hombre y mujer** para que cada persona elija
+- [x] `crear_modelos.py` ejecutado entero desde cero con MakeHuman/MPFB2: los modelos salen iguales en el cuerpo y mejor en la cabeza
+  (oreja entera de piel, pelo alrededor en curva, nuca recta) y sin dientes en el tirante de ella ni en el cuello de la camiseta de él
+- [x] Imágenes de la figura 3D hechas antes para el widget, que no puede mostrar 3D: una por fase (71 por sexo), claro y oscuro,
+  WebP de 400 px con fondo transparente, ~6 KB cada una, 1,7 MB todas (`widget/`, cómo se hacen en `NOTAS.md`)
+- [x] Los 34 ejercicios revisados otra vez con capturas a 412 px, hombre y mujer, con los modelos nuevos
+- Para D2 y C1/C2 (en `NOTAS.md`): el fondo actual del widget (`#1E6B74`) es el color de la camiseta y ella se pierde;
+  lo que hay que pasar a `rutina.json`; peso de la figura 3D en la APK (5,3–6,1 MB: three.js, dos modelos e imágenes)
 
-#### D2 · Producto completo, sistema de diseño y prototipo — en paralelo con D1
+#### D2 · Producto completo, sistema de diseño y prototipo ✅
 - [x] Lista de funcionalidades (`docs/diseno/1-funcionalidades.md`)
-- [ ] Ampliar la lista con todo lo de este plan (Claude, planes, calendario, Strava, pulso, peso, usuarios, estilo de figura)
-- [ ] Sistema de diseño: pocos tamaños de letra, colores de la marca (`#1E6B74`, `#F0B04A`, `#EDF1F0` y oscuro),
-  espacios, componentes; también para el widget
-- [ ] Prototipo navegable desde cero de **todas** las pantallas, también las de lo que viene: Entrenar (hoy, plan de la semana,
-  favoritas), Ejercicios (cuadrícula de miniaturas → ficha con el movimiento), reproductor a pantalla completa, final de sesión,
-  Historial (con estado de Strava y pulso), Perfil (cuenta, peso y medidas, objetivo), Ajustes (material, bandas, voz, estilo
-  y sexo de la figura, conexiones: Claude, Strava, Polar), widget grande y pequeño. La figura va en un hueco fijo hasta que D1 termine
-- [ ] Publicado para abrirlo en el móvil
+- [x] Ampliada con todo lo del plan: Claude (qué ve y qué hace), planes por objetivo, calendario de la semana, Strava y Polar,
+  pulso, peso y medidas, varias personas, figura 3D hombre o mujer y su personalización más adelante
+- [x] Sistema de diseño (`docs/diseno/2-sistema-de-diseno.md`): 4 tamaños de letra más uno solo para el reproductor,
+  colores de la marca (`#1E6B74`, `#F0B04A`, `#EDF1F0`) y oscuro, espacios, componentes y widget
+- [x] Prototipo navegable de todas las pantallas (`docs/diseno/prototipo/`) con la **figura 3D real** de D1: miniaturas en la
+  cuadrícula y las listas, movimiento con etiquetas en la ficha, a toda pantalla en el reproductor (en los de pie se recortan los lados),
+  el siguiente durante el descanso, hombre o mujer en Tú → Figura y una prueba de personalización (complexión, músculo, piel, pelo, camiseta)
+- [x] Widget grande y pequeño con las imágenes WebP de D1 (alternan las fases)
+- [x] **Fondo del widget:** el de hoy (`#1E6B74`) es el color de la camiseta. Pantalla «Fondo: dos opciones» con las imágenes reales:
+  A, fondo de la app claro u oscuro (propuesta); B, fondo de hoy y camiseta coral (imágenes de prueba en `prototipo/widget-ropa-coral/`)
+- [x] Publicado para abrirlo en el móvil: https://claude.ai/artifact/SozxjV2P1cQ8F2uUFU8rpL (privado; la copia publicada lleva los modelos
+  como glTF en JSON y solo las imágenes del widget que usa)
+- Partió del D2 que no se había fusionado (rama `claude/vigilant-lovelace-hb4acy`): su revisión de validación (`3-validacion.md`)
+  se hizo con la figura en un hueco y se rehace en D3. Esta rama incluye D1 (`claude/rutina-core-3d-models-vd7k7j`), que tampoco está en `main`
+- [x] **Tú:** elegido el fondo del widget: **A, el de la app (claro u oscuro)**
 
-#### D3 · Validación
-- [ ] Revisión con las skills de diseño (crítica heurística, accesibilidad, textos) y corrección hasta no tener fallos graves
-- [ ] Tu visto bueno en el móvil. Hecho cuando: das el diseño por cerrado
+#### D3 · Validación ✅ revisión hecha (falta tu visto bueno) — rama `claude/coruti-validacion-d3-h51513`, parte de D2
+- [x] Revisión con las skills de diseño (crítica heurística, accesibilidad WCAG 2.2 AA en claro y oscuro, textos) y corrección
+  hasta no tener fallos graves: `docs/diseno/3-validacion.md`. axe: 0 fallos en 43 pantallas y estados, en los dos temas
+- [x] Reproductor a 1–2 m: cantidad más grande (`p2` 72–120 sp, se lee a 2 m) y **fondo distinto en descanso y «Prepárate»**
+  (antes no se distinguían de lejos). El nombre no se lee desde el suelo: para C1, que la voz lo diga
+- [x] Figura de pie en el reproductor: el recorte fijo **cortaba la etiqueta de la zona** («JUNTA ESCÁPULAS», «GLÚTEO DE LADO»).
+  Ahora el encuadre se mide por ejercicio: nada cortado (comprobado con la 3D) y la persona hasta ×1,55 más grande
+- [x] Rendimiento: aquí no hay GPU (todo va lento, también D2), así que se añadió **«Rendimiento en este móvil»** al prototipo
+  para medirlo en el tuyo. Las miniaturas se dibujan una a una sin bloquear y se guardan
+- [x] Widget con el fondo A: hombre y mujer se ven en claro y oscuro; para C2, la persona de pie sale pequeña (recortar la imagen)
+- [x] Prototipo republicado en el mismo enlace. **Ojo:** la copia publicada de D2 enseñaba la figura dibujada, no la 3D (fallo de ruta,
+  arreglado): esta es la primera vez que la 3D se ve en el enlace
+- [ ] **Tú:** visto bueno en el móvil (lista en `3-validacion.md` → «Lo que falta»), con las cifras de «Rendimiento».
+  Hecho cuando: das el diseño por cerrado
 
 ### Bloque B · Base técnica
 
@@ -164,10 +202,29 @@ Después: P1 Pulso · P2 Planes por objetivo · P3 Peso y medidas · P4 Carreras
 
 ### Bloque C · La app nueva
 
-#### C1 · Construir la app a partir del diseño validado — después de D3 y B1
-- [ ] Por entregas, con APK en cada una: navegación y Entrenar; reproductor y figura; Ejercicios y ficha; Historial; Perfil y Ajustes
-- [ ] Sin perder nada: historial, copias, favoritas, bandas, pesos, racha, rutina de core, favorita en el widget
-- [ ] Hecho cuando: hace todo lo de antes con el diseño nuevo y te parece bien en el móvil
+#### C1 · Construir la app a partir del diseño validado — después de D3 y B1 (en la rama `claude/coruti-c1-app-android-2vhnk1`; falta probar en el móvil)
+- [x] Entrega 1 · navegación (Entrenar · Ejercicios · Historial · Tú) y Entrenar: Hoy (la sesión del widget: favorita con ★ o rutina de core),
+  semana con los días hechos, favoritas (también la rutina de core si la marcas), sesión nueva, elegir ejercicios y rutina de core
+- [x] Entrega 2 · reproductor a pantalla completa y figura 3D dentro del APK (three.js y modelos, copiados de `docs/diseno/figura`
+  al compilar; la dibujada si no hay WebGL): encuadre por ejercicio, fondo `accion-suave` en descanso y «Prepárate», la voz dice
+  el nombre al empezar cada serie, densidad del lienzo como máximo 2, repeticiones que esperan al toque, deslizar para volver,
+  pausa con Seguir · Anterior · Parar (guarda como incompleta), banda y kilos en marcha, y el final con «¿Cómo te ha ido?»
+- [x] Entrega 3 · Ejercicios (cuadrícula con filtros) y ficha (movimiento, claves, dosis, tus marcas, YouTube, añadir a una sesión)
+- [x] Entrega 4 · Historial por días, detalle con cada serie (hora, reps o segundos, kilos, banda) y por ejercicio
+- [x] Entrega 5 · Tú: cuenta (entrar con el código de B1, sincronizar, salir), material, mis bandas, sonido, figura hombre o mujer,
+  widget y copia de seguridad (exportar e importar)
+- [x] `rutina.json` con lo pendiente de `figura/NOTAS.md`: vista de frente, puntillas, sin correas TRX, rodillas de `remo_db`
+- [x] Sin perder nada: mismas claves de datos (historial, copias, favoritas, bandas, pesos, racha, configuración, favorita del widget);
+  la lógica del plan y de los sueltos es la de antes (`assets/app/motor.js` = `Plan.kt` y `Free.kt`)
+- [x] Comprobado en Chromium a 360 × 740: claro y oscuro, letra al 100, 130 y 200 % (las pestañas y el reproductor crecen como mucho
+  un 30 % para que la figura siga cabiendo) y axe-core WCAG 2.2 AA: 19 pantallas × 2 temas × 2 tamaños, 0 fallos
+- Decidido: lo que aún no existe (Claude, planes por objetivo, Strava, pulso, peso, varias personas) no sale en la app hasta que exista.
+  El rodillo tampoco: no hay ejercicios de rodillo en `rutina.json`. «Menos volumen en cada ronda» está en la rutina de core
+  («Menos repeticiones en cada ronda»), porque es volumen de entrenamiento, no de sonido. «Prepárate» dura lo de siempre (8 s) y va
+  antes de cada ejercicio, igual que en el widget
+- [ ] **Tú:** probar con TalkBack en el móvil (aquí solo se ha comprobado el árbol de accesibilidad y axe, no TalkBack de verdad)
+  y medir la fluidez del reproductor 3D en tu móvil
+- [ ] **Tú:** Hecho cuando: hace todo lo de antes con el diseño nuevo y te parece bien en el móvil
 
 #### C2 · Widget con el diseño nuevo — después de C1
 - [ ] Mismo sistema de diseño; muestra la sesión de hoy (también la del plan de Claude) o la favorita elegida

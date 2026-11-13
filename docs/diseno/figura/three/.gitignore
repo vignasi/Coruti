@@ -1,0 +1,2 @@
+# El .gitignore de la raíz ignora todas las carpetas build/; esta es three.js, no un resultado de compilar
+!build/
