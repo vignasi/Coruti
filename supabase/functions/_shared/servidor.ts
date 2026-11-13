@@ -188,9 +188,13 @@ async function subirSesion(uid: string, s: FilaSesion): Promise<void> {
   };
   let polar: PolarExercise | null = null;
   if (s.polar_exercise_id && await conexion(uid, "polar")) {
-    const r = await polarGet(uid, `/exercises/${s.polar_exercise_id}?samples=true`);
-    if (r.ok) polar = await r.json();
-    else if (r.status !== 404) throw new Error(`Polar no dio el pulso (${r.status})`);
+    try {
+      const r = await polarGet(uid, `/exercises/${s.polar_exercise_id}?samples=true`);
+      if (r.ok) polar = await r.json();
+      else if (r.status !== 404) throw new Error(`Polar no dio el pulso (${r.status})`);
+    } catch (e) {
+      if (!(e instanceof SinPermiso)) throw e;  // sin permiso de Polar: se sube igual, sin pulso
+    }
   }
   const datos = jsonFuerza(ses, polar);
   if (!(datos.sets as unknown[]).length) {
@@ -297,7 +301,14 @@ export async function procesar(uid: string, forzar?: string): Promise<void> {
       } else if (Date.parse(p.started_at) < Date.parse(desde)) {
         await db.from("polar_exercises").update({ status: "kept", next_at: "infinity" }).eq("user_id", uid).eq("id", p.id);
       } else {
-        await reenviarPolar(uid, p);
+        try {
+          await reenviarPolar(uid, p);
+        } catch (e) {
+          const n = p.attempts + 1, sig = e instanceof SinPermiso ? null : siguienteIntento(n, Date.now());
+          await db.from("polar_exercises").update({
+            status: "error", attempts: n, error: (e as Error).message, next_at: sig ? new Date(sig).toISOString() : "infinity",
+          }).eq("user_id", uid).eq("id", p.id);
+        }
       }
     }
   }
