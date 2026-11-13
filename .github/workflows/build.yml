@@ -1,13 +1,14 @@
 name: Compilar APK
 
-# Solo compila cuando cambia algo que va dentro del APK (la app, la figura o la configuración de Gradle).
-# Cambios de documentación (ROADMAP, CLAUDE.md, docs/*.md), del servidor (supabase/) o de este archivo no compilan nada.
-# Para compilar a mano: Actions → Compilar APK → Run workflow.
-# En main: compila y publica el APK en Releases (con el repo privado, solo lo descarga quien tenga acceso).
-# En las ramas de trabajo (claude/…): compila, pasa las pruebas y deja el APK como artefacto del run para probarlo antes de fusionar.
+# Gastar Actions solo cuando hace falta un APK para instalarlo en el móvil:
+# · main: al fusionar, si cambia algo que va dentro del APK (la app, la figura o Gradle), compila y lo publica en Releases.
+#   Documentación (ROADMAP, CLAUDE.md, docs/*.md), servidor (supabase/) o este archivo: no compila nada.
+# · Ramas de trabajo (claude/…): nunca solo. Cuando el usuario necesita el APK de una rama para probarlo:
+#   Actions → Compilar APK → Run workflow → elegir la rama (queda como artefacto del run, 14 días).
+#   Claude compila y prueba en local; no usa Actions para comprobar nada.
 on:
   push:
-    branches: [main, "claude/**"]
+    branches: [main]
     paths:
       - "app/**"
       - "docs/diseno/figura/figura.js"
@@ -19,7 +20,7 @@ on:
       - "gradle.properties"
   workflow_dispatch:
 
-# Si se suben varios cambios seguidos a la misma rama, solo se compila el último
+# Si se lanza otra vez en la misma rama, solo cuenta la última
 concurrency:
   group: apk-${{ github.ref }}
   cancel-in-progress: true

@@ -177,8 +177,9 @@ Después: P1 Pulso · P2 Planes por objetivo · P3 Peso y medidas · P4 Carreras
 - [x] Salir deja los datos en el móvil. Si entra otra cuenta, lo del móvil se cambia por lo de esa cuenta,
   y no deja hacerlo si queda algo de la anterior sin subir
 - [x] La pantalla de entrar es provisional: bloque «Cuenta» en Historial; la buena llega con C1
-- [x] GitHub Actions: con el repo privado, el APK de `main` sigue en Releases (solo con acceso); las ramas `claude/…`
-  compilan, pasan las pruebas y dejan el APK como artefacto del run
+- [x] GitHub Actions: con el repo privado, el APK de `main` sigue en Releases (solo con acceso).
+  Desde el 13 nov, para no gastar: `main` solo compila si cambia algo del APK, y las ramas solo a mano
+  (Actions → Compilar APK → Run workflow) cuando hace falta el APK para probarlo en el móvil
 - Decidido: la Edge Function para secretos pasa a S1, cuando haya un secreto real (Strava) y algo que la use.
   La tabla `connection_secrets` ya está lista y la app no puede leerla
 - [x] Migración de B1 aplicada en Supabase (13 nov, desde la conversación de S1)

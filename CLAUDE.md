@@ -16,8 +16,10 @@ La usan Ignasi y su mujer, cada uno con su cuenta. Todo en **español** (código
   Strava y la compilación del APK en GitHub Actions. Compilar y pasar las pruebas antes de subir.
 - **Al acabar:** marcar lo hecho en `ROADMAP.md` (con lo que falta que haga el usuario como «**Tú:**»),
   explicar cómo probarlo e instalar el APK, y dar el prompt de la fase siguiente.
-- **Subir a GitHub una vez al final** (o cuando haga falta un APK para probar), no después de cada commit.
-  GitHub Actions solo compila si cambia algo del APK (`app/`, la figura o Gradle); la documentación y `supabase/` no compilan.
+- **Subir a GitHub una vez al final**, no después de cada commit.
+- **GitHub Actions solo cuando es imprescindible:** para que el usuario tenga un APK que instalar. Claude compila y prueba
+  en local (`gradle …`), nunca con Actions. Las ramas no compilan solas: si el usuario necesita el APK de una rama,
+  se lanza «Compilar APK» a mano en esa rama, una sola vez. En `main` compila al fusionar si cambia algo del APK.
 - Antes de empezar, mirar si `main` ha cambiado (otras fases se hacen a la vez en otras ramas) y fusionarlo si hace falta.
 - El usuario prefiere respuestas directas: la verdad incómoda primero, nivel de confianza en las afirmaciones clave,
   sin elogios de relleno.
@@ -34,7 +36,7 @@ La usan Ignasi y su mujer, cada uno con su cuenta. Todo en **español** (código
   (`docs/strava.md`). Proyecto `jlyqtxihsorqczlxvbly`.
 - `docs/supabase.md` (cuentas y nube), `docs/strava.md` (Strava y Polar), `docs/diseno/` (funcionalidades, sistema de
   diseño, validación, prototipo y figura 3D; la figura se copia al APK al compilar).
-- `.github/workflows/build.yml`: compila y prueba. En `main` publica el APK en Releases; en las ramas lo deja como artefacto.
+- `.github/workflows/build.yml`: en `main` (al fusionar cambios del APK) publica el APK en Releases; en una rama, solo a mano, lo deja como artefacto.
 
 ## Comandos
 - Compilar y probar: `gradle assembleRelease testReleaseUnitTest` (necesita el SDK de Android 34 en `local.properties`).
