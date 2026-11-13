@@ -287,13 +287,9 @@ Todo explicado en `docs/strava.md`.
 3. Commits pequeños y separados. No se rompen las rutinas, el widget ni la compilación del APK.
 4. Al acabar: este archivo actualizado, instrucciones para probar e instalar, y el prompt de la fase siguiente.
 
-Plantilla del prompt:
+Cómo se trabaja, qué es la app y dónde está cada cosa está en `CLAUDE.md`, que Claude lee solo al empezar.
+Por eso el prompt puede ser corto:
 
 ```
-Trabajamos en mi app Android «Rutina core» (repo vignasi/Coruti).
-Lee ROADMAP.md y haz la Fase N: <nombre>.
-Antes de tocar código, revisa lo necesario y hazme las preguntas que haga falta.
-Commits pequeños y separados; no rompas las rutinas, el widget ni la compilación del APK con GitHub Actions.
-Al acabar: marca lo hecho en ROADMAP.md, explícame cómo probarlo e instalar el APK,
-y dame el prompt para la fase siguiente.
+Haz <fase> del ROADMAP (p. ej. «B2: Conector de Claude»).
 ```
