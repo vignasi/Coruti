@@ -48,7 +48,7 @@
      "articulacion": "rodilla",
      "lado": "alguno",
      "entre": [
-      65,
+      55,
       115
      ]
     }
@@ -372,7 +372,7 @@
     "angulo": {
      "articulacion": "hombro",
      "entre": [
-      60,
+      40,
       110
      ]
     }
@@ -606,7 +606,8 @@
      "entre": [
       60,
       115
-     ]
+     ],
+     "lado": "alguno"
     },
     "fase": 1
    },
@@ -1461,7 +1462,8 @@
      "entre": [
       60,
       115
-     ]
+     ],
+     "lado": "alguno"
     },
     "fase": 1
    }
