@@ -1,0 +1,10 @@
+# Solo lo necesario para desplegar las Edge Functions de S1 (ver docs/strava.md).
+project_id = "jlyqtxihsorqczlxvbly"
+
+# Strava y Polar vuelven a «conexiones» sin JWT, y Polar avisa a «polar-aviso» sin JWT:
+# cada función comprueba por su cuenta quién llama (cuenta de la app, firma de Polar o clave de la tarea programada).
+[functions.conexiones]
+verify_jwt = false
+
+[functions.polar-aviso]
+verify_jwt = false
