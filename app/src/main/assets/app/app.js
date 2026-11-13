@@ -1,7 +1,7 @@
 /* Rutina core · la app (C1), construida desde el prototipo validado (docs/diseno/prototipo/, D2 y D3).
    Pantallas con cuatro pestañas (Entrenar · Ejercicios · Historial · Tú), el reproductor a pantalla completa y el final.
    La lógica de datos está en motor.js; la figura, en fig.js. Solo lo que funciona de verdad: lo que llega más adelante
-   (Claude, planes, Strava, pulso, peso) no sale hasta que exista. */
+   (Claude, planes, pulso en directo, peso) no sale hasta que exista. Strava y Polar (S1): Tú → Conexiones, historial y final. */
 'use strict';
 
 /* ---------- Iconos (trazo 2, 24×24; los del prototipo) ---------- */
@@ -28,7 +28,10 @@ const I = {
   nube: '<path d="M7 18a4.5 4.5 0 0 1-.5-9A6 6 0 0 1 18 9.5 4.3 4.3 0 0 1 17.5 18z"/>',
   cerrar: '<path d="M6 6l12 12M18 6L6 18"/>', mancuerna: '<path d="M6 8v8M9 6v12M15 6v12M18 8v8M9 12h6"/>',
   correo: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/>', salir: '<path d="M10 4H5v16h5M14 8l4 4-4 4M18 12H9"/>',
-  externo: '<path d="M14 4h6v6M20 4l-9 9M18 14v5H5V6h5"/>', papelera: '<path d="M5 7h14M10 7V4h4v3M7 7l1 13h8l1-13"/>',
+  externo: '<path d="M14 4h6v6M20 4l-9 9M18 14v5H5V6h5"/>',
+  reloj: '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
+  doble: '<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/>',
+  conexion: '<path d="M9 7V3M15 7V3M7 7h10v4a5 5 0 0 1-10 0zM12 16v5"/>', papelera: '<path d="M5 7h14M10 7V4h4v3M7 7l1 13h8l1-13"/>',
 };
 const ico = (n, cls = '') => `<svg class="${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${I[n] || ''}</svg>`;
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -72,7 +75,7 @@ function sesionHoy() { const w = widgetFav(), f = w && favs().find(x => x.name =
 /* ---------- Pantallas ---------- */
 const P = {};
 const TABS = [['entrenar', 'Entrenar'], ['ejercicios', 'Ejercicios'], ['historial', 'Historial'], ['tu', 'Tú']];
-const TAB_DE = { entrar: 'tu', material: 'tu', bandas: 'tu', sonido: 'tu', figura: 'tu', widgetconf: 'tu', copia: 'tu', core: 'entrenar', nueva: 'entrenar', elegir: 'entrenar', final: 'entrenar', ficha: 'ejercicios', detalle: 'historial', marcas: 'historial' };
+const TAB_DE = { entrar: 'tu', material: 'tu', bandas: 'tu', sonido: 'tu', figura: 'tu', widgetconf: 'tu', copia: 'tu', conexiones: 'tu', strava: 'tu', polar: 'tu', core: 'entrenar', nueva: 'entrenar', elegir: 'entrenar', final: 'entrenar', ficha: 'ejercicios', detalle: 'historial', marcas: 'historial' };
 
 P.entrenar = { render: () => {
   const st = store.stats(), hoy = sesionHoy(), dias = new Set(store.days());
@@ -216,7 +219,7 @@ P.historial = { render: () => { const h = historyList(), n = S.hver || 30;
       <span class="item-icono">${ico(o.src === 'widget' ? 'widget' : 'entrenar')}</span>
       <span class="crece"><span class="nombre">${esc(o.title || (o.type === 'sueltos' ? 'Ejercicios sueltos' : 'Rutina'))}</span>
         <span class="meta">${esc([hhmm(o.start), durTxt(o.end - o.start), plural(o.sets.length, 'serie', 'series'), o.src === 'widget' ? 'desde el widget' : ''].filter(Boolean).join(' · '))}</span>
-        ${o.complete ? '' : '<span class="estado neutro" style="align-self:flex-start;margin-top:2px">Incompleta</span>'}</span>${ico('chev', 'chev')}</button>`).join('')}</div></section>`).join('')}
+        ${chipsSesion(o)}</span>${ico('chev', 'chev')}</button>`).join('')}</div></section>`).join('')}
     ${h.length > n ? '<button class="btn btn-secundario" data-act="hmas">Ver más</button>' : ''}
   </div>`; } };
 
@@ -228,6 +231,7 @@ P.detalle = { render: () => { const o = historyList().find(x => x.id === S.det);
     <div class="pila"><h1 class="titulo-pantalla">${esc(o.title || 'Sesión')}</h1>
       <p class="meta">${hhmm(o.start)} – ${hhmm(o.end)} · ${durTxt(o.end - o.start)} · ${plural(o.sets.length, 'serie', 'series')} · ${o.type === 'sueltos' ? 'Ejercicios sueltos' : 'Rutina de core'}${o.src === 'widget' ? ' · desde el widget' : ''}</p>
       ${o.complete ? '' : '<span class="estado neutro" style="align-self:flex-start">Incompleta · no cuenta para la racha</span>'}</div>
+    ${bloqueStrava(o)}
     ${[...g.values()].map(l => `<section class="seccion"><h2>${esc(l[0].name)}</h2><div style="overflow-x:auto" tabindex="0" role="region" aria-label="Series de ${esc(l[0].name)}"><table class="tabla"><thead><tr><th>Hora</th><th>${W}</th><th class="n">Hecho</th>${kg ? '<th class="n">Kilos</th>' : ''}${bd ? '<th>Banda</th>' : ''}</tr></thead><tbody>
       ${l.map(x => `<tr><td>${hhmm(x.start)}</td><td>${x.r}${x.side ? ' · ' + esc(x.side.toLowerCase()) : ''}</td><td class="n">${esc(doseOf(x))}${x.skipped ? ' <span class="meta">(saltada)</span>' : ''}</td>${kg ? `<td class="n">${x.kg != null ? fkg(x.kg) : '–'}</td>` : ''}${bd ? `<td>${esc(x.band || '–')}</td>` : ''}</tr>`).join('')}</tbody></table></div></section>`).join('')}
     ${o.fb && Object.keys(o.fb).length ? `<section class="seccion"><h2>Cómo te fue</h2><p>${esc(Object.entries(o.fb).map(([k, v]) => { const m = D.modules.find(x => x.key === k); return (m ? m.name : k) + ': ' + FBT[v]; }).join(' · '))}</p></section>` : ''}
@@ -243,6 +247,87 @@ function nubeTxt(st) { const i = [];
   if (st.busy) i.push('Sincronizando…'); else if (st.lastSync) i.push('Sincronizado el ' + dayShort(st.lastSync) + ' a las ' + hhmm(st.lastSync));
   if (st.pending) i.push(plural(st.pending, 'sesión sin subir', 'sesiones sin subir'));
   return [st.msg, ...i].filter(Boolean).join(' · '); }
+/* ---------- Strava y Polar (S1): estados, conexiones y lo que sale en el historial y al terminar ---------- */
+const FEEL = [['mal', 'Mal'], ['regular', 'Regular'], ['bien', 'Bien'], ['muybien', 'Muy bien']];
+const STRAVA = { done: ['bien', 'check', 'En Strava'], waiting: ['aviso', 'reloj', 'Pendiente'], uploading: ['aviso', 'reloj', 'Subiendo'],
+  error: ['error', 'aviso', 'No se pudo subir'], duplicate: ['aviso', 'doble', 'Ya estaba en Strava'], no: ['neutro', 'nube', 'Sin enviar'] };
+const estado = k => { const [c, i, t] = STRAVA[k]; return `<span class="estado ${c}">${ico(i)}${esc(t)}</span>`; };
+function conn(p, st = nube()) { const c = st && st.signedIn && st.conn ? st.conn[p] : null; return c && c.status ? c : null; }
+const conectado = (p, st) => { const c = conn(p, st); return !!c && c.status === 'connected'; };
+/* El estado de Strava de una sesión: el que puso el servidor o, si aún no ha llegado, lo que va a pasar */
+function stravaDe(o, sc = conn('strava')) {
+  if (o.strava && STRAVA[o.strava.s]) return o.strava.s;
+  if (!sc || sc.status !== 'connected' || (o.src && o.src !== 'app' && o.src !== 'widget')) return null;
+  return o.st !== false && o.start >= Date.parse(sc.connected_at || 0) ? 'waiting' : 'no';
+}
+function chipsSesion(o) {
+  const k = stravaDe(o), c = [o.complete ? '' : '<span class="estado neutro">Incompleta</span>', k ? estado(k) : '', o.hr && o.hr.avg ? `<span class="estado neutro">${o.hr.avg} ppm</span>` : ''].filter(Boolean);
+  return c.length ? `<span class="fila envuelve" style="gap:var(--e2);margin-top:2px">${c.join('')}</span>` : '';
+}
+function bloqueStrava(o) {
+  const k = stravaDe(o), fe = FEEL.find(x => x[0] === o.feel), cifras = [];
+  if (o.hr && o.hr.avg) cifras.push(['Pulso medio', o.hr.avg, 'ppm']);
+  if (o.hr && o.hr.max) cifras.push(['Máximo', o.hr.max, 'ppm']);
+  if (o.rpe) cifras.push(['Esfuerzo', o.rpe, '/10']);
+  const datos = cifras.length || fe ? `<div class="fila envuelve" style="gap:var(--e5)">${cifras.map(([e, v, u]) => `<div><span class="etiqueta">${e}</span><p class="cifra">${v}<small>${u}</small></p></div>`).join('')}</div>${fe ? `<p class="meta">Te sentiste ${esc(fe[1].toLowerCase())}</p>` : ''}` : '';
+  if (!k) return datos ? `<section class="seccion">${datos}</section>` : '';
+  const id = o.strava && o.strava.id, polar = conectado('polar'), msg = (S.strMsg || {})[o.id];
+  const txt = {
+    done: o.hr ? 'Subida con la lista de ejercicios y el pulso del reloj.' : 'Subida con la lista de ejercicios.',
+    waiting: polar ? 'Se envía sola cuando llega la sesión del reloj, para subirla con el pulso. Si no llega, a las 3 horas, sin pulso.' : 'Se envía sola en unos minutos.',
+    uploading: 'Subiendo a Strava…',
+    error: ((o.strava && o.strava.err) || 'Strava no respondió.') + ' Se volverá a intentar sola, o envíala ahora.',
+    duplicate: 'Strava ya tenía una actividad a esa hora (la del reloj). No se ha subido otra.',
+    no: 'No se ha enviado.' }[k];
+  const puede = ['waiting', 'error', 'no'].includes(k) && conectado('strava');
+  return `<section class="seccion"><div class="tarjeta">
+    <div class="fila"><span class="crece"><span class="etiqueta">Strava</span></span>${estado(k)}</div>
+    <p>${esc(txt)}</p>
+    ${id ? `<a class="btn btn-texto" style="align-self:flex-start;padding:0" href="https://www.strava.com/activities/${esc(id)}" target="_blank" rel="noopener">${ico('externo')}Abrir en Strava</a>` : ''}
+    ${puede ? `<button class="btn btn-principal" data-act="enviar" data-v="${esc(o.id)}" ${S.envStr === o.id ? 'disabled' : ''}>${ico(k === 'error' ? 'reintentar' : 'subir')}${S.envStr === o.id ? 'Enviando…' : k === 'error' ? 'Reintentar' : 'Enviar a Strava'}</button>` : ''}
+    ${msg ? `<p class="meta" role="status">${esc(msg)}</p>` : ''}
+    </div>${datos}</section>`;
+}
+function connResumen(st) {
+  if (!st.signedIn) return 'Entra con tu cuenta para conectarlas';
+  const t = p => conectado(p, st) ? 'conectado' : conn(p, st) ? 'hay que volver a conectar' : 'sin conectar';
+  return `Strava ${t('strava')} · Polar ${t('polar')}`;
+}
+const connAviso = () => S.connMsg ? `<p class="meta" role="status" aria-live="polite" ${S.connOk === false ? 'style="color:var(--error)"' : ''}>${esc(S.connMsg)}</p>` : '<p class="meta" role="status" aria-live="polite"></p>';
+const estadoConn = (p, st) => conectado(p, st) ? `<span class="estado bien">${ico('check')}Conectado</span>` : conn(p, st) ? `<span class="estado error">${ico('aviso')}Volver a conectar</span>` : '<span class="estado neutro">Sin conectar</span>';
+function botonConn(p, st) {
+  const nombre = p === 'polar' ? 'Polar' : 'Strava';
+  return conectado(p, st) ? `<button class="btn btn-peligro" data-act="pedirdesc" data-v="${p}">Desconectar</button>`
+    : `<button class="btn btn-principal btn-grande" data-act="conectar" data-v="${p}">${ico('conexion')}Conectar con ${nombre}</button>`;
+}
+P.conexiones = { render: () => { const st = nube();
+  if (!st || !st.signedIn) return `${cab('Conexiones')}<div class="pantalla"><p>Para conectar Strava y Polar hace falta entrar con tu cuenta: las claves se guardan en tu cuenta, no en el móvil.</p>${st ? item({ t: 'Entrar', m: 'Con tu email, sin contraseña', go: 'entrar', icono: 'correo' }) : ''}</div>`;
+  const pend = historyList().filter(o => ['waiting', 'error'].includes(stravaDe(o))).length;
+  return `${cab('Conexiones')}
+  <div class="pantalla"><div class="lista">
+    ${item({ t: 'Strava', m: conectado('strava', st) ? 'Conectado' + (pend ? ' · ' + plural(pend, 'sesión pendiente', 'sesiones pendientes') : '') : conn('strava', st) ? 'Hay que volver a conectar' : 'Sin conectar', go: 'strava', icono: 'subir' })}
+    ${item({ t: 'Polar', m: conectado('polar', st) ? 'Conectado · da el pulso del reloj' : conn('polar', st) ? 'Hay que volver a conectar' : 'Sin conectar', go: 'polar', icono: 'reloj2' })}
+  </div>${connAviso()}</div>`; } };
+P.strava = { render: () => { const st = nube(), sc = conn('strava', st), on = conectado('strava', st), m = (sc && sc.meta) || {};
+  const pend = on ? historyList().filter(o => ['waiting', 'error'].includes(stravaDe(o, sc))) : [];
+  return `${cab('Strava')}
+  <div class="pantalla">
+    <div class="fila"><span class="crece h2">Strava</span>${estadoConn('strava', st)}</div>
+    <p>Cada sesión se sube al terminar con la lista de ejercicios, las series, los kilos, el pulso del reloj y cómo te has sentido.${on && m.name ? ' Cuenta: ' + esc(m.name) + '.' : ''}</p>
+    ${sc && !on && m.error ? `<p style="color:var(--error)">${esc(m.error)}</p>` : ''}
+    ${on ? `<div class="lista"><label class="item" for="st-fwd"><span class="crece"><span class="nombre">Reenviar también carreras y paseos</span><span class="meta">Solo si en Polar Flow has quitado del todo la sincronización con Strava</span></span>${inter('st-fwd', S.fwd != null ? S.fwd : !!m.forward, 'Reenviar también carreras y paseos')}</label></div>` : ''}
+    ${pend.length ? `<div class="tarjeta"><div class="fila"><span class="crece nombre" style="font-weight:700">${plural(pend.length, 'sesión pendiente', 'sesiones pendientes')}</span>${estado('waiting')}</div><button class="btn btn-secundario" data-act="det" data-v="${esc(pend[0].id)}">Ver</button></div>` : ''}
+    ${botonConn('strava', st)}${connAviso()}
+  </div>`; } };
+P.polar = { render: () => { const st = nube(), pc = conn('polar', st), on = conectado('polar', st);
+  return `${cab('Polar')}
+  <div class="pantalla">
+    <div class="fila"><span class="crece h2">Cuenta de Polar Flow</span>${estadoConn('polar', st)}</div>
+    <p>Para traer de cada sesión del reloj el pulso y subirlo a Strava con la lista de ejercicios. Polar Flow lo sigue recibiendo todo como siempre.</p>
+    ${pc && !on && pc.meta && pc.meta.error ? `<p style="color:var(--error)">${esc(pc.meta.error)}</p>` : ''}
+    ${botonConn('polar', st)}${connAviso()}
+  </div>`; } };
+
 P.tu = { render: () => { const st = nube(), wf = widgetFav();
   return `<div class="pantalla">
     <h1 class="titulo-pantalla">Tú</h1>
@@ -261,6 +346,7 @@ P.tu = { render: () => { const st = nube(), wf = widgetFav();
       ${item({ t: 'Widget', m: wf && favs().some(f => f.name === wf) ? 'Favorita: ' + wf : 'Rutina de core', go: 'widgetconf', icono: 'widget' })}
       ${item({ t: 'Copia de seguridad', m: st && st.signedIn ? 'En la nube · también a un archivo' : 'A un archivo: exportar e importar', go: 'copia', icono: 'nube' })}
     </div></section>
+    ${st ? `<section class="seccion"><h2 class="etiqueta">Conexiones</h2><div class="lista">${item({ t: 'Strava y Polar', m: connResumen(st), go: 'conexiones', icono: 'conexion' })}</div></section>` : ''}
   </div>`; } };
 
 P.entrar = { sinPestanas: true, render: () => `${cab('Entrar')}
@@ -474,7 +560,11 @@ P.final = { sinPestanas: true, render: () => { const f = S.final, st = store.sta
     </div>
     ${f.mods.length ? `<section class="seccion"><h2>¿Cómo te ha ido?</h2><p class="meta">Las 2–3 últimas repeticiones de cada serie tienen que costar. La próxima vez cada módulo sube o baja de nivel.</p>
       ${f.mods.map(m => `<div class="pila"><span><strong>${esc(m.name)}</strong> <span class="meta">· hoy en ${INT[f.lv0 ? f.lv0[m.key] : cfg.lv[m.key]]}</span></span>${seg('fb.' + m.key, [['up', 'Fácil'], ['ok', 'Justo'], ['down', 'Demasiado']], f.fb[m.key] || '', 'Cómo te ha ido ' + m.name)}<span class="meta" aria-live="polite">${esc(fbTxt(f, m))}</span></div>`).join('')}</section>` : ''}
-    <div class="lista"><div class="item" style="cursor:default"><span class="item-icono">${ico('reloj2')}</span><span class="crece"><span class="nombre">En el reloj Polar</span><span class="meta">Guarda la grabación como «Entrenamiento en circuito»</span></span></div></div>
+    ${f.id ? `<section class="seccion"><h2>Esfuerzo</h2>
+      <div class="fila"><span class="crece meta">De 1 (muy fácil) a 10 (máximo)</span>${paso('esfuerzo', f.rpe ? f.rpe + ' / 10' : '–', 'Esfuerzo de 1 a 10')}</div>
+      <h2>¿Cómo te has sentido?</h2>${seg('sentir', FEEL, f.feel || '', 'Cómo te has sentido')}</section>` : ''}
+    <div class="lista">${f.id && conectado('strava') ? `<label class="item" for="fin-strava"><span class="item-icono">${ico('subir')}</span><span class="crece"><span class="nombre">Enviar a Strava</span><span class="meta">Con la lista de ejercicios, el pulso del reloj, el esfuerzo y cómo te has sentido</span></span>${inter('fin-strava', f.st !== false, 'Enviar a Strava')}</label>` : ''}
+      <div class="item" style="cursor:default"><span class="item-icono">${ico('reloj2')}</span><span class="crece"><span class="nombre">En el reloj Polar</span><span class="meta">Guarda la grabación como «Entrenamiento en circuito»</span></span></div></div>
     <button class="btn btn-principal btn-grande" data-act="finvolver">Guardar y volver</button>
     <button class="btn btn-texto" data-act="repetir">${ico('reintentar')}Repetir la sesión</button>
   </div>`; } };
@@ -525,6 +615,7 @@ const HOJAS = {
   banda: () => { const k = S.hojaDe, cur = bandOf(k); return `<h2 class="h2">¿Qué banda llevas?</h2><p class="meta">${esc(D.exercises[k].name)}. La próxima vez sale la que elijas.</p><div class="lista">${BANDS.map(b => `<button class="item" data-act="ponbanda" data-v="${esc(b)}" role="radio" aria-checked="${b === cur}"><span class="item-icono">${ico('banda')}</span><span class="crece"><span class="nombre">${esc(b)}</span></span>${b === cur ? ico('check', 'chev') : '<span style="width:20px"></span>'}</button>`).join('')}</div><p class="meta">Los nombres se cambian en Tú → Mis bandas.</p>`; },
   kg: () => { const s = R.pasos[R.idx].prep ? R.pasos[R.idx + 1] : R.pasos[R.idx]; return `<h2 class="h2">Kilos de ${esc(D.exercises[s.k].name)}</h2><div class="fila"><span class="crece meta">Orientativo: ${esc(kgRange(s.kg))}</span>${paso('kg', fkg(kgDe(s)) + ' kg', 'Kilos', 'Medio kilo menos', 'Medio kilo más')}</div><p class="meta">Se recuerda para la próxima vez.</p><button class="btn btn-principal btn-grande" data-act="cerrar">Listo</button>`; },
   guardarfav: () => `<h2 class="h2">Guardar como favorita</h2><form class="pila" style="gap:var(--e4)" data-form="fav"><div class="campo"><label for="fav-n">Nombre</label><input id="fav-n" maxlength="40" autocomplete="off" placeholder="${esc(autoName(fr))}"></div><button class="btn btn-principal btn-grande" type="submit">${ico('estrella')}Guardar</button></form>`,
+  desconectar: () => { const s = S.hojaDe === 'polar'; return `<h2 class="h2">¿Desconectar ${s ? 'Polar' : 'Strava'}?</h2><p>${s ? 'Las sesiones se seguirán subiendo a Strava, pero sin el pulso del reloj.' : 'No se enviará nada más a Strava. Lo que ya está allí no se toca.'}</p><button class="btn btn-peligro btn-grande" data-act="desconectar">Desconectar</button><button class="btn btn-principal btn-grande" data-act="cerrar">No desconectar</button>`; },
   salir: () => `<h2 class="h2">¿Salir de la cuenta?</h2><p>Tus datos se quedan en este móvil. Si queda algo sin subir, se sube antes.</p><button class="btn btn-peligro btn-grande" data-act="salirya">${ico('salir')}Salir</button><button class="btn btn-principal btn-grande" data-act="cerrar">Seguir con la cuenta</button>`,
   borrarfav: () => `<h2 class="h2">¿Borrar «${esc(S.favEdit)}»?</h2><p>Se quita de favoritas${widgetFav() === S.favEdit ? ' y el widget vuelve a la rutina de core' : ''}. Tu historial no cambia.</p><button class="btn btn-peligro btn-grande" data-act="borrarya">${ico('papelera')}Borrar</button><button class="btn btn-principal btn-grande" data-act="cerrar">No borrar</button>`,
 };
@@ -563,6 +654,7 @@ function cambiar(k, d) {
   else if (k === 'f.rondas') { fr.rounds = lim(fr.rounds + d, 1, 10); saveFree(); }
   else if (k === 'f.desc') { fr.rest = lim(fr.rest + d * 15, 15, 180); saveFree(); }
   else if (k.startsWith('n.')) { const it = fr.sel[+k.slice(2)]; if (it) { it.n = clampN(it.k, it.n + d * (isHoldEx(it.k) ? 5 : 1)); saveFree(); } }
+  else if (k === 'esfuerzo') { const f = S.final; f.rpe = f.rpe ? lim(f.rpe + d, 1, 10) : 7; if (f.id) store.setSessionFields(f.id, { rpe: f.rpe }); }
   else if (k === 'kg') { const s = R.pasos[R.idx].prep ? R.pasos[R.idx + 1] : R.pasos[R.idx]; R.w = { k: s.k, v: lim(kgDe(s) + d * 0.5, 0.5, 60) }; guardarKg(); }
 }
 const ACC = {
@@ -571,12 +663,15 @@ const ACC = {
   mas: b => cambiar(b.dataset.k, 1), menos: b => cambiar(b.dataset.k, -1),
   seg: b => { const k = b.dataset.k, v = b.dataset.v;
     if (k.startsWith('nivel.')) { cfg.lv[k.slice(6)] = v; saveCfg(); }
-    else if (k.startsWith('fb.')) marcarFb(k.slice(3), v); },
+    else if (k.startsWith('fb.')) marcarFb(k.slice(3), v);
+    else if (k === 'sentir') { S.final.feel = v; if (S.final.id) store.setSessionFields(S.final.id, { feel: v }); } },
   sw: b => { const k = b.dataset.k, on = b.checked;
     if (k === 'core-auto') cfg.auto = on; else if (k === 'core-taper') cfg.taper = on;
     else if (k.startsWith('mod-')) cfg.mods[k.slice(4)] = on;
     else if (k === 'f-alt') { fr.alt = on; saveFree(); return; }
     else if (k.startsWith('m-')) cfg[k.slice(2)] = on;
+    else if (k === 'fin-strava') { S.final.st = on; if (S.final.id) store.setSessionFields(S.final.id, { st: on ? null : false }); return; }
+    else if (k === 'st-fwd') { S.fwd = on; S.connMsg = 'Guardando…'; S.connOk = true; try { A.connForward(on); } catch (e) {} return; }
     else if (k === 's-tonos') cfg.app.tonos = on; else if (k === 's-mitad') cfg.app.mitad = on; else if (k === 's-count') cfg.count = on;
     saveCfg(); },
   zona: b => { S.zona = S.zona === b.dataset.v ? '' : b.dataset.v; },
@@ -601,6 +696,10 @@ const ACC = {
   borrarya: () => { deleteFav(S.favEdit); const n = S.favEdit; S.favEdit = null; S.hoja = null; atras(); toast(`«${n}» borrada`); return 'nav'; },
   det: b => { S.det = b.dataset.v; ir('detalle'); return 'nav'; },
   hmas: () => { S.hver = (S.hver || 30) + 30; },
+  pedirdesc: b => { S.hojaDe = b.dataset.v; S.hoja = 'desconectar'; },
+  conectar: b => { S.connMsg = 'Abriendo ' + (b.dataset.v === 'polar' ? 'Polar' : 'Strava') + '…'; S.connOk = true; try { A.connConnect(b.dataset.v); } catch (e) { S.connMsg = 'Conectar solo funciona en la app del móvil.'; S.connOk = false; } },
+  desconectar: b => { S.hoja = null; S.connMsg = 'Desconectando…'; S.connOk = true; try { A.connDisconnect(S.hojaDe); } catch (e) {} },
+  enviar: b => { const id = b.dataset.v; S.envStr = id; S.strMsg = { ...(S.strMsg || {}), [id]: 'Enviando…' }; try { A.stravaSend(id); } catch (e) { S.envStr = null; } },
   hoja: b => { S.hoja = b.dataset.v; },
   sincronizar: () => { try { A.cloudSync(); } catch (e) {} setTimeout(() => pintar(false), 300); },
   salirya: () => { S.hoja = null; try { A.cloudSignOut(); } catch (e) {} },
@@ -671,7 +770,11 @@ window.refreshStats = () => { if (!D || R) return; lastDay = store.lastDay(); of
 /* El widget abre la app para la rutina de core */
 window.autoStart = () => { try { if (!D || R) return; iniciar('rutina', corePasos(), 'Rutina de core'); } catch (e) {} };
 window.onBackup = (msg, ok, imported) => { S.copiaMsg = msg; S.copiaOk = ok; if (imported) reloadAll(); else if (S.ruta === 'copia') pintar(false); };
-window.onCloud = (st, changed) => { if (changed) reloadAll(); else if (!R && ['tu', 'copia'].includes(S.ruta)) pintar(false); };
+window.onCloud = (st, changed) => { if (changed) reloadAll(); else if (!R && ['tu', 'copia', 'conexiones', 'strava', 'polar', 'historial', 'detalle', 'final'].includes(S.ruta)) pintar(false); };
+/* Strava y Polar: respuesta al conectar, desconectar o reenviar carreras, y a «Enviar a Strava» */
+window.onConnMsg = (msg, ok) => { S.connMsg = msg; S.connOk = ok; S.fwd = null; if (!R) pintar(false); };
+window.irConexiones = () => { if (R || !D) return; S.hoja = null; S.pila = ['tu']; S.ruta = 'conexiones'; pintar(true); };
+window.onStravaSent = (id, msg, ok) => { S.envStr = null; S.strMsg = { ...(S.strMsg || {}), [id]: msg }; if (!R) pintar(false); };
 /* Respuesta de la nube al pedir el código o al comprobarlo */
 window.onCloudMsg = (msg, ok, kind) => { S.enviando = false; S.nubeMsg = msg; S.nubeOk = ok;
   if (kind === 'code' && ok) S.codigo = true;

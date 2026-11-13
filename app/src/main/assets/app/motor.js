@@ -46,6 +46,8 @@ const store = {
   done(rounds, day) { try { if (A) { A.markDone(rounds, day); A.vibrate(); } else { addDay(); LS.set('rutina.lastDay', day); LS.set('rutina.sessions', store.sessions() + 1); } } catch (e) {} },
   history() { try { const a = JSON.parse(A && A.history ? A.history() : LS.get('rutina.history')); return Array.isArray(a) ? a : []; } catch (e) { return []; } },
   saveSession(o) { try { if (A && A.saveSession) A.saveSession(JSON.stringify(o)); else { const a = store.history().filter(x => x.id !== o.id); a.push(o); a.sort((x, y) => x.start - y.start); LS.set('rutina.history', JSON.stringify(a)); } } catch (e) {} },
+  /* Campos sueltos de una sesión guardada: rpe (esfuerzo), feel (cómo te has sentido), st (false = no enviar a Strava) */
+  setSessionFields(id, f) { try { if (A && A.setSessionFields) A.setSessionFields(id, JSON.stringify(f)); else { const a = store.history(); const o = a.find(x => x.id === id); if (o) { Object.entries(f).forEach(([k, v]) => { if (v == null) delete o[k]; else o[k] = v; }); LS.set('rutina.history', JSON.stringify(a)); } } } catch (e) {} },
   setSessionFeedback(id, fb) { try { if (A && A.setSessionFeedback) A.setSessionFeedback(id, JSON.stringify(fb)); else { const a = store.history(); const o = a.find(x => x.id === id); if (o) { o.fb = fb; LS.set('rutina.history', JSON.stringify(a)); } } } catch (e) {} },
 };
 function addDay() { const d = new Set(store.days()); d.add(dayKey(Date.now())); LS.set('rutina.days', JSON.stringify([...d].sort())); }
