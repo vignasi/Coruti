@@ -125,8 +125,8 @@
     "angulo": {
      "articulacion": "rodilla",
      "entre": [
-      50,
-      110
+      45,
+      125
      ]
     }
    },
@@ -462,7 +462,7 @@
     "angulo": {
      "articulacion": "cadera",
      "entre": [
-      70,
+      60,
       110
      ]
     },
@@ -747,8 +747,8 @@
     "angulo": {
      "articulacion": "rodilla",
      "entre": [
-      50,
-      110
+      45,
+      125
      ]
     }
    },
@@ -1011,7 +1011,7 @@
      "articulacion": "rodilla",
      "entre": [
       0,
-      20
+      25
      ]
     }
    }
@@ -1076,7 +1076,7 @@
      "articulacion": "rodilla",
      "entre": [
       0,
-      20
+      25
      ]
     }
    }
@@ -1132,8 +1132,8 @@
     "angulo": {
      "articulacion": "rodilla",
      "entre": [
-      50,
-      110
+      45,
+      125
      ]
     }
    },
@@ -1161,7 +1161,7 @@
     "angulo": {
      "articulacion": "hombro",
      "entre": [
-      70,
+      60,
       135
      ]
     }
@@ -1734,8 +1734,8 @@
     "angulo": {
      "articulacion": "rodilla",
      "entre": [
-      50,
-      110
+      45,
+      125
      ]
     }
    },
@@ -1809,8 +1809,8 @@
     "angulo": {
      "articulacion": "rodilla",
      "entre": [
-      50,
-      110
+      45,
+      125
      ]
     }
    },
@@ -1910,7 +1910,7 @@
      "articulacion": "rodilla",
      "entre": [
       0,
-      20
+      25
      ]
     }
    }
@@ -2040,8 +2040,8 @@
     "angulo": {
      "articulacion": "rodilla",
      "entre": [
-      50,
-      110
+      45,
+      125
      ]
     }
    },

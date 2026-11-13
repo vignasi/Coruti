@@ -66,7 +66,7 @@ function muebles(ex, k) {
     const et = (e.label || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
     const tipo = wall ? 'pared' : /sofa/.test(et) ? 'sofa' : 'silla';
     // la pared es un panel de fondo detrás de la persona (figura3d.js: drawProps), de 4 cm de grueso
-    return wall ? {tipo, min: [cx - W / 2, 0, -.32], max: [cx + W / 2, H, -.28]} : {tipo, min: [cx - W / 2, 0, cz - d / 2], max: [cx + W / 2, H, cz + d / 2]};
+    return wall ? {tipo, min: [cx - W / 2, 0, cz - .02], max: [cx + W / 2, H, cz + .02]} : {tipo, min: [cx - W / 2, 0, cz - d / 2], max: [cx + W / 2, H, cz + d / 2]};
   });
 }
 // distancia con signo a una caja: fuera > 0, dentro < 0 (lo que se mete)

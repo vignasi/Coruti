@@ -23,7 +23,8 @@ function state(ex,t,clamp){
   const cur=ph[i],prev=ph[(i-1+ph.length)%ph.length];
   const a=withC(ex.poses[prev.pose]),b=withC(ex.poses[cur.pose]);
   const f=tt<cur.move?ease(tt/cur.move):1,pose={};
-  for(const k in b){pose[k]=[a[k][0]+(b[k][0]-a[k][0])*f,a[k][1]+(b[k][1]-a[k][1])*f];
+  for(const k in b){if(!Array.isArray(b[k]))continue;   // claves que no son puntos ("apoya" de la figura 3D)
+    pose[k]=[a[k][0]+(b[k][0]-a[k][0])*f,a[k][1]+(b[k][1]-a[k][1])*f];
     // tercera coordenada (E3): hacia delante del dibujo (hacia la cámara); la usa solo la figura 3D, la dibujada la ignora
     if(a[k].length>2||b[k].length>2)pose[k].push((a[k][2]||0)+((b[k][2]||0)-(a[k][2]||0))*f);}
   return {pose,phase:cur,idx:i,n:ph.length,f,tt};

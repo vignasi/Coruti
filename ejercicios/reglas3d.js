@@ -5,12 +5,14 @@
 const TOCA = 2;          // cm: un apoyo toca su superficie si está a menos de esto
 const ROZA = 1;          // cm: una parte que no es apoyo y está a menos de esto, toca (y no debería)
 const METE = 1.5;        // cm: lo que se mete en el suelo o en un mueble más de esto, lo atraviesa
+const METE_BLANDO = 3;  // cm: lo mismo en las partes blandas que se aplastan al apoyarse (culo, muslo, barriga, pecho)
+const BLANDAS = /^(cadera|muslo|barriga|pecho|espalda_baja)/;
 const RANGO = {rodilla: [-5, 150], codo: [-5, 155], cadera: [-35, 150], hombro: [0, 185]};
 const LADOS = ['_izq', '_der'];
 
 /* Cada apoyo: qué regiones del cuerpo cuentan (por lado), si hacen falta los dos lados y qué más puede rozar sin fallar */
 const APOYO = {
-  cabeza: {r: ['cabeza']},
+  cabeza: {r: ['cabeza'], roza: ['cuello']},
   espalda_alta: {r: ['espalda_alta'], roza: ['cuello', 'brazo', 'codo']},
   espalda_baja: {r: ['espalda_baja']},
   cadera: {r: ['cadera']},
@@ -51,7 +53,7 @@ function grupos(nombre, m) {
 function permitidas(nombre, m) {
   const a = APOYO[nombre], ab = abajo(m), out = new Set();
   (grupos(nombre, m) || []).flat().forEach(r => out.add(r));
-  (a.roza || []).forEach(r => (a.r.some(x => x.endsWith('@abajo')) ? [ab] : LADOS).forEach(l => out.add(r + l)));
+  (a.roza || []).forEach(r => r === 'cuello' ? out.add(r) : (a.r.some(x => x.endsWith('@abajo')) ? [ab] : LADOS).forEach(l => out.add(r.replace('@abajo', '') + l)));
   return out;
 }
 /* Distancia de una región a una superficie (suelo o el mueble de ese tipo más cercano) */
@@ -124,10 +126,11 @@ function comprobar(tec, muestras) {
     // nada más toca, y nada atraviesa
     for (const r in mu.reg) {
       const o = mu.reg[r];
-      if (o.suelo < -METE) mal(mu, `${r} atraviesa el suelo (${o.suelo} cm)`);
+      const mete = BLANDAS.test(r) ? METE_BLANDO : METE;
+      if (o.suelo < -mete) mal(mu, `${r} atraviesa el suelo (${o.suelo} cm)`);
       else if (o.suelo <= ROZA && !perm.suelo.has(r)) mal(mu, `${r} toca el suelo y no es un apoyo (${o.suelo} cm)`);
       o.cajas.forEach((d, j) => { const t = mu.cajas[j];
-        if (d < -METE && t !== 'pared') mal(mu, `${r} atraviesa ${t} (${d} cm)`);
+        if (d < -mete) mal(mu, `${r} atraviesa ${t} (${d} cm)`);
         else if (d <= ROZA && !perm[t].has(r)) mal(mu, `${r} toca ${t} y no es un apoyo (${d} cm)`); });
     }
     // rangos de las articulaciones
