@@ -202,10 +202,29 @@ Después: P1 Pulso · P2 Planes por objetivo · P3 Peso y medidas · P4 Carreras
 
 ### Bloque C · La app nueva
 
-#### C1 · Construir la app a partir del diseño validado — después de D3 y B1
-- [ ] Por entregas, con APK en cada una: navegación y Entrenar; reproductor y figura; Ejercicios y ficha; Historial; Perfil y Ajustes
-- [ ] Sin perder nada: historial, copias, favoritas, bandas, pesos, racha, rutina de core, favorita en el widget
-- [ ] Hecho cuando: hace todo lo de antes con el diseño nuevo y te parece bien en el móvil
+#### C1 · Construir la app a partir del diseño validado — después de D3 y B1 (en la rama `claude/coruti-c1-app-android-2vhnk1`; falta probar en el móvil)
+- [x] Entrega 1 · navegación (Entrenar · Ejercicios · Historial · Tú) y Entrenar: Hoy (la sesión del widget: favorita con ★ o rutina de core),
+  semana con los días hechos, favoritas (también la rutina de core si la marcas), sesión nueva, elegir ejercicios y rutina de core
+- [x] Entrega 2 · reproductor a pantalla completa y figura 3D dentro del APK (three.js y modelos, copiados de `docs/diseno/figura`
+  al compilar; la dibujada si no hay WebGL): encuadre por ejercicio, fondo `accion-suave` en descanso y «Prepárate», la voz dice
+  el nombre al empezar cada serie, densidad del lienzo como máximo 2, repeticiones que esperan al toque, deslizar para volver,
+  pausa con Seguir · Anterior · Parar (guarda como incompleta), banda y kilos en marcha, y el final con «¿Cómo te ha ido?»
+- [x] Entrega 3 · Ejercicios (cuadrícula con filtros) y ficha (movimiento, claves, dosis, tus marcas, YouTube, añadir a una sesión)
+- [x] Entrega 4 · Historial por días, detalle con cada serie (hora, reps o segundos, kilos, banda) y por ejercicio
+- [x] Entrega 5 · Tú: cuenta (entrar con el código de B1, sincronizar, salir), material, mis bandas, sonido, figura hombre o mujer,
+  widget y copia de seguridad (exportar e importar)
+- [x] `rutina.json` con lo pendiente de `figura/NOTAS.md`: vista de frente, puntillas, sin correas TRX, rodillas de `remo_db`
+- [x] Sin perder nada: mismas claves de datos (historial, copias, favoritas, bandas, pesos, racha, configuración, favorita del widget);
+  la lógica del plan y de los sueltos es la de antes (`assets/app/motor.js` = `Plan.kt` y `Free.kt`)
+- [x] Comprobado en Chromium a 360 × 740: claro y oscuro, letra al 100, 130 y 200 % (las pestañas y el reproductor crecen como mucho
+  un 30 % para que la figura siga cabiendo) y axe-core WCAG 2.2 AA: 19 pantallas × 2 temas × 2 tamaños, 0 fallos
+- Decidido: lo que aún no existe (Claude, planes por objetivo, Strava, pulso, peso, varias personas) no sale en la app hasta que exista.
+  El rodillo tampoco: no hay ejercicios de rodillo en `rutina.json`. «Menos volumen en cada ronda» está en la rutina de core
+  («Menos repeticiones en cada ronda»), porque es volumen de entrenamiento, no de sonido. «Prepárate» dura lo de siempre (8 s) y va
+  antes de cada ejercicio, igual que en el widget
+- [ ] **Tú:** probar con TalkBack en el móvil (aquí solo se ha comprobado el árbol de accesibilidad y axe, no TalkBack de verdad)
+  y medir la fluidez del reproductor 3D en tu móvil
+- [ ] **Tú:** Hecho cuando: hace todo lo de antes con el diseño nuevo y te parece bien en el móvil
 
 #### C2 · Widget con el diseño nuevo — después de C1
 - [ ] Mismo sistema de diseño; muestra la sesión de hoy (también la del plan de Claude) o la favorita elegida

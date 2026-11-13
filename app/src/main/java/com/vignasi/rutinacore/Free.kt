@@ -3,7 +3,7 @@ package com.vignasi.rutinacore
 import org.json.JSONObject
 
 /* Ejercicios sueltos (favoritas) para el widget. Misma lógica que normFree, buildFree y freeExpand en
-   assets/index.html: si cambias una, cambia la otra (FreePlanTest compara las dos). */
+   assets/app/motor.js (buildFree): si cambias una, cambia la otra (FreePlanTest compara las dos). */
 
 class FreeItem(val k: String, val n: Int)
 

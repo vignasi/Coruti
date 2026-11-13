@@ -123,7 +123,7 @@ class WorkoutService : Service() {
     private fun resetCues() { cuePhase = -1; cueRep = -1; cueHalf = false }
 
     /** Sonido durante el ejercicio: tono agudo al subir/empujar y grave al bajar/volver, cuenta en voz alta,
-     *  «mitad» en los de mantener y pitidos en los 3 últimos segundos. Igual que cues() en index.html. */
+     *  «mitad» en los de mantener y pitidos en los 3 últimos segundos. Igual que cues() en assets/app/app.js. */
     private fun cues(st: Step, before: Int, after: Int) {
         val el = Workout.elapsedInStep()
         if (!st.prep && !st.rest && st.reps > 0) {

@@ -2,7 +2,7 @@ package com.vignasi.rutinacore
 
 import org.json.JSONObject
 
-/* Plan de la sesión. Misma lógica que buildPlan() en assets/index.html: si cambias una, cambia la otra. */
+/* Plan de la sesión. Misma lógica que buildPlan() en assets/app/motor.js: si cambias una, cambia la otra. */
 
 val INTENSITIES = listOf("S", "N", "F")
 val INT_NAME = mapOf("S" to "Suave", "N" to "Normal", "F" to "Fuerte")

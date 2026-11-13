@@ -13,7 +13,7 @@ import java.io.File
  * fb (opcional: cómo te ha ido cada módulo, "up" | "ok" | "down") y sets: una por serie hecha, con
  * k (clave del ejercicio), name, r (ronda), side, start, end, reps y planReps (0 en los de mantener),
  * secs y planSecs (0 en los de repeticiones), kg, band, mod y skipped (si se saltó antes de acabar).
- * La misma forma la escriben la página (index.html) y el servicio del widget (SessionRecorder).
+ * La misma forma la escriben la página (assets/app/app.js) y el servicio del widget (SessionRecorder).
  */
 object History {
     private const val FILE = "history.json"

@@ -12,7 +12,7 @@ import kotlin.random.Random
 /**
  * Favoritas en el widget: Kotlin tiene que montar los mismos pasos que la página.
  * Además de comprobar unos casos, deja en app/build/free-check.json 400 favoritas al azar con sus pasos
- * para compararlas con buildFree() de index.html.
+ * para compararlas con buildFree() de assets/app/motor.js.
  */
 class FreePlanTest {
     private val data = Rutina.parse(File("src/main/assets/rutina.json").readText())

@@ -8,7 +8,7 @@ import android.graphics.Path
 import android.graphics.RectF
 import android.graphics.Typeface
 
-/** Dibuja la figura del ejercicio (misma lógica que draw() en index.html) para el widget. */
+/** Dibuja la figura del ejercicio (la figura de palos de la app 1.0; la app nueva usa docs/diseno/figura) para el widget. */
 object PoseRenderer {
     private const val BG = 0xFF1E6B74.toInt()
     private const val INK = 0xFFFFFFFF.toInt()
