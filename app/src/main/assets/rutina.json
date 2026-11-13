@@ -17,6 +17,7 @@
   },
   "exercises": {
     "psoas": {
+      "apoya": "rodillas",
       "name": "Estiramiento de psoas",
       "info": "30 s cada pierna · entras en la postura y te quedas quieto",
       "hold": true,
@@ -41,6 +42,7 @@
       ]
     },
     "puente": {
+      "apoya": "tronco",
       "name": "Puente de glúteo",
       "info": "15 reps · 4 s cada una · las dos piernas a la vez",
       "rep": 4,
@@ -63,6 +65,7 @@
       ]
     },
     "deadbug": {
+      "apoya": "tronco",
       "name": "Dead bug",
       "info": "8 por lado (16 en total) · 4 s cada una · alternando",
       "rep": 4,
@@ -109,6 +112,7 @@
       ]
     },
     "gato": {
+      "apoya": "rodillas",
       "name": "Gato-camello",
       "info": "6 respiraciones lentas · 7 s cada una",
       "rep": 7,
@@ -131,6 +135,7 @@
       ]
     },
     "crunch_inv": {
+      "apoya": "tronco",
       "name": "Crunch inverso",
       "rep": 5,
       "unit": "Repetición",
@@ -152,6 +157,7 @@
       ]
     },
     "hollow_k": {
+      "apoya": "tronco",
       "name": "Hollow hold",
       "hold": true,
       "vid": "hollow hold rodillas dobladas principiante",
@@ -172,6 +178,7 @@
       ]
     },
     "plancha_lat": {
+      "apoya": "pies",
       "view": "frente",
       "name": "Plancha lateral",
       "hold": true,
@@ -214,6 +221,7 @@
       ]
     },
     "press_db": {
+      "apoya": "tronco",
       "name": "Press de suelo con mancuernas",
       "rep": 4,
       "unit": "Repetición",
@@ -325,6 +333,7 @@
       ]
     },
     "ext_db": {
+      "apoya": "tronco",
       "name": "Extensión de tríceps tumbado",
       "rep": 4,
       "unit": "Repetición",
@@ -369,6 +378,7 @@
       ]
     },
     "hollow_kb": {
+      "apoya": "tronco",
       "name": "Hollow hold con brazos atrás",
       "hold": true,
       "vid": "hollow hold rodillas dobladas brazos atrás",
@@ -389,6 +399,7 @@
       ]
     },
     "hollow_l": {
+      "apoya": "tronco",
       "name": "Hollow hold con piernas estiradas",
       "hold": true,
       "vid": "hollow hold técnica correcta",
@@ -409,6 +420,7 @@
       ]
     },
     "plancha_lat_k": {
+      "apoya": "rodillas",
       "view": "frente",
       "name": "Plancha lateral con rodillas",
       "hold": true,
@@ -495,6 +507,7 @@
       ]
     },
     "puente_banda": {
+      "apoya": "tronco",
       "name": "Puente de glúteo con banda",
       "info": "15 reps · 4 s cada una · las dos piernas a la vez",
       "rep": 4,
@@ -518,6 +531,7 @@
       ]
     },
     "press_goma": {
+      "apoya": "tronco",
       "name": "Press de suelo con banda",
       "rep": 4,
       "unit": "Repetición",
@@ -584,6 +598,7 @@
       ]
     },
     "puente_abd": {
+      "apoya": "tronco",
       "name": "Puente con apertura de rodillas",
       "rep": 3,
       "unit": "Repetición",
@@ -631,6 +646,7 @@
     },
     "almeja": {
       "view": "frente",
+      "apoya": "tronco",
       "name": "Almeja",
       "rep": 3,
       "unit": "Repetición",
@@ -643,11 +659,11 @@
       ],
       "marks": {"glm":{"at":["p"],"off":[0,-6],"lab":[86,22],"text":"GLÚTEO DE LADO"}},
       "poses": [
-        {"h":[30,86],"s":[44,92],"c":[68,93],"p":[92,93],"k1":[114,99],"a1":[136,97],"k2":[114,93],"a2":[136,92],"e1":[26,100],"w1":[8,100],"e2":[66,76],"w2":[88,86]},
-        {"h":[30,86],"s":[44,92],"c":[68,93],"p":[92,93],"k1":[114,99],"a1":[136,97],"k2":[110,66],"a2":[136,92],"e1":[26,100],"w1":[8,100],"e2":[66,76],"w2":[88,86]}
+        {"h":[30,98.5],"s":[44,95],"c":[68,97.3],"p":[92,97.6],"k1":[107.5,104.4,15.5],"a1":[123,103.5],"k2":[107.5,96.5,15.5],"a2":[123,99],"e1":[26,93],"w1":[8,93],"e2":[66,78],"w2":[90,86]},
+        {"h":[30,98.5],"s":[44,95],"c":[68,97.3],"p":[92,97.6],"k1":[107.5,104.4,15.5],"a1":[123,103.5],"k2":[107.5,86.5,11.9],"a2":[123,99],"e1":[26,93],"w1":[8,93],"e2":[66,78],"w2":[90,86]}
       ],
       "phases": [
-        {"pose":1,"move":1,"hold":0.5,"tone":"up","sq":["glm"],"arrow":[126,86,122,62],"cap":"Abre la rodilla de arriba hacia el techo, pies juntos"},
+        {"pose":1,"move":1,"hold":0.5,"tone":"up","sq":["glm"],"arrow":[118,84,116,66],"cap":"Abre la rodilla de arriba hacia el techo, pies juntos"},
         {"pose":0,"move":1,"hold":0.5,"tone":"down","cap":"Cierra despacio sin girar la cadera"}
       ]
     },
