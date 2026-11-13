@@ -38,7 +38,9 @@ usa su geometría (`Figura.solve`, etiquetas) y como respaldo si un móvil no ti
    - «AQUÍ ESTIRA»;
    - «BANDA», colocada fuera del cuerpo y sin tapar la zona que trabaja.
 
-## Para mover a `rutina.json` cuando se construya C1 (aquí no se toca)
+## Para mover a `rutina.json` cuando se construya C1
+**Hecho en C1:** vista de frente, puntillas (y `figura.js` acepta el tobillo ya subido), sin correas TRX y rodillas de `remo_db`.
+Quedan las flechas y las etiquetas de la esquina (no se pidieron en C1).
 - Añadir `"view":"frente"` en `paso_lateral`, `angel`, `plancha_lat`, `plancha_lat_k` y `almeja`. Hoy esa lista está en `figura.js` (`VIEW`).
 - En plancha y flexiones, los tobillos están a la altura del suelo (y = 100). La figura los sube al dibujar para ponerse de puntillas. Sería mejor guardar en los datos la postura con el tobillo unos 5 puntos más alto.
 - Quitar los 4 ejercicios con correas TRX (`press_trx`, `remo_trx`, `curl_trx`, `ext_trx`), según lo decidido en funcionalidades. Se dibujan bien, pero en la página llevan la nota «Con correas: se quita».

@@ -107,7 +107,7 @@ function geom(ex,p0,o){
     let d=nrm(sub(A,K)),n=side(perp(d),bent?kb:front);
     let sup=supportY(ex,A);
     // boca abajo con las piernas rectas (plancha, flexiones): de puntillas; se sube el tobillo para que la punta toque el suelo
-    const tucked=!bent&&front[1]>.5&&A[1]>sup-7;
+    const tucked=!bent&&front[1]>.5&&A[1]>sup-12;   // C1: en rutina.json el tobillo ya va ~5 más alto (de puntillas)
     if(tucked){for(let it=0;it<3;it++){d=nrm(sub(A,K));n=side(perp(d),front);const toe=add(A,add(mul(n,7.8),mul(d,3.1)));A=[A[0],A[1]-(toe[1]-sup)];}
       p["a"+i]=A;d=nrm(sub(A,K));n=side(perp(d),front);}
     const al=footSolve(A,d,n,sup,tucked)*Math.PI/180;

@@ -84,6 +84,14 @@ object PoseRenderer {
         // lado cercano
         limb("p", "k1", INK, 5f); limb("k1", "a1", INK, 4.5f)
         limb("s", "e1", INK, 4.5f); limb("e1", "w1", INK, 4f)
+        // de puntillas (plancha, flexiones): en rutina.json el tobillo va ~5 por encima del suelo; el pie llega hasta él
+        for (i in listOf("2", "1")) {
+            val a = pt("a$i"); val k = pt("k$i")
+            if (a[1] in 90f..99f && kotlin.math.abs(k[1] - a[1]) < 15f && a[0] > k[0]) {
+                line.color = INK; line.strokeWidth = 3.5f
+                c.drawLine(a[0], a[1], a[0] + 3f, 101.5f, line)
+            }
+        }
 
         fill.color = INK
         val h = pt("h")
