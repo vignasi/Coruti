@@ -3,6 +3,7 @@ package com.vignasi.rutinacore
 import org.json.JSONArray
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -64,5 +65,15 @@ class FreePlanTest {
         File("build").mkdirs()
         File("build/free-check.json").writeText(out.toString())
         assertTrue(out.length() > 300)
+    }
+
+    @Test
+    fun posturasConZYApoyaSeLeen() {
+        // E3: la almeja tiene puntos con tercera coordenada y la plancha lateral, "apoya" en una postura
+        val almeja = data.exercises.getValue("almeja")
+        assertEquals(3, almeja.poses[0].getValue("k1").size)
+        val lat = data.exercises.getValue("plancha_lat").poses[0]
+        assertFalse(lat.containsKey("apoya"))
+        assertEquals(2, lat.getValue("s").size)
     }
 }
