@@ -42,14 +42,13 @@ mejor empezarlo cuando B2 esté fusionado.
   y **Polar Flow tiene que seguir teniendo todas las sesiones** (carga semanal y avisos del reloj).
 - Lo que se sabe: Strava solo acepta los ejercicios al **subir** la actividad (archivo FIT con series o su JSON de fuerza);
   no se pueden añadir a la que ya subió Polar, y la API no deja borrarla. Polar → Strava no envía ejercicios.
-- **Camino alternativo (si la API no deja añadir ejercicios a una actividad existente):** el reloj graba como siempre (Polar Flow lo tiene todo),
+- **Camino elegido en S1** (la API no deja añadir ejercicios a una actividad existente): el reloj graba como siempre (Polar Flow lo tiene todo),
   pero se **desactiva la sincronización automática Polar Flow → Strava**. La app descarga de Polar (API AccessLink)
   el archivo de cada sesión con el pulso, le añade las series si es una sesión de la app o de Freeletics, y lo sube a Strava.
   Las carreras y lo demás se reenvían tal cual. Riesgo: si la app falla, no llega nada a Strava hasta reintentar.
 - **Dato clave:** la lista de ejercicios de la actividad del 9 de noviembre la añadiste a mano en Strava sobre la actividad
   que subió Polar. O sea, Strava **sí deja añadir ejercicios a una actividad que ya existe**, al menos desde su app.
-  Si la API también lo permite, el camino más sencillo es: Polar sigue subiendo a Strava como ahora y la app solo
-  añade los ejercicios y el título a esa actividad. Es lo primero que se investiga en la Fase 4.
+  Investigado en S1: la API **no** lo permite (solo la app de Strava), así que se sigue el camino de arriba.
 - Descartado: el modo sensor de FC (el reloj no graba) porque la sesión no llegaría a Polar Flow.
 - Freeletics no está conectado ni a Polar ni a Strava, así que no hay duplicados por su parte.
 - **Material real:** bandas elásticas grandes (bucles largos y cerrados, sin asas) y una mini banda de glúteo.
@@ -83,7 +82,7 @@ Base de todo lo demás (Strava, nube, planes). Cada serie se guarda con su hora 
   Importar **combina**: no duplica sesiones ni borra lo que ya hay. Pruebas en `app/src/test` (`gradle testReleaseUnitTest`)
 - Decidido: el historial empieza vacío (los días de la racha anteriores no tienen detalle y no se muestran).
   Si cierras la app del todo a mitad de una sesión, esa sesión no se guarda
-- [ ] **Tú:** fusionar la rama `claude/coruti-phase-1-history-backup-x0n7e3` en `main` y comprobar que «Compilar APK» acaba en verde
+- [x] **Tú:** fusionar la rama `claude/coruti-phase-1-history-backup-x0n7e3` en `main` (pull request #2, versión 1.0.9)
 - [ ] **Tú:** Hecho cuando: una sesión aparece en el historial al terminar (desde la app y desde el widget),
   y exportar → desinstalar → importar lo recupera todo
 
@@ -121,9 +120,7 @@ B1 Cuentas y nube ────────────────────�
 Después: P1 Pulso · P2 Planes por objetivo · P3 Peso y medidas · P4 Carreras de Strava · P5 Cardio · P6 Coach por voz
 ```
 
-**Ahora mismo:** tu visto bueno de D3 (D1 y D2 cerrados) y probar B1 en el móvil.
-**Hecho:** C1 (fusionada) y S1 (rama `claude/strava-ejercicios-pulso-iv6njk`, encima de C1; falta probarlo con tus cuentas).
-**Siguiente, a la vez:** B2 (conector de Claude) y C2 (widget con el diseño nuevo), en ramas distintas.
+**Ahora mismo:** ver «Estado» al principio.
 
 ### Bloque D · Diseño (antes de construir nada de interfaz)
 
@@ -173,10 +170,10 @@ Después: P1 Pulso · P2 Planes por objetivo · P3 Peso y medidas · P4 Carreras
 - [x] Publicado para abrirlo en el móvil: https://claude.ai/artifact/SozxjV2P1cQ8F2uUFU8rpL (privado; la copia publicada lleva los modelos
   como glTF en JSON y solo las imágenes del widget que usa)
 - Partió del D2 que no se había fusionado (rama `claude/vigilant-lovelace-hb4acy`): su revisión de validación (`3-validacion.md`)
-  se hizo con la figura en un hueco y se rehace en D3. Esta rama incluye D1 (`claude/rutina-core-3d-models-vd7k7j`), que tampoco está en `main`
+  se hizo con la figura en un hueco y se rehace en D3. D1, D2 y D3 llegaron a `main` con C1 (pull request #5)
 - [x] **Tú:** elegido el fondo del widget: **A, el de la app (claro u oscuro)**
 
-#### D3 · Validación ✅ revisión hecha (falta tu visto bueno) — rama `claude/coruti-validacion-d3-h51513`, parte de D2
+#### D3 · Validación ✅ revisión hecha y en `main` (con C1); tu visto bueno sin confirmar
 - [x] Revisión con las skills de diseño (crítica heurística, accesibilidad WCAG 2.2 AA en claro y oscuro, textos) y corrección
   hasta no tener fallos graves: `docs/diseno/3-validacion.md`. axe: 0 fallos en 43 pantallas y estados, en los dos temas
 - [x] Reproductor a 1–2 m: cantidad más grande (`p2` 72–120 sp, se lee a 2 m) y **fondo distinto en descanso y «Prepárate»**
@@ -193,7 +190,7 @@ Después: P1 Pulso · P2 Planes por objetivo · P3 Peso y medidas · P4 Carreras
 
 ### Bloque B · Base técnica
 
-#### B1 · Cuentas y datos en la nube (Supabase) ✅ (en la rama `claude/stoic-sagan-h759u8`; falta probar en el móvil)
+#### B1 · Cuentas y datos en la nube (Supabase) ✅ (en `main`, pull request #4; falta probar en el móvil)
 - [x] **Tú, antes:** crear el proyecto en supabase.com (gratis) y pasar la URL y la clave pública
 - [x] Modelo de datos pensado para todo el plan (`supabase/migrations/`): personas (perfil, objetivo), peso y medidas,
   ejercicios propios, sesiones y series, favoritas, planes y días del plan, conexiones (Strava, Polar, Claude) y sus tokens
@@ -214,12 +211,13 @@ Después: P1 Pulso · P2 Planes por objetivo · P3 Peso y medidas · P4 Carreras
 - [x] Migración de B1 aplicada en Supabase (13 nov, desde la conversación de S1)
 - [ ] **Tú:** cambiar las plantillas de email para que traigan el código (pasos en `docs/supabase.md`, apartado 2).
   Ahora mismo mandan un enlace en inglés y la longitud del código es 8 (la app acepta de 6 a 10)
-- [ ] **Tú:** probar el APK de la rama (ver «Cómo probarlo»), fusionar la rama en `main` y comprobar que «Compilar APK» acaba en verde
+- [x] **Tú:** fusionar la rama en `main` (pull request #4, versión 1.0.12)
+- [ ] **Tú:** probar en el móvil con el APK de `main` (1.0.31)
 - [ ] **Tú:** Hecho cuando: con otro móvil, o tras reinstalar, entras y aparece todo; y tu mujer con su cuenta ve solo lo suyo
 - Ojo: el plan gratuito pausa el proyecto tras ~1 semana sin uso; se reactiva desde la web y no se pierden datos.
   El email de Supabase manda pocos códigos por hora: si pides varios seguidos, espera unos minutos
 
-#### B2 · Conector de Claude ⭐ — después de B1, en paralelo con C1 y S1
+#### B2 · Conector de Claude ⭐ — siguiente, en paralelo con C2
 - [ ] Servidor MCP propio (en Supabase) que se añade en Claude como conector personalizado, con inicio de sesión de tu cuenta de la app
 - [ ] Lo que Claude puede **leer**: perfil y objetivo, peso y medidas, historial con series, kilos, bandas y pulso,
   favoritas, plan actual, catálogo de ejercicios con el material que tienes
@@ -234,7 +232,7 @@ Después: P1 Pulso · P2 Planes por objetivo · P3 Peso y medidas · P4 Carreras
 
 ### Bloque C · La app nueva
 
-#### C1 · Construir la app a partir del diseño validado — después de D3 y B1 (en la rama `claude/coruti-c1-app-android-2vhnk1`; falta probar en el móvil)
+#### C1 · Construir la app a partir del diseño validado ✅ (en `main`, pull request #5, versión 1.0.26; falta probar en el móvil)
 - [x] Entrega 1 · navegación (Entrenar · Ejercicios · Historial · Tú) y Entrenar: Hoy (la sesión del widget: favorita con ★ o rutina de core),
   semana con los días hechos, favoritas (también la rutina de core si la marcas), sesión nueva, elegir ejercicios y rutina de core
 - [x] Entrega 2 · reproductor a pantalla completa y figura 3D dentro del APK (three.js y modelos, copiados de `docs/diseno/figura`
@@ -258,12 +256,12 @@ Después: P1 Pulso · P2 Planes por objetivo · P3 Peso y medidas · P4 Carreras
   y medir la fluidez del reproductor 3D en tu móvil
 - [ ] **Tú:** Hecho cuando: hace todo lo de antes con el diseño nuevo y te parece bien en el móvil
 
-#### C2 · Widget con el diseño nuevo — después de C1
+#### C2 · Widget con el diseño nuevo — siguiente, en paralelo con B2
 - [ ] Mismo sistema de diseño; muestra la sesión de hoy (también la del plan de Claude) o la favorita elegida
 
 ### Bloque S · Strava con ejercicios y pulso, sin perder Polar Flow ⭐
 
-#### S1 ✅ (en la rama `claude/strava-ejercicios-pulso-iv6njk`; servidor ya desplegado; falta probar con cuentas reales)
+#### S1 ✅ (en `main`, pull request #6, versión 1.0.31; servidor desplegado; falta probar con cuentas reales)
 Todo explicado en `docs/strava.md`.
 - [x] **Investigación** (13 nov, con la documentación oficial):
   1) la API de Strava **no** deja añadir ejercicios a una actividad que ya existe (al editar solo cambia nombre, descripción,
