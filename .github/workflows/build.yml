@@ -31,6 +31,18 @@ jobs:
       - name: Preparar APK
         run: cp app/build/outputs/apk/release/app-release.apk rutina-core.apk
 
+      # C1: la figura 3D va dentro del APK (copiada de docs/diseno/figura al compilar). Si falta algo, el run falla.
+      - name: Comprobar que el APK lleva la figura y la letra
+        run: |
+          unzip -l rutina-core.apk > contenido.txt
+          for f in assets/index.html assets/rutina.json assets/app/app.js assets/app/fig.js assets/app/fuente/atkinson-hyperlegible-next.woff2 \
+                   assets/figura/figura.js assets/figura/figura3d.js assets/figura/three/build/three.module.min.js \
+                   assets/figura/three/examples/jsm/loaders/GLTFLoader.js assets/figura/modelos/persona_m.glb assets/figura/modelos/persona_f.glb; do
+            grep -q " $f$" contenido.txt || { echo "Falta $f en el APK"; exit 1; }
+          done
+          grep "assets/figura/modelos" contenido.txt
+          ls -l rutina-core.apk
+
       - name: Guardar el APK de la rama
         if: github.ref != 'refs/heads/main'
         uses: actions/upload-artifact@v4
