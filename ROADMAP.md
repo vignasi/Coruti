@@ -93,7 +93,7 @@ Después: P1 Pulso · P2 Planes por objetivo · P3 Peso y medidas · P4 Carreras
 ```
 
 **Ahora mismo, a la vez:** D1, D2 y B1 (solo tocan `docs/diseno/` o el almacenamiento y el servidor, no la interfaz).
-**Después, a la vez:** C1, B2 y S1.
+**Después, a la vez:** C1, B2 y S1 (S1 hecho; falta probarlo con tus cuentas).
 
 ### Bloque D · Diseño (antes de construir nada de interfaz)
 
@@ -142,8 +142,9 @@ Después: P1 Pulso · P2 Planes por objetivo · P3 Peso y medidas · P4 Carreras
   compilan, pasan las pruebas y dejan el APK como artefacto del run
 - Decidido: la Edge Function para secretos pasa a S1, cuando haya un secreto real (Strava) y algo que la use.
   La tabla `connection_secrets` ya está lista y la app no puede leerla
-- [ ] **Tú:** en Supabase, pegar la migración en SQL Editor y cambiar las plantillas de email para que traigan el código
-  (pasos en `docs/supabase.md`)
+- [x] Migración de B1 aplicada en Supabase (13 nov, desde la conversación de S1)
+- [ ] **Tú:** cambiar las plantillas de email para que traigan el código (pasos en `docs/supabase.md`, apartado 2).
+  Ahora mismo mandan un enlace en inglés y la longitud del código es 8 (la app acepta de 6 a 10)
 - [ ] **Tú:** probar el APK de la rama (ver «Cómo probarlo»), fusionar la rama en `main` y comprobar que «Compilar APK» acaba en verde
 - [ ] **Tú:** Hecho cuando: con otro móvil, o tras reinstalar, entras y aparece todo; y tu mujer con su cuenta ve solo lo suyo
 - Ojo: el plan gratuito pausa el proyecto tras ~1 semana sin uso; se reactiva desde la web y no se pierden datos.
@@ -172,19 +173,38 @@ Después: P1 Pulso · P2 Planes por objetivo · P3 Peso y medidas · P4 Carreras
 #### C2 · Widget con el diseño nuevo — después de C1
 - [ ] Mismo sistema de diseño; muestra la sesión de hoy (también la del plan de Claude) o la favorita elegida
 
-### Bloque S · Strava con ejercicios y pulso, sin perder Polar Flow ⭐ — después de B1, en paralelo con C1 y B2
-- [ ] **Primero, investigar de verdad** (antes de escribir código):
-  1) si la API de Strava deja añadir ejercicios a una actividad que ya existe (camino sencillo: Polar sigue subiendo);
-  2) si en Polar Flow se puede **dejar de subir a Strava solo la fuerza y el circuito** y seguir subiendo las carreras;
-  3) si no, confirmar que la API AccessLink de Polar da el archivo FIT con el pulso y que Strava muestra las series de un FIT subido por API.
-  Decidir el camino contigo
-- [ ] **Tú, antes:** registrar una app en strava.com/settings/api y otra en Polar AccessLink (gratis); los secretos, en Supabase
-- [ ] Edge Function base para guardar secretos (pasada desde B1): tokens en `connection_secrets`, ninguna clave en el APK
-- [ ] Conectar Strava y Polar una vez; tabla de cada ejercicio del catálogo a su ejercicio FIT
-- [ ] Subir cada sesión con ejercicios, pulso, esfuerzo y cómo te has sentido, y un título claro; botón «Enviar a Strava»
-  en las que no se hayan subido; pendientes, reintentos y aviso de duplicado
-- [ ] Hecho cuando: una sesión real está en Polar Flow como siempre y en Strava con la lista de ejercicios y el pulso,
+### Bloque S · Strava con ejercicios y pulso, sin perder Polar Flow ⭐
+
+#### S1 ✅ (en la rama `claude/strava-ejercicios-pulso-iv6njk`; servidor ya desplegado; falta probar con cuentas reales)
+Todo explicado en `docs/strava.md`.
+- [x] **Investigación** (13 nov, con la documentación oficial):
+  1) la API de Strava **no** deja añadir ejercicios a una actividad que ya existe (al editar solo cambia nombre, descripción,
+  tipo, material y etiquetas; borrar tampoco). «Editar ejercicios» solo existe en la app de Strava;
+  2) Polar no documenta un filtro por deporte en Polar Flow → Strava (lo miras tú en el paso 5 de `docs/strava.md`);
+  3) desde mayo de 2026 Strava acepta los ejercicios **al subir** (FIT con series o JSON de fuerza, con el pulso), y
+  AccessLink da cada sesión del reloj con el pulso durante 30 días y avisa al momento
+- [x] **Decidido:** Polar Flow → Strava solo carreras, trail y caminatas. Los entrenos los sube el servidor: con sesión de la app,
+  JSON de fuerza con la lista de ejercicios y el pulso del reloj; sin ella (Freeletics…), el archivo del reloj tal cual.
+  Sin reloj, se sube sin pulso a las 3 horas. Si Polar Flow no deja filtrar, se quita del todo y se marca
+  «Reenviar también carreras y paseos»
+- [x] Migración (`supabase/migrations/20261113000000_s1_strava_polar.sql`): estado de Strava por sesión, esfuerzo,
+  sesiones de Polar, claves del servidor y revisión cada 15 minutos (pg_cron). Aplicada en Supabase
+- [x] Edge Functions `conexiones` y `polar-aviso` (desplegadas): conectar y desconectar Strava y Polar (tokens en
+  `connection_secrets`, ninguna clave en el APK), aviso de Polar con firma comprobada, emparejar por la hora,
+  reintentos (1 h, 2 h, 4 h, 8 h) y aviso de duplicado. Probadas en el proyecto con un usuario de prueba (ya borrado)
+- [x] Cada ejercicio del catálogo con su ejercicio de Strava (`_shared/logica.ts`, con pruebas que lo comparan con la lista
+  oficial de Strava). Esfuerzo y sensación van en la descripción (la API no deja ponerlos en su sitio)
+- [x] App (provisional hasta C1): Historial → Conexiones (Strava, Polar, reenviar carreras); en cada sesión, estado de
+  Strava y pulso, y «Enviar a Strava» / «Reintentar» / «Abrir en Strava»; al terminar, esfuerzo 1–10, cómo te has sentido
+  y «Enviar a Strava». Textos y estados del prototipo D2
+- [ ] **Tú:** registrar la app en Strava y en Polar AccessLink y poner las 4 claves en Supabase (pasos 1–3 de `docs/strava.md`)
+- [ ] **Tú:** conectar Strava y Polar en la app y luego cambiar Polar Flow → Strava (pasos 4–5)
+- [ ] **Tú:** Hecho cuando: una sesión real está en Polar Flow como siempre y en Strava con la lista de ejercicios y el pulso,
   y una carrera sigue llegando a Strava
+- Ojo: una app nueva de Strava solo admite 1 atleta; para tu mujer hay que pedir más plazas en strava.com/settings/api.
+  La API de Strava cambia de dirección el 4 de enero de 2027 (una línea en `_shared/servidor.ts`)
+- Si se añade un ejercicio a `rutina.json`, hay que añadirlo en `EJERCICIO_STRAVA` (la prueba lo avisa; se ejecuta con Node,
+  no en GitHub Actions)
 
 ### Bloque P · Después (cada uno, cuando toque; casi todos independientes entre sí)
 - **P1 · Pulso en directo del Polar Vantage V3** (antes: Fase 3). **Tú, una vez:** en Polar Flow, en el perfil de deporte,

@@ -15,6 +15,7 @@ App Android personal con la rutina diaria de core y pelvis neutra y un widget pa
 - **Historial:** cada sesión (rutina o sueltos, desde la app o el widget) se guarda con la hora de inicio y fin de cada serie, las repeticiones o segundos, los kilos y la banda. Lista por días, detalle de cada sesión y, por ejercicio, la última vez y la mejor. Las sesiones paradas a mitad salen como «Incompleta».
 - **Copia de seguridad:** en Historial, «Exportar» guarda todo (historial, favoritas, bandas, pesos, ajustes y racha) en un archivo JSON donde elijas (Drive, Descargas…); «Importar» lo combina con lo que haya en el móvil, sin duplicar ni borrar.
 - **Cuenta y nube (opcional):** en Historial → Cuenta entras con tu email (te llega un código, sin contraseña). Se guarda todo en Supabase (historial, favoritas, bandas, pesos, ajustes y racha) y se sincroniza al terminar cada sesión y al abrir la app; en otro móvil o tras reinstalar, entras y aparece todo. Cada persona ve solo lo suyo. Sin cuenta, todo sigue solo en el móvil. Puesta en marcha: [`docs/supabase.md`](docs/supabase.md).
+- **Strava y Polar (con cuenta):** en Historial → Conexiones conectas Strava y Polar. Cada sesión llega a Strava con la lista de ejercicios (series, repeticiones, kilos) y el pulso del reloj, y Polar Flow lo sigue teniendo todo. Al terminar, apuntas el esfuerzo y cómo te has sentido. Puesta en marcha y cómo funciona: [`docs/strava.md`](docs/strava.md).
 
 ## Datos
 
