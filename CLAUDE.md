@@ -16,6 +16,8 @@ La usan Ignasi y su mujer, cada uno con su cuenta. Todo en **español** (código
   Strava y la compilación del APK en GitHub Actions. Compilar y pasar las pruebas antes de subir.
 - **Al acabar:** marcar lo hecho en `ROADMAP.md` (con lo que falta que haga el usuario como «**Tú:**»),
   explicar cómo probarlo e instalar el APK, y dar el prompt de la fase siguiente.
+- **Subir a GitHub una vez al final** (o cuando haga falta un APK para probar), no después de cada commit.
+  GitHub Actions solo compila si cambia algo del APK (`app/`, la figura o Gradle); la documentación y `supabase/` no compilan.
 - Antes de empezar, mirar si `main` ha cambiado (otras fases se hacen a la vez en otras ramas) y fusionarlo si hace falta.
 - El usuario prefiere respuestas directas: la verdad incómoda primero, nivel de confianza en las afirmaciones clave,
   sin elogios de relleno.
