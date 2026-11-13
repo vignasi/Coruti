@@ -51,7 +51,90 @@ object Cloud {
             .put("lastSync", p.getLong("lastSync", 0))
             .put("msg", p.getString("msg", ""))
             .put("ok", p.getBoolean("msgOk", true))
+            .put("conn", connections(c))
             .toString()
+    }
+
+    /* ---------------- Conexiones: Strava y Polar (S1) ---------------- */
+
+    /** Las conexiones de la última sincronización: { strava: { status, meta, connected_at }, polar: {…} }. */
+    private fun connections(c: Context): JSONObject =
+        try { JSONObject(prefs(c).getString("conn", "{}") ?: "{}") } catch (e: Exception) { JSONObject() }
+
+    private fun stravaOn(c: Context) = connections(c).optJSONObject("strava")?.optString("status") == "connected"
+
+    private fun fetchConnections(c: Context) {
+        val r = http("GET", "/rest/v1/connections?select=provider,status,meta,connected_at", null, token(c))
+        if (r.code !in 200..299) return
+        val rows = JSONArray(r.body)
+        val o = JSONObject()
+        for (i in 0 until rows.length()) rows.getJSONObject(i).let { o.put(it.getString("provider"), it) }
+        prefs(c).edit().putString("conn", o.toString()).apply()
+    }
+
+    /** Llama a la Edge Function «conexiones» con tu cuenta. */
+    private fun fn(c: Context, body: JSONObject): JSONObject {
+        val r = http("POST", "/functions/v1/conexiones", body.toString(), token(c))
+        val o = try { JSONObject(r.body) } catch (e: Exception) { JSONObject() }
+        if (r.code !in 200..299) throw CloudError(o.optString("error").ifEmpty { "Error del servidor (${r.code})." })
+        return o
+    }
+
+    private fun post(done: (String, Boolean) -> Unit, msg: String, ok: Boolean) =
+        Handler(Looper.getMainLooper()).post { done(msg, ok) }
+
+    /** Pide el enlace para conectar Strava o Polar; [done] recibe la dirección que hay que abrir en el navegador. */
+    fun connect(c: Context, provider: String, done: (String, Boolean) -> Unit) = exec.execute {
+        try { post(done, fn(c, JSONObject().put("action", "conectar").put("provider", provider)).getString("url"), true) }
+        catch (e: CloudError) { post(done, e.message ?: "No se pudo conectar.", false) }
+        catch (e: IOException) { post(done, "Sin conexión. Prueba otra vez cuando tengas internet.", false) }
+        catch (e: Exception) { post(done, "No se pudo conectar: ${e.message}", false) }
+    }
+
+    fun disconnect(c: Context, provider: String, done: (String, Boolean) -> Unit) = exec.execute {
+        try {
+            fn(c, JSONObject().put("action", "desconectar").put("provider", provider))
+            fetchConnections(c)
+            post(done, if (provider == "strava") "Strava desconectado." else "Polar desconectado.", true)
+        } catch (e: IOException) { post(done, "Sin conexión. Prueba otra vez cuando tengas internet.", false) }
+        catch (e: Exception) { post(done, e.message ?: "No se pudo desconectar.", false) }
+        notifyUi(false)
+    }
+
+    /** «Enviar a Strava»: sube ya esa sesión (antes, la sincroniza para que el servidor la tenga). */
+    fun sendToStrava(c: Context, id: String, done: (String, Boolean) -> Unit) = exec.execute {
+        try {
+            sync(c)
+            val o = fn(c, JSONObject().put("action", "enviar").put("session_id", id))
+            sync(c)
+            val (msg, ok) = when (o.optString("status")) {
+                "done" -> "Enviada a Strava." to true
+                "duplicate" -> "Strava ya tenía una actividad a esa hora. No se ha subido otra." to true
+                "error" -> (o.optString("error").ifEmpty { "Strava no respondió." } + " Se volverá a intentar sola.") to false
+                else -> "En cola: se enviará en unos minutos." to true
+            }
+            post(done, msg, ok)
+        } catch (e: IOException) { post(done, "Sin conexión. Se enviará cuando haya internet.", false) }
+        catch (e: Exception) { post(done, e.message ?: "No se pudo enviar.", false) }
+        notifyUi(true)
+    }
+
+    /** «Reenviar carreras y paseos»: para cuando Polar Flow ya no sube nada a Strava. */
+    fun setForward(c: Context, on: Boolean, done: (String, Boolean) -> Unit) = exec.execute {
+        try {
+            if (!stravaOn(c)) throw CloudError("Conecta Strava primero.")
+            val meta = connections(c).optJSONObject("strava")?.optJSONObject("meta") ?: JSONObject()
+            meta.put("forward", on)
+            // HttpURLConnection no sabe hacer PATCH: se guarda con un upsert sobre la fila que ya existe
+            val row = JSONObject().put("user_id", prefs(c).getString("uid", "")).put("provider", "strava").put("meta", meta)
+            val r = http("POST", "/rest/v1/connections?on_conflict=user_id,provider", JSONArray().put(row).toString(), token(c),
+                mapOf("Prefer" to "resolution=merge-duplicates,return=minimal"))
+            if (r.code !in 200..299) throw CloudError(errorText(r))
+            fetchConnections(c)
+            post(done, if (on) "Las carreras y paseos del reloj también se envían desde aquí." else "Las carreras y paseos los sube Polar Flow.", true)
+        } catch (e: IOException) { post(done, "Sin conexión. Prueba otra vez cuando tengas internet.", false) }
+        catch (e: Exception) { post(done, e.message ?: "No se pudo guardar.", false) }
+        notifyUi(false)
     }
 
     private fun setMsg(c: Context, msg: String, ok: Boolean) {
@@ -148,7 +231,7 @@ object Cloud {
     fun signOut(c: Context, done: () -> Unit) = exec.execute {
         val at = prefs(c).getString("at", null)
         try { if (at != null) http("POST", "/auth/v1/logout", null, at) } catch (e: Exception) { }
-        prefs(c).edit().remove("at").remove("rt").remove("exp").remove("uid").remove("email").apply()
+        prefs(c).edit().remove("at").remove("rt").remove("exp").remove("uid").remove("email").remove("conn").apply()
         setMsg(c, "Has salido de la cuenta. Tus datos siguen en el móvil.", true)
         Handler(Looper.getMainLooper()).post { done() }
     }
@@ -269,11 +352,19 @@ object Cloud {
         }
 
         // 2. Subir las sesiones pendientes (de 50 en 50)
+        var pushed = 0
         SyncLogic.pendingSessions(History.all(c), up).chunked(50).forEach { batch ->
             rpc(c, "push_sessions", JSONObject().put("sessions", JSONArray(batch)))
             batch.forEach { up.put(it.optString("id"), SyncLogic.sessionHash(it)) }
             p.edit().putString("up", up.toString()).apply()
+            pushed += batch.size
         }
+
+        // 2b. Strava y Polar: cómo están las conexiones y, si hay sesiones nuevas, que el servidor las mire ya
+        try {
+            fetchConnections(c)
+            if (pushed > 0 && stravaOn(c)) fn(c, JSONObject().put("action", "procesar"))
+        } catch (e: Exception) { }  // no estorba a la sincronización; la tarea de cada 15 minutos lo hará
 
         // 3. Ajustes, pesos, bandas, favoritas y racha. Mientras el widget hace una sesión no se toca nada
         if (Workout.active) return changed

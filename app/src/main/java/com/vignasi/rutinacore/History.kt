@@ -13,6 +13,8 @@ import java.io.File
  * fb (opcional: cómo te ha ido cada módulo, "up" | "ok" | "down") y sets: una por serie hecha, con
  * k (clave del ejercicio), name, r (ronda), side, start, end, reps y planReps (0 en los de mantener),
  * secs y planSecs (0 en los de repeticiones), kg, band, mod y skipped (si se saltó antes de acabar).
+ * Opcionales al terminar: rpe (esfuerzo 1–10), feel ("mal" | "regular" | "bien" | "muybien") y st (false = no enviar a Strava).
+ * Solo los escribe la nube (S1): strava { s: waiting|uploading|done|error|duplicate, id, err } y hr { avg, max } del reloj.
  * La misma forma la escriben la página (index.html) y el servicio del widget (SessionRecorder).
  */
 object History {
@@ -59,6 +61,18 @@ object History {
         for (i in 0 until a.length()) {
             val o = a.optJSONObject(i) ?: continue
             if (o.optString("id") == id) { o.put("fb", fb); write(c, a); Cloud.syncSoon(c); return@synchronized }
+        }
+    }
+
+    /** Pone o cambia campos sueltos de una sesión ya guardada (esfuerzo «rpe», sensación «feel», «st»: false = no enviar a Strava). */
+    fun setFields(c: Context, id: String, fields: JSONObject) = synchronized(lock) {
+        val a = all(c)
+        for (i in 0 until a.length()) {
+            val o = a.optJSONObject(i) ?: continue
+            if (o.optString("id") == id) {
+                fields.keys().forEach { k -> if (fields.isNull(k)) o.remove(k) else o.put(k, fields.get(k)) }
+                write(c, a); Cloud.syncSoon(c); return@synchronized
+            }
         }
     }
 
