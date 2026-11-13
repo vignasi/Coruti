@@ -13,6 +13,7 @@ import android.speech.tts.TextToSpeech
 import android.view.WindowManager
 import android.webkit.JavascriptInterface
 import android.webkit.WebResourceRequest
+import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import java.util.Locale
@@ -21,6 +22,11 @@ class MainActivity : Activity() {
 
     companion object {
         const val EXTRA_AUTOSTART = "autostart"
+        /** Los assets se sirven con esta dirección (no file://): los módulos de three.js y los modelos .glb no cargan desde file://. */
+        const val HOST = "appassets.androidplatform.net"
+        private val MIME = mapOf("html" to "text/html", "js" to "text/javascript", "mjs" to "text/javascript", "css" to "text/css",
+            "json" to "application/json", "glb" to "model/gltf-binary", "woff2" to "font/woff2", "webp" to "image/webp",
+            "png" to "image/png", "svg" to "image/svg+xml", "txt" to "text/plain")
         private const val REQ_EXPORT = 11
         private const val REQ_IMPORT = 12
     }
@@ -45,10 +51,30 @@ class MainActivity : Activity() {
         web.settings.javaScriptEnabled = true
         web.settings.domStorageEnabled = true
         web.settings.mediaPlaybackRequiresUserGesture = false
+        // La letra del sistema la aplica la página (--escala, con tope en los textos grandes): así el reproductor sigue cabiendo
+        web.settings.textZoom = 100
+        web.settings.allowFileAccess = false
         web.addJavascriptInterface(Bridge(), "Android")
         web.webViewClient = object : WebViewClient() {
+            /** https://appassets.androidplatform.net/<ruta> → assets/<ruta>. El resto de la red no pasa por aquí. */
+            override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest): WebResourceResponse? {
+                val url = request.url
+                if (url.host != HOST) return null
+                val path = (url.path ?: "/").trimStart('/').ifEmpty { "index.html" }
+                if (path.contains("..")) return WebResourceResponse("text/plain", "utf-8", 404, "No", emptyMap(), null)
+                val ext = path.substringAfterLast('.', "").lowercase()
+                return try {
+                    val r = WebResourceResponse(MIME[ext] ?: "application/octet-stream", if (ext in setOf("html", "js", "css", "json", "txt")) "utf-8" else null, assets.open(path))
+                    r.responseHeaders = mapOf("Access-Control-Allow-Origin" to "*", "Cache-Control" to "no-cache")
+                    r
+                } catch (e: Exception) {
+                    WebResourceResponse("text/plain", "utf-8", 404, "No encontrado", emptyMap(), null)
+                }
+            }
+
             override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
                 val url = request.url
+                if (url.host == HOST) return false
                 if (url.scheme == "http" || url.scheme == "https") {
                     startActivity(Intent(Intent.ACTION_VIEW, url))
                     return true
@@ -76,7 +102,7 @@ class MainActivity : Activity() {
         pendingAutostart = intent?.getBooleanExtra(EXTRA_AUTOSTART, false) == true
         // La nube avisa al terminar de sincronizar; si han llegado datos, la página los vuelve a leer
         Cloud.listener = { changed -> cloudChanged(changed) }
-        web.loadUrl("file:///android_asset/index.html")
+        web.loadUrl("https://$HOST/index.html?escala=" + resources.configuration.fontScale)
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -91,6 +117,15 @@ class MainActivity : Activity() {
         WidgetUpdater.refresh(this, force = true)
         if (pageReady) js("window.reloadConfig && window.reloadConfig(); window.refreshStats && window.refreshStats()")
         Cloud.syncSoon(this, 1)
+    }
+
+    /** Atrás: primero lo resuelve la página (cerrar una hoja, volver de una subpantalla, pausar la sesión). */
+    @Deprecated("Activity sin AndroidX: Atrás llega aquí")
+    override fun onBackPressed() {
+        if (!pageReady) { @Suppress("DEPRECATION") super.onBackPressed(); return }
+        web.evaluateJavascript("window.atras ? window.atras() : false") { r ->
+            if (r != "true") { @Suppress("DEPRECATION") super.onBackPressed() }
+        }
     }
 
     override fun onDestroy() {
@@ -249,6 +284,10 @@ class MainActivity : Activity() {
 
         @JavascriptInterface
         fun cloudSignOut() = Cloud.signOut(this@MainActivity) { cloudChanged(false) }
+
+        /** Días hechos (fechas «2026-11-11»), para la semana de Entrenar. */
+        @JavascriptInterface
+        fun days(): String = org.json.JSONArray(Store.allDays(this@MainActivity).sorted()).toString()
 
         @JavascriptInterface
         fun stats(): String {
