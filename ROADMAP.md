@@ -7,6 +7,35 @@ marca aquí lo hecho y termina dando el prompt de la fase siguiente.
 Cada conversación nueva parte de `main`; si no se fusiona, empieza sin los cambios anteriores.
 Qué se puede hacer a la vez y en qué orden: ver «Plan a partir de aquí».
 
+## Estado (13 nov 2026)
+
+**Dónde estamos:** todo lo construido está en `main` (APK 1.0.31 en Releases); falta que lo pruebes en el móvil
+y que pongas en marcha Supabase, Strava y Polar. Lo siguiente que se programa es B2 y C2, a la vez.
+
+**Hecho y en `main`:** Fases 0, 1 y 1b · D1, D2, D3 · B1 (cuentas y nube) · C1 (app nueva) · S1 (Strava y Polar; servidor desplegado
+y migraciones aplicadas) · CLAUDE.md y Actions solo cuando hace falta un APK. Pull requests #1–#6 fusionados; último APK: 1.0.31.
+
+**Hecho pero sin fusionar:** nada. Las ramas que quedan con commits fuera de `main` son trabajo viejo ya superado
+(`claude/elegant-bardeen-9nk8c1` y `claude/vigilant-lovelace-hb4acy`: D1 y D2 rehechos después;
+`claude/affectionate-shannon-9oa7zz`: plan de producto de octubre, sustituido por este ROADMAP). Se pueden borrar.
+
+**Tú, en este orden:**
+1. Plantillas de email de Supabase para que llegue el código: `docs/supabase.md`, apartado 2. Sin esto no puedes entrar en la cuenta.
+2. Instalar el APK 1.0.31 de Releases (es el de `main`; donde `docs/strava.md` dice «el APK de la rama», usa este).
+3. Probar en el móvil la app nueva: lo de siempre (rutina, sueltos, favorita en el widget, historial, exportar e importar),
+   TalkBack y la fluidez del reproductor 3D (C1, Fases 1 y 1b más abajo).
+4. Entrar con tu cuenta; luego reinstalar u otro móvil y comprobar que aparece todo; tu mujer con su cuenta ve solo lo suyo (B1).
+5. Registrar la app en Strava y en Polar AccessLink y poner las 4 claves en Supabase: `docs/strava.md`, pasos 1–3.
+6. Conectar Strava y Polar en Tú → Conexiones: `docs/strava.md`, paso 4.
+7. Polar Flow → Strava solo carreras (o quitarlo y marcar «Reenviar también carreras y paseos»): `docs/strava.md`, paso 5; y el reloj, paso 6.
+8. Comprobar con una sesión real: en Polar Flow como siempre y en Strava con ejercicios y pulso; una carrera sigue llegando (S1).
+9. Para tu mujer en Strava: pedir más plazas de atletas en strava.com/settings/api (la app nueva solo admite 1).
+- Sin confirmar: el visto bueno de D3 en el móvil (C1 se construyó encima, así que se dio por bueno; dime si lo hiciste).
+
+**Siguiente fase:** B2 (conector de Claude) y C2 (widget con el diseño nuevo), a la vez y en ramas distintas.
+Después, el bloque P. Casi todo el bloque P toca `app/app.js`, igual que B2 (que añade «Plan de Claude» en Entrenar):
+mejor empezarlo cuando B2 esté fusionado.
+
 ## Decisiones tomadas
 
 - **Requisitos:** Strava tiene que mostrar los ejercicios (series, repeticiones, kilos), no una descripción,
