@@ -234,7 +234,7 @@ export async function crear({modelo,gender='m',loader}){
 
   /* Igual que Figura.draw: pinta el ejercicio en el lienzo 2D cv, en el instante t */
   function draw(cv,ex,t,clamp,o={}){
-    const dpr=window.devicePixelRatio||1,cw=cv.clientWidth||300;
+    const dpr=Math.min(o.maxDpr||Infinity,window.devicePixelRatio||1),cw=cv.clientWidth||300;   // maxDpr: el reproductor de C1 usa 2
     if(cv.width!==Math.round(cw*dpr)){cv.width=Math.round(cw*dpr);cv.height=Math.round(cw*112/180*dpr);}
     const k=o.key,big=!!o.labels,dk=!!o.dark;
     const box=frameOf(ex,k,big);const R=pose(ex,k,t,clamp);drawProps(ex,k);drawGear(ex,R);place(box,big);

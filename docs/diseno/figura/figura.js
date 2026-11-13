@@ -425,7 +425,7 @@ function labels(ctx,ex,st,gm,t,text,toScreen,sc,C,bx){
 /* ---------- Dibujar ---------- */
 function draw(cv,ex,t,clamp,o={}){
   const style=o.style||"persona",g=o.gender==="f"?"f":"m",B=BODY[g],C=colorsFor(o);
-  const dpr=window.devicePixelRatio||1,cw=cv.clientWidth||300;
+  const dpr=Math.min(o.maxDpr||Infinity,window.devicePixelRatio||1),cw=cv.clientWidth||300;
   if(cv.width!==Math.round(cw*dpr)){cv.width=Math.round(cw*dpr);cv.height=Math.round(cw*112/180*dpr);}
   const ctx=cv.getContext("2d"),sc=cv.width/180,big=!!o.labels,bx=boxOf(ex,big);
   ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,cv.width,cv.height);
