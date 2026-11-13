@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Comprobador 3D · medidas</title>
+<!-- Paso 3 (docs/diseno/4-ejercicios.md): coloca la figura 3D de la app en cada fase y a mitad de cada movimiento y mide
+     sobre la malla deformada (la superficie del cuerpo y la ropa, no los huesos). No decide nada: devuelve las medidas en
+     window.res y las reglas están en ejercicios/reglas3d.js. Lo abre ejercicios/comprobar3d.js con Playwright.
+     ?g=m|f &ex=a,b -->
+<script src="../docs/diseno/figura/figura.js"></script>
+<script type="importmap">{"imports":{"three":"../docs/diseno/figura/three/build/three.module.min.js","three/addons/":"../docs/diseno/figura/three/examples/jsm/"}}</script>
+</head>
+<body>
+<script type="module">
+import * as THREE from 'three';
+import {crear} from '../docs/diseno/figura/figura3d.js';
+const q = new URLSearchParams(location.search), g = q.get('g') || 'm';
+const D = await (await fetch('../app/src/main/assets/rutina.json')).json();
+const T = await (await fetch('tecnicas.json')).json();
+const f3 = await crear({modelo: '../docs/diseno/figura/modelos/persona_' + g + '.glb', gender: g});
+const B = f3.bones, wp = n => B[n].getWorldPosition(new THREE.Vector3());
+const nombre = n => n.replace('mixamorig', '').replace(':', '');
+
+/* ---- Regiones del cuerpo, decididas una vez en reposo (cada vértice va con su hueso principal) ---- */
+const meshes = [];
+f3.root.traverse(o => { if (o.isSkinnedMesh && [].concat(o.material)[0].name !== 'ojos') meshes.push(o); });
+f3.root.updateMatrixWorld(true);
+const R0 = {}; for (const n in B) R0[n] = wp(n);
+const fwd0 = R0.LeftToeBase.clone().sub(R0.LeftFoot).setY(0).normalize();     // hacia dónde mira el modelo en reposo
+const hipsQ0 = B.Hips.getWorldQuaternion(new THREE.Quaternion());
+const V = [];            // {m, i, r} r = región con lado (p. ej. rodilla_izq)
+const v = new THREE.Vector3();
+for (const m of meshes) {
+  const si = m.geometry.attributes.skinIndex, sw = m.geometry.attributes.skinWeight, n = m.geometry.attributes.position.count;
+  for (let i = 0; i < n; i++) {
+    let best = 0, bw = -1; for (let j = 0; j < 4; j++) { const w = sw.getComponent(i, j); if (w > bw) { bw = w; best = si.getComponent(i, j); } }
+    const bn = nombre(m.skeleton.bones[best].name);
+    m.getVertexPosition(i, v); m.localToWorld(v);
+    const lado = bn.startsWith('Left') ? '_izq' : bn.startsWith('Right') ? '_der' : '', S = bn.startsWith('Left') ? 'Left' : 'Right';
+    const atras = (ref) => v.clone().sub(R0[ref]).dot(fwd0) < 0, cerca = (ref, cm) => v.distanceTo(R0[ref]) < cm / 100;
+    let r;
+    if (bn === 'Head') r = 'cabeza';
+    else if (bn === 'Neck') r = 'cuello';
+    else if (/Spine1|Spine2|Shoulder/.test(bn)) r = atras('Spine1') ? 'espalda_alta' : 'pecho';
+    else if (bn === 'Spine') r = atras('Spine') ? 'espalda_baja' : 'barriga';
+    else if (bn === 'Hips') r = atras('Hips') ? 'cadera' : 'barriga';
+    else if (/UpLeg$/.test(bn)) r = cerca(S + 'Leg', 9) ? 'rodilla' + lado : atras(S + 'UpLeg') && cerca(S + 'UpLeg', 16) ? 'cadera' : 'muslo' + lado;
+    else if (/Leg$/.test(bn)) r = cerca(S + 'Leg', 9) ? 'rodilla' + lado : 'espinilla' + lado;
+    else if (/Foot$/.test(bn)) r = v.clone().sub(R0[S + 'Foot']).dot(fwd0) < .015 ? 'talon' + lado : 'pie' + lado;
+    else if (/ToeBase$/.test(bn)) r = 'punta' + lado;
+    else if (/Arm$/.test(bn)) r = cerca(S + 'ForeArm', 6) ? 'codo' + lado : 'brazo' + lado;
+    else if (/ForeArm$/.test(bn)) r = cerca(S + 'ForeArm', 6) ? 'codo' + lado : 'antebrazo' + lado;
+    else if (/Hand/.test(bn)) r = 'mano' + lado;
+    else r = 'otro';
+    V.push({m, i, r});
+  }
+}
+// grupos para distancias entre partes del cuerpo (juntos, separados, cabeza apoyada en el brazo…)
+const GRUPO = {pie: ['talon', 'pie', 'punta'], rodilla: ['rodilla'], mano: ['mano'], codo: ['codo'], cabeza: ['cabeza'],
+  brazo: ['brazo', 'codo', 'antebrazo', 'mano'], muslo: ['muslo', 'rodilla'], tobillo: ['talon', 'pie']};
+const enGrupo = (r, gr) => { if (gr === 'cabeza') return r === 'cabeza'; const [base, lado] = gr.split(/_(?=izq$|der$)/); return GRUPO[base] && GRUPO[base].some(x => r === x + '_' + lado); };
+
+/* ---- Lo que hay alrededor: suelo, muebles (cajas) y pared ---- */
+function muebles(ex, k) {
+  return f3.props(ex, k).map(({e, cx, cz, D: d, H, W, wall}) => {
+    const et = (e.label || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+    const tipo = wall ? 'pared' : /sofa/.test(et) ? 'sofa' : 'silla';
+    // la pared es un panel de fondo detrás de la persona (figura3d.js: drawProps), de 4 cm de grueso
+    return wall ? {tipo, min: [cx - W / 2, 0, -.32], max: [cx + W / 2, H, -.28]} : {tipo, min: [cx - W / 2, 0, cz - d / 2], max: [cx + W / 2, H, cz + d / 2]};
+  });
+}
+// distancia con signo a una caja: fuera > 0, dentro < 0 (lo que se mete)
+function dCaja(p, b) {
+  const dx = Math.max(b.min[0] - p.x, p.x - b.max[0]), dy = Math.max(b.min[1] - p.y, p.y - b.max[1]), dz = Math.max(b.min[2] - p.z, p.z - b.max[2]);
+  if (dx <= 0 && dy <= 0 && dz <= 0) return Math.max(dx, dy, dz);
+  return Math.hypot(Math.max(dx, 0), Math.max(dy, 0), Math.max(dz, 0));
+}
+const JOINTS = {cabeza: 'Head', cuello: 'Neck', pecho: 'Spine2', espalda: 'Spine1', pelvis: 'Hips',
+  hombro_izq: 'LeftArm', hombro_der: 'RightArm', codo_izq: 'LeftForeArm', codo_der: 'RightForeArm', muneca_izq: 'LeftHand', muneca_der: 'RightHand',
+  cadera_izq: 'LeftUpLeg', cadera_der: 'RightUpLeg', rodilla_izq: 'LeftLeg', rodilla_der: 'RightLeg', tobillo_izq: 'LeftFoot', tobillo_der: 'RightFoot',
+  punta_izq: 'LeftToeBase', punta_der: 'RightToeBase'};
+const r2 = x => Math.round(x * 1000) / 10;      // m → cm con un decimal
+
+function medir(ex, k, t, pares) {
+  f3.pose(ex, k, t, true);
+  f3.root.updateMatrixWorld(true);
+  const cajas = muebles(ex, k), reg = {}, pos = new Array(V.length);
+  let i = 0;
+  for (const x of V) {
+    const p = x.m.getVertexPosition(x.i, new THREE.Vector3()); x.m.localToWorld(p); pos[i++] = p;
+    const o = reg[x.r] || (reg[x.r] = {suelo: 1e9, cajas: cajas.map(() => 1e9)});
+    if (p.y < o.suelo) o.suelo = p.y;
+    cajas.forEach((b, j) => { const d = dCaja(p, b); if (d < o.cajas[j]) o.cajas[j] = d; });
+  }
+  for (const r in reg) { reg[r].suelo = r2(reg[r].suelo); reg[r].cajas = reg[r].cajas.map(r2); }
+  const J = {}; for (const j in JOINTS) J[j] = wp(JOINTS[j]).toArray().map(r2);
+  const fwd = fwd0.clone().applyQuaternion(B.Hips.getWorldQuaternion(new THREE.Quaternion()).multiply(hipsQ0.clone().invert()));
+  // distancias entre grupos (superficie con superficie), solo las que pide la técnica
+  const dist = {};
+  for (const [a, b] of pares) {
+    const A = [], Bv = [];
+    V.forEach((x, n) => { if (n % 2) return; if (enGrupo(x.r, a)) A.push(pos[n]); if (enGrupo(x.r, b)) Bv.push(pos[n]); });
+    let d = 1e9; for (const p of A) for (const r of Bv) { const e = p.distanceToSquared(r); if (e < d) d = e; }
+    dist[a + '|' + b] = A.length && Bv.length ? r2(Math.sqrt(d)) : null;
+  }
+  return {reg, J, fwd: fwd.toArray(), cajas: cajas.map(c => c.tipo), dist};
+}
+
+const keys = (q.get('ex') || Object.keys(T).join(',')).split(',').filter(k => D.exercises[k] && T[k]);
+const res = {};
+for (const k of keys) {
+  const ex = D.exercises[k], tec = T[k], pares = new Set();
+  // pares de partes que hay que medir: condiciones juntos/separados y apoyos sobre el propio cuerpo (cabeza@brazo_abajo)
+  const lista = [];
+  for (const c of tec.condiciones || []) for (const tipo of ['juntos', 'separados']) if (c[tipo]) {
+    const [a, b] = Array.isArray(c[tipo]) ? c[tipo] : c[tipo].partes; lista.push([a, b]); }
+  for (const f of tec.fases) for (const a of f.apoyos || []) { const [p, s] = a.split('@');
+    if (s && !['suelo', 'silla', 'sofa', 'pared'].includes(s)) for (const l of ['_izq', '_der']) for (const m of ['_izq', '_der'])
+      lista.push([p === 'cabeza' ? 'cabeza' : p.replace(/s?$/, '') + l, s.replace(/_abajo$/, '').replace(/s$/, '') + m]); }
+  lista.forEach(pp => pares.add(pp.join('|')));
+  const P = [...pares].map(s => s.split('|'));
+  f3.props(ex, k);
+  const muestras = [];
+  ex.phases.forEach((ph, i) => {
+    const fin = Figura.phaseT(ex, i);
+    if (ph.move > 0) muestras.push({fase: i, momento: 'mitad', ...medir(ex, k, fin - ph.move / 2, P)});
+    muestras.push({fase: i, momento: 'fin', ...medir(ex, k, fin, P)});
+  });
+  res[k] = muestras;
+}
+window.res = res; window.__done = true;
+</script>
+</body>
+</html>
