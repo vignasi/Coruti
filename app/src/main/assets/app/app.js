@@ -72,7 +72,7 @@ function sesionHoy() { const w = widgetFav(), f = w && favs().find(x => x.name =
 /* ---------- Pantallas ---------- */
 const P = {};
 const TABS = [['entrenar', 'Entrenar'], ['ejercicios', 'Ejercicios'], ['historial', 'Historial'], ['tu', 'Tú']];
-const TAB_DE = { core: 'entrenar', nueva: 'entrenar', elegir: 'entrenar', final: 'entrenar', ficha: 'ejercicios', detalle: 'historial', marcas: 'historial' };
+const TAB_DE = { entrar: 'tu', material: 'tu', bandas: 'tu', sonido: 'tu', figura: 'tu', widgetconf: 'tu', copia: 'tu', core: 'entrenar', nueva: 'entrenar', elegir: 'entrenar', final: 'entrenar', ficha: 'ejercicios', detalle: 'historial', marcas: 'historial' };
 
 P.entrenar = { render: () => {
   const st = store.stats(), hoy = sesionHoy(), dias = new Set(store.days());
@@ -176,9 +176,151 @@ P.elegir = { titulo: 'Elegir ejercicios', render: () => { const l = filtrar(), n
   </div>
   <div style="padding:var(--e3) var(--e4);border-top:1px solid var(--linea);background:var(--capa)"><button class="btn btn-principal btn-grande" data-act="atras">${n ? `Listo · ${plural(n, 'ejercicio', 'ejercicios')}` : 'Volver'}</button></div>`; } };
 
-P.ejercicios = { render: () => `<div class="pantalla"><h1 class="titulo-pantalla">Ejercicios</h1><div class="tarjeta"><p>La cuadrícula de ejercicios con su ficha llega en la entrega 3. Mientras, los ves en Entrenar → Sesión nueva → Añadir ejercicios.</p></div></div>` };
-P.historial = { render: () => `<div class="pantalla"><h1 class="titulo-pantalla">Historial</h1><div class="tarjeta"><p>Tus sesiones siguen guardadas (${plural(historyList().length, 'sesión', 'sesiones')}). La pantalla nueva llega en la entrega 4.</p></div></div>` };
-P.tu = { render: () => `<div class="pantalla"><h1 class="titulo-pantalla">Tú</h1><div class="tarjeta"><p>Cuenta, material, bandas, sonido, figura, widget y copia de seguridad llegan en la entrega 5. Tus datos y ajustes siguen guardados.</p></div></div>` };
+P.ejercicios = { render: () => { const l = filtrar(); return `
+  <div class="pantalla">
+    <h1 class="titulo-pantalla">Ejercicios</h1>
+    <div class="pila">${filtros()}</div>
+    <p class="meta" aria-live="polite">${plural(l.length, 'ejercicio', 'ejercicios')}</p>
+    <div class="rejilla">${l.map(k => `<button class="miniatura" data-act="ficha" data-v="${k}">${fig(k)}<span class="nombre">${esc(D.exercises[k].name)}</span><span class="meta">${esc(dosisDe(k))}</span></button>`).join('') || '<p class="meta">Ninguno con estos filtros. Quita alguno.</p>'}</div>
+  </div>`; } };
+
+/* Ficha: el movimiento entero, los pasos, las claves, la dosis, el material, vídeos y tus marcas */
+P.ficha = { render: () => { const k = S.ex, ex = D.exercises[k], c = catOf(k), m = exSummary(historyList()).find(e => e.k === k), w = store.weights()[k];
+  const pasos = []; ex.phases.forEach(ph => { if (ph.cap && !pasos.includes(ph.cap)) pasos.push(ph.cap); });
+  return `${cab(ex.name)}
+  <div class="pantalla">
+    ${fig(k, 'grande')}
+    <div class="fila envuelve"><span class="estado neutro">${esc(c.zone || '')}</span><span class="estado neutro">${esc(NEEDS()[c.needs || ''])}</span>${c.sides ? '<span class="estado neutro">Por lado</span>' : ''}</div>
+    <div class="pila"><span class="etiqueta">Dosis orientativa</span><p class="h2">${esc(ex.info || dosisDe(k))}</p>${c.kg ? `<p class="meta">${esc(kgRange(c.kg))}</p>` : ''}</div>
+    ${pasos.length > 1 ? `<section class="seccion"><h2>Movimiento</h2><ol class="pila" style="margin:0;padding-left:1.4em">${pasos.map(t => `<li>${esc(t)}</li>`).join('')}</ol></section>` : ''}
+    <section class="seccion"><h2>Claves</h2><ul class="pila" style="margin:0;padding-left:1.4em">${ex.cues.map(t => `<li>${esc(t)}</li>`).join('')}</ul></section>
+    <section class="seccion"><h2>Tus marcas</h2>
+      ${m ? `<div class="lista"><div class="item" style="cursor:default"><span class="crece"><span class="meta">Última vez · ${esc(dayShort(m.last))}</span><span class="nombre">${esc(lastTxt(m))}</span></span></div>
+        <div class="item" style="cursor:default"><span class="crece"><span class="meta">Mejor · ${esc(dayShort(m.bestAt))}</span><span class="nombre">${esc(bestTxt(m))}</span></span></div></div>`
+        : '<p class="meta">Aún no lo has hecho. Cuando lo hagas, aquí verás la última vez y tu mejor marca.</p>'}
+      ${w != null ? `<p class="meta">Últimos kilos usados: ${fkg(w)} kg</p>` : ''}${usesBand(k) && bandOf(k) ? `<p class="meta">Tu banda: ${esc(bandOf(k))}</p>` : ''}
+    </section>
+    <a class="btn btn-texto" href="https://www.youtube.com/results?search_query=${encodeURIComponent(ex.vid || ex.name)}" target="_blank" rel="noopener" aria-label="Ver vídeos de ${esc(ex.name)} en YouTube (se abre fuera de la app)">${ico('externo')}Ver vídeos en YouTube</a>
+    <button class="btn btn-principal btn-grande" data-act="anadir" data-v="${k}">${ico('mas')}${fr.sel.some(it => it.k === k) ? 'Ya está en tu sesión: abrirla' : 'Añadir a una sesión'}</button>
+  </div>`; } };
+
+/* Historial: sesiones por días (de la app y del widget; las paradas a mitad, «Incompleta»), detalle y marcas por ejercicio */
+P.historial = { render: () => { const h = historyList(), n = S.hver || 30;
+  if (!h.length) return `<div class="pantalla"><h1 class="titulo-pantalla">Historial</h1>
+    <div class="tarjeta"><h2 class="h2">Aquí saldrán tus sesiones</h2><p>Cada sesión que termines, desde la app o el widget, se guarda con sus series, kilos y bandas. Si paras a mitad, también, como incompleta.</p><button class="btn btn-secundario" data-go="copia">${ico('subir')}Importar una copia</button></div></div>`;
+  const dias = []; h.slice(0, n).forEach(o => { const k = dayKey(o.start); if (!dias.length || dias[dias.length - 1].k !== k) dias.push({ k, t: dayLong(o.start), s: [] }); dias[dias.length - 1].s.push(o); });
+  return `<div class="pantalla">
+    <div class="fila-titulo"><h1 class="titulo-pantalla">Historial</h1><button class="btn btn-texto" data-go="marcas">Por ejercicio</button></div>
+    <p class="meta">${plural(h.length, 'sesión', 'sesiones')} desde el ${esc(dayShort(h[h.length - 1].start))}</p>
+    ${dias.map(d => `<section class="seccion"><h2 class="etiqueta">${esc(d.t)}</h2><div class="lista">${d.s.map(o => `<button class="item" data-act="det" data-v="${esc(o.id)}">
+      <span class="item-icono">${ico(o.src === 'widget' ? 'widget' : 'entrenar')}</span>
+      <span class="crece"><span class="nombre">${esc(o.title || (o.type === 'sueltos' ? 'Ejercicios sueltos' : 'Rutina'))}</span>
+        <span class="meta">${esc([hhmm(o.start), durTxt(o.end - o.start), plural(o.sets.length, 'serie', 'series'), o.src === 'widget' ? 'desde el widget' : ''].filter(Boolean).join(' · '))}</span>
+        ${o.complete ? '' : '<span class="estado neutro" style="align-self:flex-start;margin-top:2px">Incompleta</span>'}</span>${ico('chev', 'chev')}</button>`).join('')}</div></section>`).join('')}
+    ${h.length > n ? '<button class="btn btn-secundario" data-act="hmas">Ver más</button>' : ''}
+  </div>`; } };
+
+P.detalle = { render: () => { const o = historyList().find(x => x.id === S.det); if (!o) return `${cab('Sesión')}<div class="pantalla"><p>No se encuentra la sesión.</p></div>`;
+  const g = new Map(); o.sets.forEach(x => { if (!g.has(x.k)) g.set(x.k, []); g.get(x.k).push(x); });
+  const W = o.type === 'sueltos' ? 'Serie' : 'Ronda', kg = o.sets.some(x => x.kg != null), bd = o.sets.some(x => x.band);
+  return `${cab(dayLong(o.start))}
+  <div class="pantalla">
+    <div class="pila"><h1 class="titulo-pantalla">${esc(o.title || 'Sesión')}</h1>
+      <p class="meta">${hhmm(o.start)} – ${hhmm(o.end)} · ${durTxt(o.end - o.start)} · ${plural(o.sets.length, 'serie', 'series')} · ${o.type === 'sueltos' ? 'Ejercicios sueltos' : 'Rutina de core'}${o.src === 'widget' ? ' · desde el widget' : ''}</p>
+      ${o.complete ? '' : '<span class="estado neutro" style="align-self:flex-start">Incompleta · no cuenta para la racha</span>'}</div>
+    ${[...g.values()].map(l => `<section class="seccion"><h2>${esc(l[0].name)}</h2><div style="overflow-x:auto" tabindex="0" role="region" aria-label="Series de ${esc(l[0].name)}"><table class="tabla"><thead><tr><th>Hora</th><th>${W}</th><th class="n">Hecho</th>${kg ? '<th class="n">Kilos</th>' : ''}${bd ? '<th>Banda</th>' : ''}</tr></thead><tbody>
+      ${l.map(x => `<tr><td>${hhmm(x.start)}</td><td>${x.r}${x.side ? ' · ' + esc(x.side.toLowerCase()) : ''}</td><td class="n">${esc(doseOf(x))}${x.skipped ? ' <span class="meta">(saltada)</span>' : ''}</td>${kg ? `<td class="n">${x.kg != null ? fkg(x.kg) : '–'}</td>` : ''}${bd ? `<td>${esc(x.band || '–')}</td>` : ''}</tr>`).join('')}</tbody></table></div></section>`).join('')}
+    ${o.fb && Object.keys(o.fb).length ? `<section class="seccion"><h2>Cómo te fue</h2><p>${esc(Object.entries(o.fb).map(([k, v]) => { const m = D.modules.find(x => x.key === k); return (m ? m.name : k) + ': ' + FBT[v]; }).join(' · '))}</p></section>` : ''}
+  </div>`; } };
+
+P.marcas = { render: () => { const l = exSummary(historyList()); return `${cab('Por ejercicio')}
+  <div class="pantalla"><p class="meta">La última vez y la mejor (la de más kilos; sin kilos, la de más repeticiones o segundos).</p>
+  ${l.length ? `<div class="lista">${l.map(e => `<button class="item" data-act="ficha" data-v="${e.k}"><span class="crece"><span class="nombre">${esc(e.name)}</span><span class="meta">Última · ${esc(dayShort(e.last))}: ${esc(lastTxt(e))}</span><span class="meta">Mejor · ${esc(dayShort(e.bestAt))}: ${esc(bestTxt(e))}</span></span>${ico('chev', 'chev')}</button>`).join('')}</div>` : '<p>Aún no hay series guardadas.</p>'}</div>`; } };
+
+/* ---------- Tú: cuenta y ajustes ---------- */
+function nube() { try { return A && A.cloudState ? JSON.parse(A.cloudState()) : null; } catch (e) { return null; } }
+function nubeTxt(st) { const i = [];
+  if (st.busy) i.push('Sincronizando…'); else if (st.lastSync) i.push('Sincronizado el ' + dayShort(st.lastSync) + ' a las ' + hhmm(st.lastSync));
+  if (st.pending) i.push(plural(st.pending, 'sesión sin subir', 'sesiones sin subir'));
+  return [st.msg, ...i].filter(Boolean).join(' · '); }
+P.tu = { render: () => { const st = nube(), wf = widgetFav();
+  return `<div class="pantalla">
+    <h1 class="titulo-pantalla">Tú</h1>
+    <section class="seccion"><h2 class="etiqueta">Cuenta</h2>
+      ${!st ? '<p class="meta">La cuenta solo funciona en la app del móvil.</p>'
+        : st.signedIn ? `<div class="lista"><div class="item" style="cursor:default"><span class="item-icono">${ico('correo')}</span><span class="crece"><span class="nombre" style="overflow-wrap:anywhere">${esc(st.email)}</span><span class="meta">Tus datos se guardan en la nube y se sincronizan al terminar cada sesión y al abrir la app</span></span></div>
+          <button class="item" data-act="sincronizar" ${st.busy ? 'disabled' : ''}><span class="item-icono">${ico('reintentar')}</span><span class="crece"><span class="nombre">Sincronizar ahora</span><span class="meta" aria-live="polite">${esc(nubeTxt(st))}</span></span></button>
+          <button class="item" data-act="hoja" data-v="salir"><span class="item-icono">${ico('salir')}</span><span class="crece"><span class="nombre">Salir</span><span class="meta">Tus datos se quedan en este móvil</span></span></button></div>`
+        : `<div class="lista">${item({ t: 'Entrar', m: 'Para no perder nada y tenerlo también en otro móvil', go: 'entrar', icono: 'correo' })}</div>`}
+    </section>
+    <section class="seccion"><h2 class="etiqueta">Ajustes</h2><div class="lista">
+      ${item({ t: 'Material', m: MAT_TXT(), go: 'material', icono: 'mancuerna' })}
+      ${item({ t: 'Mis bandas', m: BANDS.join(', '), go: 'bandas', icono: 'banda' })}
+      ${item({ t: 'Sonido y voz', m: [cfg.app.tonos && 'Tonos', cfg.count && 'cuenta en voz alta', cfg.app.mitad && 'aviso a la mitad'].filter(Boolean).join(', ') || 'Solo la voz con el nombre', go: 'sonido', icono: 'sonido' })}
+      ${item({ t: 'Figura', m: cfg.app.fig === 'f' ? 'Mujer' : 'Hombre', go: 'figura', icono: 'figura' })}
+      ${item({ t: 'Widget', m: wf && favs().some(f => f.name === wf) ? 'Favorita: ' + wf : 'Rutina de core', go: 'widgetconf', icono: 'widget' })}
+      ${item({ t: 'Copia de seguridad', m: st && st.signedIn ? 'En la nube · también a un archivo' : 'A un archivo: exportar e importar', go: 'copia', icono: 'nube' })}
+    </div></section>
+  </div>`; } };
+
+P.entrar = { sinPestanas: true, render: () => `${cab('Entrar')}
+  <div class="pantalla">
+    <div class="pila" style="gap:var(--e3)"><h1 class="titulo-pantalla">Rutina core</h1><p>Entra con tu email para guardar tus sesiones en la nube y tenerlas en otro móvil. Te llega un código, sin contraseña.</p></div>
+    ${S.codigo ? `<form class="pila" style="gap:var(--e4)" data-form="codigo">
+      <p>Código enviado a <strong style="overflow-wrap:anywhere">${esc(S.email)}</strong>. Si no llega en 2 minutos, mira en spam.</p>
+      <div class="campo"><label for="codigo">Código del email</label><input id="codigo" inputmode="numeric" autocomplete="one-time-code" maxlength="10" required style="font-size:var(--t4);letter-spacing:.3em;text-align:center"></div>
+      <button class="btn btn-principal btn-grande" type="submit" ${S.enviando ? 'disabled' : ''}>Entrar</button>
+      <button class="btn btn-texto" type="button" data-act="otrocodigo">Enviar otro código o cambiar el email</button>
+    </form>` : `<form class="pila" style="gap:var(--e4)" data-form="email">
+      <div class="campo"><label for="email">Email</label><input id="email" type="email" autocomplete="email" inputmode="email" value="${esc(S.email || '')}" required></div>
+      <button class="btn btn-principal btn-grande" type="submit" ${S.enviando ? 'disabled' : ''}>Enviarme un código</button>
+    </form>`}
+    <p class="mensaje ${S.nubeOk === false ? 'error' : ''}" role="status" aria-live="polite">${esc(S.nubeMsg || '')}</p>
+    <button class="btn btn-texto" data-act="atras">Seguir sin cuenta</button>
+    <p class="meta">Sin cuenta, todo se queda solo en este móvil. Puedes entrar más tarde desde Tú.</p>
+  </div>` };
+
+P.material = { render: () => `${cab('Material')}
+  <div class="pantalla"><p class="meta">Cada ejercicio de la rutina de core sale en la versión para el material que tienes.</p>
+  <div class="lista">${[['gomas', 'Bandas grandes', 'Bucles largos y cerrados, sin asas'], ['banda', 'Mini banda', 'El bucle pequeño por encima de las rodillas'], ['mancuernas', 'Mancuernas', '']].map(([k, t, m]) => `<label class="item" for="m-${k}"><span class="crece"><span class="nombre">${t}</span>${m ? `<span class="meta">${m}</span>` : ''}</span>${inter('m-' + k, cfg[k], t)}</label>`).join('')}</div></div>` };
+
+P.bandas = { render: () => `${cab('Mis bandas')}
+  <div class="pantalla"><p class="meta">Ponles un nombre que las distinga (color o dureza). La app recuerda cuál usas en cada ejercicio.</p>
+  <div class="lista">${BANDS.map((b, i) => `<div class="item" style="cursor:default"><span class="item-icono">${ico('banda')}</span><div class="campo crece"><label class="oculto-visual" for="banda-${i}">Nombre de la banda ${i + 1}</label><input id="banda-${i}" data-banda="${i}" value="${esc(b)}" maxlength="30" autocomplete="off"></div>${BANDS.length > 1 ? `<button class="icono-btn" data-act="quitabanda" data-v="${i}" aria-label="Quitar ${esc(b)}">${ico('papelera')}</button>` : ''}</div>`).join('')}</div>
+  ${BANDS.length < 8 ? `<button class="btn btn-secundario" data-act="nuevabanda">${ico('mas')}Añadir banda</button>` : ''}</div>` };
+
+P.sonido = { render: () => `${cab('Sonido y voz')}
+  <div class="pantalla"><div class="lista">
+    <label class="item" for="s-tonos"><span class="crece"><span class="nombre">Tonos en cada repetición</span><span class="meta">Agudo al subir o empujar, grave al bajar</span></span>${inter('s-tonos', cfg.app.tonos, 'Tonos en cada repetición')}</label>
+    <label class="item" for="s-count"><span class="crece"><span class="nombre">Contar en voz alta</span></span>${inter('s-count', cfg.count, 'Contar en voz alta')}</label>
+    <label class="item" for="s-mitad"><span class="crece"><span class="nombre">Avisar a la mitad</span><span class="meta">En los ejercicios de mantener</span></span>${inter('s-mitad', cfg.app.mitad, 'Avisar a la mitad')}</label>
+  </div>
+  <p class="meta">La voz siempre dice el ejercicio en «Prepárate» y al empezar cada serie. La pantalla no se apaga durante la sesión.</p></div>` };
+
+P.figura = { render: () => `${cab('Figura')}
+  <div class="pantalla">
+    <section class="seccion"><h2>Quién hace los ejercicios</h2>
+      <div class="rejilla">${[['m', 'Hombre'], ['f', 'Mujer']].map(([g, t]) => `<button class="miniatura" data-act="figsexo" data-v="${g}" aria-pressed="${cfg.app.fig === g}">${fig('remo_incl_banda', 'mini', g)}<span class="check" aria-hidden="true">${cfg.app.fig === g ? ico('check') : ''}</span><span class="nombre">${t}</span></button>`).join('')}</div>
+      <p class="meta">Es la misma figura en toda la app.</p></section>
+    <section class="seccion"><h2>Vista previa</h2>${fig(S.figPrev || 'puente', 'grande')}
+      <div class="chips" role="group" aria-label="Ejercicio de la vista previa">${['puente', 'plancha', 'remo_incl_banda', 'almeja'].filter(k => D.exercises[k]).map(k => `<button class="chip" data-act="figprev" data-v="${k}" aria-pressed="${(S.figPrev || 'puente') === k}">${esc(D.exercises[k].name)}</button>`).join('')}</div>
+      <p class="meta">En grande salen la zona que trabaja (punto ámbar), la flecha del movimiento y la banda. En las miniaturas, solo la postura.${window.FIG && !window.FIG.tres() ? ' Este móvil no puede mostrar la figura 3D: sale la dibujada.' : ''}</p></section>
+  </div>` };
+
+P.widgetconf = { render: () => { const wf = widgetFav(), l = favs(), cur = wf && l.some(f => f.name === wf) ? wf : '';
+  return `${cab('Widget')}
+  <div class="pantalla"><p class="meta">Lo que empieza el widget al tocar Empezar, y lo que sale en Hoy. También se cambia desde el propio widget grande.</p>
+  <div class="lista" role="radiogroup" aria-label="Qué hace el widget">${[['', 'Rutina de core', coreResumen().meta], ...l.map(f => [f.name, f.name, 'Favorita · ' + favResumen(f).meta])].map(([v, t, m]) => `<button class="item" data-act="widgetfav" data-v="${esc(v)}" role="radio" aria-checked="${cur === v}"><span class="crece"><span class="nombre">${esc(t)}</span><span class="meta">${esc(m)}</span></span>${cur === v ? ico('check', 'chev') : '<span style="width:20px"></span>'}</button>`).join('')}</div>
+  ${l.length ? '' : '<p class="meta">Guarda una sesión como favorita para poder ponerla en el widget.</p>'}</div>`; } };
+
+P.copia = { render: () => { const st = nube(); return `${cab('Copia de seguridad')}
+  <div class="pantalla">
+    ${st && st.signedIn ? `<div class="tarjeta"><div class="fila"><span class="item-icono">${ico('nube')}</span><span class="crece"><span class="nombre" style="font-weight:700">En la nube</span><span class="meta" style="display:block">${esc(nubeTxt(st) || 'Con tu cuenta')}</span></span></div><p class="meta">Con tu cuenta, cada sesión se guarda al terminar.</p></div>` : ''}
+    <section class="seccion"><h2>A un archivo</h2><p class="meta">Historial, favoritas, bandas, pesos, ajustes y racha en un archivo JSON. Guárdalo en Drive o en el ordenador. Importar lo combina con lo que ya hay, sin duplicar ni borrar.</p>
+    <button class="btn btn-secundario" data-act="exportar">${ico('bajar')}Exportar</button>
+    <button class="btn btn-secundario" data-act="importar">${ico('subir')}Importar</button>
+    <p class="mensaje ${S.copiaOk === false ? 'error' : ''}" role="status" aria-live="polite">${esc(S.copiaMsg || '')}</p></section>
+  </div>`; } };
 
 /* ---------- Reproductor ----------
    La figura ocupa la pantalla; abajo, donde no se pisa: clave, nombre, cantidad, línea pequeña, banda o kilos, rayas y «Luego».
@@ -383,6 +525,7 @@ const HOJAS = {
   banda: () => { const k = S.hojaDe, cur = bandOf(k); return `<h2 class="h2">¿Qué banda llevas?</h2><p class="meta">${esc(D.exercises[k].name)}. La próxima vez sale la que elijas.</p><div class="lista">${BANDS.map(b => `<button class="item" data-act="ponbanda" data-v="${esc(b)}" role="radio" aria-checked="${b === cur}"><span class="item-icono">${ico('banda')}</span><span class="crece"><span class="nombre">${esc(b)}</span></span>${b === cur ? ico('check', 'chev') : '<span style="width:20px"></span>'}</button>`).join('')}</div><p class="meta">Los nombres se cambian en Tú → Mis bandas.</p>`; },
   kg: () => { const s = R.pasos[R.idx].prep ? R.pasos[R.idx + 1] : R.pasos[R.idx]; return `<h2 class="h2">Kilos de ${esc(D.exercises[s.k].name)}</h2><div class="fila"><span class="crece meta">Orientativo: ${esc(kgRange(s.kg))}</span>${paso('kg', fkg(kgDe(s)) + ' kg', 'Kilos', 'Medio kilo menos', 'Medio kilo más')}</div><p class="meta">Se recuerda para la próxima vez.</p><button class="btn btn-principal btn-grande" data-act="cerrar">Listo</button>`; },
   guardarfav: () => `<h2 class="h2">Guardar como favorita</h2><form class="pila" style="gap:var(--e4)" data-form="fav"><div class="campo"><label for="fav-n">Nombre</label><input id="fav-n" maxlength="40" autocomplete="off" placeholder="${esc(autoName(fr))}"></div><button class="btn btn-principal btn-grande" type="submit">${ico('estrella')}Guardar</button></form>`,
+  salir: () => `<h2 class="h2">¿Salir de la cuenta?</h2><p>Tus datos se quedan en este móvil. Si queda algo sin subir, se sube antes.</p><button class="btn btn-peligro btn-grande" data-act="salirya">${ico('salir')}Salir</button><button class="btn btn-principal btn-grande" data-act="cerrar">Seguir con la cuenta</button>`,
   borrarfav: () => `<h2 class="h2">¿Borrar «${esc(S.favEdit)}»?</h2><p>Se quita de favoritas${widgetFav() === S.favEdit ? ' y el widget vuelve a la rutina de core' : ''}. Tu historial no cambia.</p><button class="btn btn-peligro btn-grande" data-act="borrarya">${ico('papelera')}Borrar</button><button class="btn btn-principal btn-grande" data-act="cerrar">No borrar</button>`,
 };
 
@@ -433,13 +576,16 @@ const ACC = {
     if (k === 'core-auto') cfg.auto = on; else if (k === 'core-taper') cfg.taper = on;
     else if (k.startsWith('mod-')) cfg.mods[k.slice(4)] = on;
     else if (k === 'f-alt') { fr.alt = on; saveFree(); return; }
+    else if (k.startsWith('m-')) cfg[k.slice(2)] = on;
+    else if (k === 's-tonos') cfg.app.tonos = on; else if (k === 's-mitad') cfg.app.mitad = on; else if (k === 's-count') cfg.count = on;
     saveCfg(); },
   zona: b => { S.zona = S.zona === b.dataset.v ? '' : b.dataset.v; },
   mat: b => { S.mat = S.mat === b.dataset.v ? '' : b.dataset.v; },
   elegir: b => { const k = b.dataset.v, i = fr.sel.findIndex(it => it.k === k); if (i >= 0) fr.sel.splice(i, 1); else fr.sel.push({ k, n: defN(k) }); saveFree(); },
   quitar: b => { fr.sel.splice(+b.dataset.v, 1); saveFree(); },
   nueva: () => { S.favEdit = null; ir('nueva'); return 'nav'; },
-  ficha: b => { S.ex = b.dataset.v; return 'nada'; },
+  ficha: b => { S.ex = b.dataset.v; ir('ficha'); return 'nav'; },
+  anadir: b => { const k = b.dataset.v; if (!fr.sel.some(it => it.k === k)) { fr.sel.push({ k, n: defN(k) }); saveFree(); toast('Añadido a la sesión'); } S.favEdit = null; ir('nueva'); return 'nav'; },
   widgetfav: b => { const name = b.dataset.v, ya = widgetFav() === name;
     if (!name) { store.setFree('free.widgetFav', ''); toast('El widget hace la rutina de core'); return 'nada'; }
     store.setFree('free.widgetFav', ya ? '' : name); toast(ya ? 'El widget vuelve a la rutina de core' : `«${name}» sale en el widget y en Hoy`); return 'nada'; },
@@ -453,7 +599,18 @@ const ACC = {
   guardarcambios: () => { const name = S.favEdit; const a = favs(), i = a.findIndex(x => x.name === name); const nf = { name, sel: fr.sel.map(it => ({ k: it.k, n: it.n })), rounds: fr.rounds, rest: fr.rest, alt: fr.alt };
     if (i >= 0) a[i] = nf; else a.unshift(nf); saveFavs(a); toast('Favorita guardada'); return 'nada'; },
   borrarya: () => { deleteFav(S.favEdit); const n = S.favEdit; S.favEdit = null; S.hoja = null; atras(); toast(`«${n}» borrada`); return 'nav'; },
+  det: b => { S.det = b.dataset.v; ir('detalle'); return 'nav'; },
+  hmas: () => { S.hver = (S.hver || 30) + 30; },
   hoja: b => { S.hoja = b.dataset.v; },
+  sincronizar: () => { try { A.cloudSync(); } catch (e) {} setTimeout(() => pintar(false), 300); },
+  salirya: () => { S.hoja = null; try { A.cloudSignOut(); } catch (e) {} },
+  otrocodigo: () => { S.codigo = false; S.nubeMsg = ''; },
+  quitabanda: b => { const a = BANDS.slice(); a.splice(+b.dataset.v, 1); setBands(a); },
+  nuevabanda: () => { setBands([...BANDS, 'Banda ' + (BANDS.length + 1)]); setTimeout(() => { const e = document.getElementById('banda-' + (BANDS.length - 1)); if (e) { e.focus(); e.select(); } }, 30); },
+  figsexo: b => { cfg.app.fig = b.dataset.v; saveCfg(); if (window.FIG) window.FIG.precargar(cfg.app.fig); },
+  figprev: b => { S.figPrev = b.dataset.v; },
+  exportar: () => { S.copiaMsg = ''; if (A && A.exportData) { A.exportData(); return 'nada'; } exportarNavegador(); },
+  importar: () => { S.copiaMsg = ''; if (A && A.importData) { A.importData(); return 'nada'; } S.copiaMsg = 'Importar solo funciona en la app del móvil.'; S.copiaOk = false; },
   hojabanda: b => { S.hojaDe = b.dataset.v; S.hoja = 'banda'; },
   ponbanda: b => { const k = S.hojaDe, cur = bandOf(k), nb = b.dataset.v === cur ? '' : b.dataset.v; setBand(k, nb);
     /* lo que se dice en las rondas que faltan también cambia */
@@ -484,8 +641,15 @@ document.addEventListener('click', ev => {
   const f = ACC[t.dataset.act]; if (!f || t.dataset.act === 'sw') return;
   const r = f(t, ev); if (r !== 'nav' && r !== 'nada') pintar(false);
 });
-document.addEventListener('change', ev => { const t = ev.target; if (t.dataset && t.dataset.act === 'sw') { ACC.sw(t); pintar(false); } });
+document.addEventListener('change', ev => { const t = ev.target; if (t.dataset && t.dataset.act === 'sw') { ACC.sw(t); pintar(false); }
+  if (t.dataset && t.dataset.banda != null) { const a = BANDS.slice(); a[+t.dataset.banda] = t.value; setBands(a); pintar(false); } });
 document.addEventListener('submit', ev => { ev.preventDefault();
+  if (ev.target.dataset.form === 'email') { const em = document.getElementById('email').value.trim();
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)) { S.nubeMsg = 'Escribe un email válido.'; S.nubeOk = false; return pintar(false); }
+    S.email = em; S.enviando = true; S.nubeMsg = 'Enviando el código…'; S.nubeOk = true; pintar(false); try { A.cloudSendCode(em); } catch (e) { S.enviando = false; S.nubeMsg = 'La cuenta solo funciona en la app del móvil.'; S.nubeOk = false; pintar(false); } return; }
+  if (ev.target.dataset.form === 'codigo') { const c = document.getElementById('codigo').value.replace(/\s/g, '');
+    if (!/^\d{6,10}$/.test(c)) { S.nubeMsg = 'El código son las cifras que te han llegado por email.'; S.nubeOk = false; return pintar(false); }
+    S.enviando = true; S.nubeMsg = 'Comprobando…'; S.nubeOk = true; pintar(false); try { A.cloudVerify(S.email, c); } catch (e) {} return; }
   if (ev.target.dataset.form === 'fav') { const n = saveFav(fr, document.getElementById('fav-n').value); S.favEdit = n; S.hoja = null; toast(`Guardada en favoritas: «${n}»`); }
 });
 document.addEventListener('keydown', ev => {
@@ -506,8 +670,20 @@ window.reloadConfig = () => { if (!D || R) return; reloadState(); pintar(false);
 window.refreshStats = () => { if (!D || R) return; lastDay = store.lastDay(); offset = store.sessions(); if (S.ruta === 'entrenar') pintar(false); };
 /* El widget abre la app para la rutina de core */
 window.autoStart = () => { try { if (!D || R) return; iniciar('rutina', corePasos(), 'Rutina de core'); } catch (e) {} };
-window.onBackup = (msg, ok, imported) => { if (imported) reloadAll(); if (msg) toast(msg); };
-window.onCloud = (st, changed) => { if (changed) reloadAll(); };
+window.onBackup = (msg, ok, imported) => { S.copiaMsg = msg; S.copiaOk = ok; if (imported) reloadAll(); else if (S.ruta === 'copia') pintar(false); };
+window.onCloud = (st, changed) => { if (changed) reloadAll(); else if (!R && ['tu', 'copia'].includes(S.ruta)) pintar(false); };
+/* Respuesta de la nube al pedir el código o al comprobarlo */
+window.onCloudMsg = (msg, ok, kind) => { S.enviando = false; S.nubeMsg = msg; S.nubeOk = ok;
+  if (kind === 'code' && ok) S.codigo = true;
+  if (kind === 'verify' && ok) { S.codigo = false; S.nubeMsg = ''; S.pila = []; S.ruta = 'tu'; pintar(true); toast(msg || 'Has entrado'); return; }
+  if (S.ruta === 'entrar') pintar(false); };
+function exportarNavegador() {
+  const free = {}; [['last', 'free.last'], ['favs', 'free.favs'], ['bands', 'free.bands'], ['bandUse', 'free.bandUse']].forEach(([k, f]) => { try { const v = JSON.parse(store.free(f)); if (v != null) free[k] = v; } catch (e) {} });
+  free.widgetFav = widgetFav();
+  const o = { app: 'rutina-core', v: 1, exportedAt: Date.now(), history: store.history(), days: store.days(), lastDay: store.lastDay(), lastRounds: 0, sessions: store.sessions(), config: store.cfg(), weights: store.weights(), free };
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(o, null, 1)], { type: 'application/json' }));
+  a.download = 'rutina-core-' + dayKey(Date.now()) + '.json'; a.click(); S.copiaMsg = 'Copia descargada.'; S.copiaOk = true;
+}
 
 window.D_LISTA = loadData().then(d => {
   D = d; window.D = d; reloadState(); loadBands(); loadFree();
