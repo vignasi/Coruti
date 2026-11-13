@@ -93,7 +93,8 @@ Después: P1 Pulso · P2 Planes por objetivo · P3 Peso y medidas · P4 Carreras
 ```
 
 **Ahora mismo:** tu visto bueno de D3 (D1 y D2 cerrados) y probar B1 en el móvil.
-**Después, a la vez:** C1, B2 y S1 (S1 hecho, encima de C1; falta probarlo con tus cuentas).
+**Hecho:** C1 (fusionada) y S1 (rama `claude/strava-ejercicios-pulso-iv6njk`, encima de C1; falta probarlo con tus cuentas).
+**Siguiente, a la vez:** B2 (conector de Claude) y C2 (widget con el diseño nuevo), en ramas distintas.
 
 ### Bloque D · Diseño (antes de construir nada de interfaz)
 
