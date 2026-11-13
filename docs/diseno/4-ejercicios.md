@@ -56,30 +56,59 @@ Campo `tecnica`. Lo que se lee en la ficha y en el reproductor, **y lo que la fi
 | `lo_notas_en` | Dónde se tiene que notar (y dónde no) |
 | `condiciones` | Lo que se cumple todo el ejercicio, escrito con el vocabulario de abajo para que se pueda comprobar |
 
-`apoyos` (por fase): partes del cuerpo que tocan el suelo o un mueble: `cabeza`, `espalda_alta`, `espalda_baja`, `cadera`,
-`brazo_abajo`, `antebrazos`, `manos`, `rodillas`, `pies`, `puntas_pies`, `talones`, `lado_cuerpo`. Con mueble: `manos@silla`.
+`apoyos` (por fase): partes del cuerpo que tocan el suelo o un mueble. En plural, los dos lados; en singular, uno.
+`cabeza`, `espalda_alta`, `espalda_baja`, `cadera`, `lado_cuerpo` (tumbado de lado: tronco, cadera y muslo de abajo),
+`brazo_abajo`, `pierna_abajo` (la de abajo, tumbado de lado), `brazos`, `antebrazos`/`antebrazo`, `codos`, `manos`/`mano`,
+`rodillas`/`rodilla`, `espinillas`, `pies`/`pie`, `puntas_pies`, `talones`. Con mueble: `manos@silla`, `mano@silla`,
+`manos@sofa`, `puntas_pies@silla`, `espalda_alta@pared`. Sobre otra parte del cuerpo: `cabeza@brazo_abajo`.
+A mitad de un movimiento se piden los apoyos que están en la fase de antes y en la de después.
 
-`condiciones` (todo el ejercicio, o por fase con `fase`):
-- `juntos: [pie_izq, pie_der]` · `separados: [...]` (distancia máxima o mínima en cm, por defecto 10)
-- `angulo: {articulacion: rodilla|cadera|codo|hombro, entre: [min, max]}` (grados)
-- `recto: [hombro, cadera, rodilla]` (alineados, ±10°) · `quieto: codo` (no se mueve más de 5 cm)
+`condiciones` (todo el ejercicio, o por fase con `fase`, número o lista, empezando en 0):
+- `juntos: [pie_izq, pie_der]` (superficie con superficie a 3 cm como mucho) · `separados: {partes: [...], cm: 15}` (como
+  mínimo; por defecto 10). Partes: `pie`, `rodilla`, `mano`, `codo`, `brazo`, `muslo`, `tobillo` con `_izq`/`_der`, y `cabeza`.
+- `angulo: {articulacion: rodilla|cadera|codo|hombro, entre: [min, max], lado: izq|der|alguno}` (grados; 0 = recto o
+  brazo pegado al cuerpo; sin `lado`, los dos). Cadera: entre tronco y muslo, negativa si el muslo va por detrás.
+- `recto: {puntos: [hombro, cadera, tobillo], tol: 12}` (alineados; por defecto ±10°) · `quieto: codo` o
+  `{parte: tobillo, cm: 5}` (no se mueve más de 5 cm en todo el ejercicio)
+- `inclinacion: {parte: tronco, entre: [min, max]}` (grados respecto a la vertical: 0 de pie, 90 horizontal)
 - `altura: {parte, sobre: suelo|silla, entre: [min, max]}` (cm)
 
-**Comprobaciones del paso 2:** todo lo que dicen `inicio`, `claves` y `fases` sobre apoyos, juntos o ángulos está en
-`apoyos` o `condiciones` (se revisa a mano con una lista, frase por frase); el texto de cada fase habla del ejercicio
-(no de otro, como pasa hoy en el press con banda); ninguna clave es de dosis ni de nivel.
+`no_medible`: frases del texto que no se pueden comprobar en 3D, con el porqué (p. ej. «palmas hacia los pies»).
+
+**Comprobaciones del paso 2** (`node ejercicios/comprobar.js`, junto con las del paso 1): todos los campos están; las fases
+coinciden con `rutina.json` en número, segundos, tono y texto, y las claves también (`node ejercicios/a_rutina.js` las pasa a
+`rutina.json`, que es lo que lee la app); apoyos y condiciones usan el vocabulario y los muebles están en el material;
+**frase por frase**, lo que dicen `inicio`, `claves` y `fases` sobre juntos, separados, ángulos, rectitud o quietud tiene
+su condición (o está en `no_medible`); ninguna clave es de dosis ni de nivel; si el texto nombra mancuernas, banda o
+toalla, el ejercicio las usa (así se habría visto el «Empuja las mancuernas» del press con banda).
 
 ## Paso 3 · Figura: el muñeco
-Campo `figura`: posturas, fases, material y vista. En 2D (lo de hoy) si el movimiento va en el plano del dibujo;
-**con giros 3D** cuando no (almeja, y los que se vean al revisar).
+Campo `figura`: lo que hay en `rutina.json` para ese ejercicio (posturas, fases, material, vista y cómo se apoya).
+- Los puntos son `[x, y]` en el plano del dibujo o **`[x, y, z]`** con un giro fuera de él (z hacia la cámara): la almeja,
+  las rodillas que se abren del puente, los pies juntos del hollow, las manos juntas de las flexiones cerradas, las
+  rodillas hacia delante del paso lateral, las espinillas y el antebrazo de las planchas laterales. La figura dibujada
+  (respaldo sin WebGL) no usa z.
+- `"apoya"` (en el ejercicio o en una postura): con qué toca el suelo el cuerpo, que el dibujo no dice porque no tiene
+  grosor: `tronco` (tumbado), `lado` (de lado sobre el antebrazo), `rodillas`, `pies`. La figura 3D apoya esa parte por
+  la piel, y además: con el tronco en el suelo inclina el cuerpo para apoyar espalda alta y pelvis y gira el cuello para
+  apoyar la cabeza; a cuatro patas gira sobre las rodillas para que los brazos rectos lleguen; las manos y los pies
+  apoyados tocan con la palma y la suela; brazos y piernas rectos en el dibujo siguen rectos; con las dos manos apoyadas,
+  el codo toma el ángulo del dibujo.
+- `"retro"`: grados de retroversión de la pelvis (tumbados con la lumbar pegada al suelo).
 
-**Comprobaciones del paso 3** (sobre el modelo 3D, hombre y mujer, cada fase y a mitad de cada movimiento):
-- Cada parte de `apoyos` toca su apoyo (a menos de 2 cm de la superficie del cuerpo, no del hueso) y **nada más flota**:
-  si el cuerpo no tiene ningún apoyo, falla.
-- Nada atraviesa el suelo ni los muebles.
+**Comprobaciones del paso 3** (`node ejercicios/comprobar3d.js [ejercicios]`; mide sobre la piel deformada del modelo 3D de
+la app, hombre y mujer, al final de cada fase y a mitad de cada movimiento; las reglas están en `ejercicios/reglas3d.js` y
+se prueban con `node --test ejercicios/reglas3d.test.js`):
+- Cada apoyo toca su superficie (a menos de 2 cm) y si no hay apoyos, el cuerpo flota y falla.
+- Ninguna otra parte toca el suelo ni un mueble (a menos de 1 cm), salvo las vecinas de un apoyo (el cuello con la cabeza,
+  la mano con el antebrazo…).
+- Nada atraviesa el suelo, los muebles ni la pared más de 1,5 cm (3 cm en las partes blandas que se aplastan: culo,
+  muslo, barriga, pecho, lumbar).
 - Se cumplen todas las `condiciones`.
-- Las articulaciones no pasan de su rango normal (rodilla 0–150°, codo 0–150°…).
-- Capturas de cada fase, hombre y mujer, claro y oscuro, a tamaño miniatura y reproductor → **tu visto bueno**.
+- Las articulaciones no pasan de su rango (rodilla −5–150°, codo −5–155°, cadera −35–150°, hombro 0–185°); una rodilla
+  doblada al revés sale negativa.
+- Capturas de cada fase y de cada mitad, hombre y mujer, claro y oscuro, grande y miniatura → **visto bueno**
+  (`docs/diseno/figura/3d.html?ex=…&g=m|f&theme=dark&mid&size=mini`).
 
 ## Ejercicios nuevos (y los que proponga Claude)
 1. Claude, en tu conversación, propone el ejercicio y rellena el paso 1 (con el conector, B2, lo deja como `borrador`).
@@ -96,9 +125,24 @@ Campo `figura`: posturas, fases, material y vista. En 2D (lo de hoy) si el movim
 - `posicion`: `boca_arriba`, `boca_abajo`, `de_lado`, `cuadrupedia`, `rodilla_en_suelo`, `sentado_suelo`, `apoyado_silla`,
   `de_pie`, `de_pie_inclinado`, `de_pie_pared`.
 
-## Estado de los 30 ejercicios (14 nov 2026)
-Paso 1 hecho y comprobado en los 30 (`node ejercicios/comprobar.js`). Pasos 2 y 3: pendientes en todos.
-Lo que ya se ha visto mal al hacer las fichas (pasa a los pasos 2 y 3):
+## Estado de los 30 ejercicios (13 nov 2026)
+**Publicados los 30.** Paso 1 (14 nov, E1), paso 2 y paso 3 (E2 y E3) comprobados: `node ejercicios/comprobar.js` y
+`node ejercicios/comprobar3d.js` dan 0 fallos. Visto bueno: Claude, revisando las capturas, por encargo de Ignasi.
+
+Qué se hizo con los apuntes del paso 1:
+- Almeja: posturas 3D (cadera a 45°, rodillas a 90°, pies juntos al abrir, cabeza sobre el brazo, tronco apoyado).
+- Tumbados (dead bug, hollow, crunch inverso, press, extensión, puentes): la espalda alta, la lumbar y la cabeza apoyan
+  en hombre y mujer (antes flotaban 3–8 cm o se hundía la cadera).
+- Plancha: la fase «Así NO» pasa a ser la postura de inicio correcta; el error queda en `errores`.
+- Plancha lateral: «brazo de arriba al techo» pasa a clave; el antebrazo apunta hacia delante.
+- Crunch inverso, flexiones cerradas, curl y press con banda: fuera las claves de dosis o nivel.
+- Press con banda: las fases dicen «manos», no «mancuernas»; la banda pasa por debajo de la espalda.
+- Fondos, flexiones inclinadas y remo con mancuerna: las manos llegan al mueble (antes no) y el brazo de apoyo no se dobla.
+- Sin hacer (son del paso 1, no de técnica ni figura): renombrar los hollow, la dosis de `hollow_l` y `flex_incl`,
+  la variante de almeja con mini banda, las etiquetas de la esquina en ángel y remo inclinado (D3).
+- Límite que queda: abrir las rodillas en el puente es un giro 3D correcto, pero de perfil apenas se ve.
+
+Apuntes del paso 1 (para la historia):
 
 | Ejercicio | Zona · patrón · nivel | Apuntes |
 |---|---|---|
@@ -132,7 +176,3 @@ Lo que ya se ha visto mal al hacer las fichas (pasa a los pasos 2 y 3):
 | Press de suelo con mancuernas (`press_db`) | Pecho · empuje horizontal · 1 | — |
 | Flexiones (`flex`) | Pecho · empuje horizontal · 2 | — |
 | Flexiones con pies elevados (`flex_pies`) | Pecho · empuje horizontal · 3 | — |
-
-Orden propuesto para los pasos 2 y 3: primero la **almeja** (es el caso que obliga a hacer posturas 3D),
-después los tumbados (dead bug, hollow, crunch inverso, press, extensión, puentes: comprobar que la espalda apoya),
-luego los de pie y los que usan muebles, y al final los que no tienen apuntes.

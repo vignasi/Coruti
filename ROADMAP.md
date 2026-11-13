@@ -15,7 +15,8 @@ y que pongas en marcha Supabase, Strava y Polar. Lo siguiente que se programa es
 **Hecho y en `main`:** Fases 0, 1 y 1b · D1, D2, D3 · B1 (cuentas y nube) · C1 (app nueva) · S1 (Strava y Polar; servidor desplegado
 y migraciones aplicadas) · CLAUDE.md y Actions solo cuando hace falta un APK. Pull requests #1–#6 fusionados; último APK: 1.0.31.
 
-**Hecho pero sin fusionar:** nada. Las ramas que quedan con commits fuera de `main` son trabajo viejo ya superado
+**Hecho pero sin fusionar:** E1, E2 y E3 (los 30 ejercicios revisados y publicados) en la rama
+`claude/confident-ritchie-box0z4`, que ya lleva dentro E1 (`claude/coruti-c1-app-android-2vhnk1`): basta fusionar esta. Las ramas que quedan con commits fuera de `main` son trabajo viejo ya superado
 (`claude/elegant-bardeen-9nk8c1` y `claude/vigilant-lovelace-hb4acy`: D1 y D2 rehechos después;
 `claude/affectionate-shannon-9oa7zz`: plan de producto de octubre, sustituido por este ROADMAP). Se pueden borrar.
 
@@ -33,10 +34,11 @@ y migraciones aplicadas) · CLAUDE.md y Actions solo cuando hace falta un APK. P
 - Sin confirmar: el visto bueno de D3 en el móvil (C1 se construyó encima, así que se dio por bueno; dime si lo hiciste).
 
 10. Catálogo de ejercicios en Supabase (bloque E): pegar en SQL Editor `supabase/migrations/20261114000000_catalogo_ejercicios.sql`
-   y después `20261114000100_catalogo_ejercicios_datos.sql` (`docs/supabase.md`, apartado 1).
+   y después `20261114000100_catalogo_ejercicios_datos.sql` (`docs/supabase.md`, apartado 1). Ya lleva los 30 publicados.
+11. Fusionar la rama de E1–E3 y probar el APK: figuras nuevas (almeja, tumbados, planchas, fondos…) y textos corregidos.
 
-**Siguiente fase:** E (revisar los 30 ejercicios: pasos 2 y 3), antes de B2, que necesita sus metadatos para elegir.
-C2 (widget con el diseño nuevo) puede ir a la vez.
+**Siguiente fase:** B2 (conector de Claude), que ya tiene los metadatos de los ejercicios, y C2 (widget con el diseño
+nuevo) a la vez. E4 (la app lee el catálogo de la nube) va con B2.
 Después, el bloque P. Casi todo el bloque P toca `app/app.js`, igual que B2 (que añade «Plan de Claude» en Entrenar):
 mejor empezarlo cuando B2 esté fusionado.
 
@@ -231,9 +233,15 @@ y vocabulario en `docs/diseno/4-ejercicios.md`; datos en `ejercicios/`; en la nu
 - [x] E1 · Tabla `exercise_catalog` y SQL con los 30 (ficha hecha; técnica y figura de hoy marcadas «sin revisar»),
   probados en un Postgres local: se crea, se puede repetir, las cuentas leen y no escriben, sin cuenta no se lee
 - [ ] **Tú:** pegar los dos SQL en Supabase (`docs/supabase.md`, apartado 1)
-- [ ] E2 · Paso 2 (técnica con apoyos y condiciones) de los 30
-- [ ] E3 · Comprobador 3D (apoyos, nada flota ni atraviesa, condiciones, rangos) y paso 3 de los 30, empezando por la almeja
-  (necesita posturas 3D); capturas de cada uno y tu visto bueno → `publicado`
+- [x] E2 · Paso 2 de los 30 (`ejercicios/tecnicas.json`): inicio, fases con apoyos, claves, errores, respiración, dónde se nota
+  y condiciones; comprobador frase por frase en `node ejercicios/comprobar.js` (218 frases); textos corregidos pasados a
+  `rutina.json` (`node ejercicios/a_rutina.js`): press con banda sin «mancuernas», fuera claves de dosis, plancha sin «Así NO»
+- [x] E3 · Comprobador 3D (`node ejercicios/comprobar3d.js`: mide sobre la piel del modelo, hombre y mujer, cada fase y a
+  mitad): 30 de 30 sin fallos. Posturas con z (almeja y otros), `"apoya"` y `"retro"` en `rutina.json`, y la figura 3D apoya
+  manos, pies, espalda y cabeza por la piel. Revisadas las capturas (claro y oscuro, grande, miniatura y mitades) → `publicado`
+- [ ] **Tú:** mirar en el móvil las figuras nuevas; si alguna no te convence, dímelo y vuelve a `figura` (el visto bueno lo di
+  yo con capturas, como pediste)
+- [ ] Pendiente del paso 1 (no se tocó): nombres de los hollow, dosis de `hollow_l` y `flex_incl`, almeja con mini banda
 - [ ] E4 · La app lee el catálogo de la nube (con `rutina.json` como copia sin conexión) y Claude puede proponer ejercicios (con B2)
 
 #### B2 · Conector de Claude ⭐ — después de E (necesita los metadatos de la ficha), en paralelo con C2
