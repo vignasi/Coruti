@@ -145,8 +145,8 @@ export async function crear({modelo,gender='m',loader}){
       const S=side[i],sh=wp(S+'Arm'),L1=sh.distanceTo(wp(S+'ForeArm')),dx=(E[0]-p.s[0])*kk,ey=(GD-sup(E))*kk+.04;
       fore[i]={dx,ey,dir:Math.sign(W[0]-E[0])||1};if(Math.abs(dx)<L1&&!apoyado)low=Math.max(low,sh.y-(ey+Math.sqrt(L1*L1-dx*dx)));}
     // manos apoyadas en una silla que no alcanzan (fondos): el cuerpo cuelga de ellas y baja; las piernas se doblan después
-    // brazo recto en el dibujo con la mano apoyada en el suelo (flexiones arriba, a cuatro patas)
-    for(const i of ['1','2']){const W=p['w'+i],E=p['e'+i];if(fore[i]||!(W[1]>sup(W)-4.5)||sup(W)<GD)continue;
+    // brazo recto en el dibujo con la mano apoyada (flexiones arriba, a cuatro patas, fondos arriba)
+    for(const i of ['1','2']){const W=p['w'+i],E=p['e'+i];if(fore[i]||!(W[1]>sup(W)-4.5))continue;
       const dw=[W[0]-p.s[0],W[1]-p.s[1]],de=[E[0]-p.s[0],E[1]-p.s[1]];if(Math.abs(dw[0]*de[1]-dw[1]*de[0])/(Math.hypot(...dw)*Math.hypot(...de)||1)<.17)recto[i]=1;}
     // (y en el suelo, si el cuerpo no se apoya en otra cosa: flexiones con los brazos estirados)
     for(const i of ['1','2']){const W=p['w'+i];if(fore[i]||!(W[1]>sup(W)-4.5))continue;
@@ -176,7 +176,9 @@ export async function crear({modelo,gender='m',loader}){
       else if(W[1]>sup(W)-4.5){const T=toW(W,.035,S+'Arm',p.s),bx=(PX.get(k)||[]).find(b=>{const [x,,w]=b.e.r;return !b.wall&&W[0]>=x-2&&W[0]<=x+w+2;});
         if(bx&&sup(W)<GD)T.x=bx.cx+(W[0]-bx.xc)*kk;     // la mano va a la silla, esté donde esté
         const bend=bendOf(p.s,E,W);ik(S+'Arm',S+'ForeArm',S+'Hand',T,bend,secA,restA);
-        cont.push({L:EXT[S+'Hand'],h:(GD-sup(W))*kk,T,S,recto:recto[i],redo:()=>{ik(S+'Arm',S+'ForeArm',S+'Hand',T,bend,secA,restA);aimHand();}});}
+        // codo del dibujo (0 = recto): con las dos manos apoyadas, el codo 3D se pone igual (flexiones, fondos)
+        const ang=(()=>{const a=[E[0]-p.s[0],E[1]-p.s[1]],b=[W[0]-E[0],W[1]-E[1]];return Math.acos(Math.max(-1,Math.min(1,(a[0]*b[0]+a[1]*b[1])/(Math.hypot(...a)*Math.hypot(...b)||1))));})();
+        cont.push({L:EXT[S+'Hand'],h:(GD-sup(W))*kk,T,S,recto:recto[i],ang,dos:['1','2'].every(j=>p['w'+j][1]>sup(p['w'+j])-4.5),redo:()=>{ik(S+'Arm',S+'ForeArm',S+'Hand',T,bend,secA,restA);aimHand();}});}
       const ft=gm.feet[i],aimFoot=()=>{if(!ft.front)aim(S+'Foot',S+'ToeBase',v3(ft.f).normalize(),secL,restL);};
       if(!frente&&A[1]>sup(A)-10){const T=toW(A,.075,S+'UpLeg',p.p),bend=bendOf(p.p,K,A).add(F.clone().multiplyScalar(.01));
         // pierna recta en el dibujo (plancha, flexiones): sigue recta; el objetivo se lleva a lo largo de la pierna
@@ -199,7 +201,11 @@ export async function crear({modelo,gender='m',loader}){
     const afina=()=>{for(const c of cont)for(let it=0;it<5;it++){const d=pielMin(c.L)-c.h;if(Math.abs(d)<.003)break;c.T.y-=d;c.redo();root.updateMatrixWorld(true);}};
     afina();
     // brazo recto en el dibujo (flexiones arriba): si al apoyar la palma se ha doblado, sube el cuerpo y se vuelve a apoyar todo
-    const falta=()=>{let sb=0,n=0;for(const c of cont){if(!c.recto)continue;const sh=wp(c.S+'Arm'),L=sh.distanceTo(wp(c.S+'ForeArm'))+wp(c.S+'ForeArm').distanceTo(wp(c.S+'Hand'))-.003;
+    // cuánto tiene que subir (o bajar) el hombro para que el codo quede como en el dibujo: recto, o con las dos manos
+    // apoyadas (y el cuerpo sin otro apoyo) con el mismo ángulo
+    const falta=()=>{let sb=0,n=0;for(const c of cont){const igual=c.dos&&!apoyado&&!frente;if(!c.recto&&!igual)continue;
+      const sh=wp(c.S+'Arm'),L1=sh.distanceTo(wp(c.S+'ForeArm')),L2=wp(c.S+'ForeArm').distanceTo(wp(c.S+'Hand'));
+      const L=c.recto?L1+L2-.003:Math.sqrt(L1*L1+L2*L2+2*L1*L2*Math.cos(c.ang));
       const dx=Math.hypot(c.T.x-sh.x,isNaN(c.T.z)?0:c.T.z-sh.z);if(dx<L){sb+=c.T.y+Math.sqrt(L*L-dx*dx)-sh.y;n++;}}return n?sb/n:0;};
     let sb=falta();
     // a cuatro patas: el cuerpo gira sobre las rodillas (sube o baja los hombros) hasta que los brazos rectos llegan al suelo
@@ -208,7 +214,7 @@ export async function crear({modelo,gender='m',loader}){
       const th=Math.atan(sb/dx),P=new THREE.Vector3(xk,yk,0),q=new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,0,1),th);
       root.position.sub(P).applyQuaternion(q).add(P);root.quaternion.premultiply(q);root.updateMatrixWorld(true);
       for(const c of cont)c.redo();root.updateMatrixWorld(true);afina();sb=falta();}sb=0;}
-    if(sb>.002){root.position.y+=sb;root.updateMatrixWorld(true);for(const c of cont)c.redo();root.updateMatrixWorld(true);afina();}
+    if(Math.abs(sb)>.002&&(sb>0||cont.some(c=>c.dos&&!c.recto))){root.position.y+=sb;root.updateMatrixWorld(true);for(const c of cont)c.redo();root.updateMatrixWorld(true);afina();}
     // de rodillas: los pies apoyados mueven la pierna y la rodilla puede bajar; se vuelve a apoyar en la rodilla
     if(a1==='rodillas'&&a0==='rodillas'){const d=pielMin(RODILLAS)+.004;if(Math.abs(d)>.003){root.position.y-=d;root.updateMatrixWorld(true);for(const c of cont)c.redo();root.updateMatrixWorld(true);afina();}}
     return {st,gm,kk,side,left,F,frente,sup};
@@ -268,14 +274,16 @@ export async function crear({modelo,gender='m',loader}){
         if(!ref&&A[1]>sup(A)-6&&A[0]>=x-2&&A[0]<=x+w+2)ref=[R.side[i]+'UpLeg',p.p,R.side[i]+'Foot'];}
       if(!ref)ref=['Hips',p.p];
       // de fondo: centrado en la mano o el pie que se apoya (así no se mete en el otro brazo, por ejemplo la mancuerna del remo)
-      const cz=ref[2]?wp(ref[2]).z:0,H=(wall?Math.min(h,GD-y):GD-y)*kk,W=w*kk;let cx=wp(ref[0]).x+(x+w/2-ref[1][0])*kk;   // hasta el suelo, como en el dibujo
+      const dos=!wall&&ref[2]&&/Hand/.test(ref[2])&&['1','2'].every(i=>{const W=p['w'+i];return W[1]>sup(W)-4.5&&W[0]>=x-2&&W[0]<=x+w+2;});
+      const cz=dos?0:ref[2]?wp(ref[2]).z:0,H=(wall?Math.min(h,GD-y):GD-y)*kk,W=w*kk;let cx=wp(ref[0]).x+(x+w/2-ref[1][0])*kk;   // hasta el suelo, como en el dibujo
       // si la silla se mete en la cadera (fondos: las piernas 3D son más largas que las del dibujo), se aparta hacia atrás;
       // las manos van a buscarla donde quede
       if(!wall&&/Hand/.test(ref[2]||'')){let t=0;for(const ph of ex.phases){t+=ph.move;const hp=(pose(ex,k,t,true),wp('Hips'));t+=ph.hold;
         const sg=Math.sign(cx-hp.x)||1;if(H>hp.y-.2&&Math.abs(cx-hp.x)<W/2+.13)cx=hp.x+sg*(W/2+.13);}}
       // pared de frente (ángel): justo detrás de la espalda, para que se pueda apoyar en ella
       let wz=-.3;if(wall&&R.frente){let z=1e9;for(const [o,i] of TRONCO){o.getVertexPosition(i,vtx);o.localToWorld(vtx);if(vtx.z<z)z=vtx.z;}wz=z-.02;}
-      out.push({e,cx,cz:wall?wz:cz,D:ref[2]?.4:.5,H,W,wall,xc:x+w/2});});
+      // con las dos manos encima (fondos), centrado en el cuerpo y más ancho
+      out.push({e,cx,cz:wall?wz:cz,D:dos?.55:ref[2]?.4:.5,H,W,wall,xc:x+w/2});});
     PX.set(k,out);return out;}
   function drawProps(ex,k){props.clear();
     propsAt(ex,k).forEach(({cx,cz,D,H,W,wall})=>{const m=new THREE.Mesh(new THREE.BoxGeometry(W,H,wall?.04:D),M.prop);

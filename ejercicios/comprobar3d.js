@@ -25,9 +25,15 @@ const ex = args.find(a => !a.startsWith('--') && a !== jsonOut) || '';
   try {
     for (const g of ['m', 'f']) {
       const p = await b.newPage();
-      p.on('pageerror', e => { console.error('ERROR en la página', e.message); process.exitCode = 1; });
+      let error = null;
+      p.on('pageerror', e => { error = e; });
       await p.goto(`${base}/ejercicios/comprobar3d.html?g=${g}${ex ? '&ex=' + ex : ''}`);
-      await p.waitForFunction(() => window.__done, null, {timeout: 900000});
+      // espera a que acabe, o falla en cuanto la página da un error (si no, se quedaría esperando)
+      for (let t = 0; !(await p.evaluate(() => !!window.__done)); t++) {
+        if (error) throw new Error('error en la página: ' + error.message);
+        if (t > 9000) throw new Error('la página no acaba');
+        await new Promise(r => setTimeout(r, 100));
+      }
       todo[g] = await p.evaluate(() => window.res);
       await p.close();
     }

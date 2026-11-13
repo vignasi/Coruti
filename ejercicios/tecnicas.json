@@ -913,7 +913,7 @@
      "articulacion": "rodilla",
      "entre": [
       5,
-      45
+      50
      ]
     }
    },
@@ -934,7 +934,8 @@
      "entre": [
       0,
       30
-     ]
+     ],
+     "lado": "alguno"
     },
     "fase": 1
    }
@@ -1216,8 +1217,8 @@
     "angulo": {
      "articulacion": "rodilla",
      "entre": [
-      50,
-      115
+      45,
+      125
      ]
     }
    },
@@ -1236,7 +1237,7 @@
      "articulacion": "codo",
      "entre": [
       20,
-      100
+      110
      ]
     },
     "fase": 0
