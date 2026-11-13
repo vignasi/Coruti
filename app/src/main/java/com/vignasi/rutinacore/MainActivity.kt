@@ -35,6 +35,7 @@ class MainActivity : Activity() {
     private var tts: TextToSpeech? = null
     private var pageReady = false
     private var pendingAutostart = false
+    private var pendingConnMsg: org.json.JSONObject? = null
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -89,6 +90,7 @@ class MainActivity : Activity() {
                     pendingAutostart = false
                     js("window.autoStart && window.autoStart()")
                 }
+                flushConnMsg()
             }
         }
         setContentView(web)
@@ -100,6 +102,7 @@ class MainActivity : Activity() {
         }
 
         pendingAutostart = intent?.getBooleanExtra(EXTRA_AUTOSTART, false) == true
+        handleConnReturn(intent)
         // La nube avisa al terminar de sincronizar; si han llegado datos, la página los vuelve a leer
         Cloud.listener = { changed -> cloudChanged(changed) }
         web.loadUrl("https://$HOST/index.html?escala=" + resources.configuration.fontScale)
@@ -107,6 +110,7 @@ class MainActivity : Activity() {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
+        handleConnReturn(intent)
         if (intent.getBooleanExtra(EXTRA_AUTOSTART, false)) {
             if (pageReady) js("window.autoStart && window.autoStart()") else pendingAutostart = true
         }
@@ -167,6 +171,28 @@ class MainActivity : Activity() {
 
     private fun backupDone(msg: String, ok: Boolean, imported: Boolean = false) {
         if (pageReady) js("window.onBackup && window.onBackup(${org.json.JSONObject.quote(msg)}, $ok, $imported)")
+    }
+
+    private fun connMsg(msg: String, ok: Boolean) {
+        if (pageReady) js("window.onConnMsg && window.onConnMsg(${org.json.JSONObject.quote(msg)}, $ok)")
+    }
+
+    /** Vuelta de Strava o Polar tras dar (o no) permiso: rutinacore://conexion?p=strava&ok=1&msg=… */
+    private fun handleConnReturn(intent: Intent?) {
+        val u = intent?.data ?: return
+        if (u.scheme != "rutinacore" || u.host != "conexion") return
+        intent?.data = null
+        val ok = u.getQueryParameter("ok") == "1"
+        val msg = u.getQueryParameter("msg").orEmpty().ifEmpty { if (ok) "Conectado." else "No se pudo conectar." }
+        pendingConnMsg = org.json.JSONObject().put("msg", msg).put("ok", ok)
+        if (pageReady) flushConnMsg()
+        Cloud.syncNow(this)
+    }
+
+    private fun flushConnMsg() {
+        val m = pendingConnMsg ?: return
+        pendingConnMsg = null
+        js("window.irConexiones && irConexiones(); window.onConnMsg && window.onConnMsg(${org.json.JSONObject.quote(m.getString("msg"))}, ${m.getBoolean("ok")})")
     }
 
     private fun cloudChanged(changed: Boolean) {
@@ -284,6 +310,32 @@ class MainActivity : Activity() {
 
         @JavascriptInterface
         fun cloudSignOut() = Cloud.signOut(this@MainActivity) { cloudChanged(false) }
+
+        /* ---------- Strava y Polar (S1) ---------- */
+        @JavascriptInterface
+        fun setSessionFields(id: String, json: String) {
+            try { History.setFields(this@MainActivity, id, org.json.JSONObject(json)) } catch (e: Exception) { }
+        }
+
+        /** Abre en el navegador la página de Strava o Polar para dar permiso; al terminar vuelve con rutinacore://conexion. */
+        @JavascriptInterface
+        fun connConnect(provider: String) = Cloud.connect(this@MainActivity, provider) { res, ok ->
+            if (ok) {
+                try { startActivity(Intent(Intent.ACTION_VIEW, android.net.Uri.parse(res))) }
+                catch (e: Exception) { connMsg("No hay navegador para abrir la página de conectar.", false) }
+            } else connMsg(res, false)
+        }
+
+        @JavascriptInterface
+        fun connDisconnect(provider: String) = Cloud.disconnect(this@MainActivity, provider) { msg, ok -> connMsg(msg, ok) }
+
+        @JavascriptInterface
+        fun connForward(on: Boolean) = Cloud.setForward(this@MainActivity, on) { msg, ok -> connMsg(msg, ok) }
+
+        @JavascriptInterface
+        fun stravaSend(id: String) = Cloud.sendToStrava(this@MainActivity, id) { msg, ok ->
+            if (pageReady) js("window.onStravaSent && window.onStravaSent(${org.json.JSONObject.quote(id)}, ${org.json.JSONObject.quote(msg)}, $ok)")
+        }
 
         /** Días hechos (fechas «2026-11-11»), para la semana de Entrenar. */
         @JavascriptInterface
