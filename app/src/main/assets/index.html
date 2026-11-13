@@ -14,13 +14,15 @@
   --display:"Barlow Condensed","Roboto Condensed","sans-serif-condensed","Arial Narrow",sans-serif;
   --body:"Source Sans 3","Roboto",system-ui,"Segoe UI",sans-serif;
   --r:16px; --tap:48px;
+  --ok:#276B43; --warn:#9A5B00; --bad:#B3261E;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#0F1513; --surface:#171F1D; --ink:#E4EBE8; --soft:#9AA9A5; --line:#2B3633;
-  --accent:#62B8C1; --accent-ink:#0B1513; --accent-soft:#1D3437; --hl:#F0B04A; --hl-ink:#1D1406; --far:#4D5B57; --prop:#24302D}}
+  --accent:#62B8C1; --accent-ink:#0B1513; --accent-soft:#1D3437; --hl:#F0B04A; --hl-ink:#1D1406; --far:#4D5B57; --prop:#24302D; --ok:#6FCF97; --warn:#E9A33B; --bad:#F2B8B5}}
 :root[data-theme="dark"]{
   --bg:#0F1513; --surface:#171F1D; --ink:#E4EBE8; --soft:#9AA9A5; --line:#2B3633;
-  --accent:#62B8C1; --accent-ink:#0B1513; --accent-soft:#1D3437; --hl:#F0B04A; --hl-ink:#1D1406; --far:#4D5B57; --prop:#24302D}
+  --accent:#62B8C1; --accent-ink:#0B1513; --accent-soft:#1D3437; --hl:#F0B04A; --hl-ink:#1D1406; --far:#4D5B57; --prop:#24302D;
+  --ok:#6FCF97; --warn:#E9A33B; --bad:#F2B8B5}
 
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
@@ -191,6 +193,21 @@ body.hist .player,body.hist #setup,body.hist #free,body.hist .exhead,body.hist .
 .hs ul{margin:2px 0 0;padding-left:18px;font-size:.95rem;color:var(--soft);font-variant-numeric:tabular-nums}
 .hs .hfb{font-size:.92rem;color:var(--soft);margin:0}
 .bkp{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+/* S1 · Strava: estado con texto + color (nunca solo color), esfuerzo y conexiones */
+.st{display:inline-flex;align-items:center;gap:4px;font-size:.78rem;font-weight:700;border-radius:999px;padding:0 8px;border:1.5px solid currentColor;color:var(--soft);white-space:nowrap}
+.st.ok{color:var(--ok)}.st.warn{color:var(--warn)}.st.bad{color:var(--bad)}
+.hs>summary .sts{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px}
+.hstr{display:flex;flex-direction:column;gap:6px;border-top:1.5px solid var(--line);padding-top:10px}
+.hstr p{margin:0;font-size:.92rem;color:var(--soft)}
+.hstr .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.hstr a{color:var(--accent);font-weight:600;min-height:var(--tap);display:inline-flex;align-items:center}
+.rpe{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.rpe button{padding:0;background:var(--surface)}
+.rpe button[aria-pressed="true"],.fin .seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.conn{display:flex;flex-direction:column;gap:8px;margin-top:6px}
+.conn .crow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--accent-soft);border-radius:12px;padding:8px 8px 8px 12px}
+.conn .crow b{flex:1;min-width:8em;line-height:1.25}.conn .crow b small{display:block;font-weight:400;color:var(--soft);font-size:.88rem}
+#connmsg.err,#acmsg.err{color:var(--bad)}
 #accode,#acin{margin-top:8px}
 #bmsg.err{color:var(--hl)}
 .hexl{display:flex;flex-direction:column;gap:8px;margin-top:6px}
@@ -242,6 +259,13 @@ body.hist .player,body.hist #setup,body.hist #free,body.hist .exhead,body.hist .
         <h3>¿Cómo te ha ido?</h3>
         <p>Las 2–3 últimas repeticiones de cada serie tienen que costar. Si no, sube de nivel.</p>
         <div id="fblist"></div>
+      </div>
+      <div class="fb fin" id="fin" hidden>
+        <div class="fbrow"><div class="fbname" id="lrpe">Esfuerzo<small>De 1 (muy fácil) a 10 (máximo)</small></div>
+          <div class="rpe" id="frpe" role="group" aria-labelledby="lrpe"></div></div>
+        <div class="fbrow"><div class="fbname" id="lfeel">¿Cómo te has sentido?</div>
+          <div class="seg" id="ffeel" role="group" aria-labelledby="lfeel"></div></div>
+        <label class="tog" id="fstw" hidden><input type="checkbox" id="fst" checked><span>Enviar a Strava<small>Con la lista de ejercicios, el pulso del reloj, el esfuerzo y cómo te has sentido</small></span></label>
       </div>
       <div class="controls">
         <button class="primary" id="bplay">Empezar</button>
@@ -324,6 +348,11 @@ body.hist .player,body.hist #setup,body.hist #free,body.hist .exhead,body.hist .
         </div>
         <div class="bkp" id="acin" hidden><button id="acsync">Sincronizar</button><button id="acexit">Salir</button></div>
         <small class="hint" id="acmsg" role="status" aria-live="polite"></small></div>
+      <div class="field" id="conns" hidden><span class="lbl">Conexiones</span>
+        <small class="hint">Strava recibe cada sesión con la lista de ejercicios y el pulso del reloj. Polar da el pulso; Polar Flow lo sigue recibiendo todo del reloj como siempre.</small>
+        <div class="conn" id="connl"></div>
+        <label class="tog" id="cfwdw" hidden><input type="checkbox" id="cfwd"><span>Reenviar también carreras y paseos<small>Solo si en Polar Flow has quitado del todo la sincronización con Strava</small></span></label>
+        <small class="hint" id="connmsg" role="status" aria-live="polite"></small></div>
       <div class="field"><span class="lbl">Copia de seguridad</span>
         <small class="hint">Todo en un archivo: historial, favoritas, bandas, pesos, ajustes y racha. Guárdalo en Drive o en el ordenador. Al importarlo se combina con lo que haya en el móvil, sin borrar nada.</small>
         <div class="bkp"><button id="bexp">Exportar</button><button id="bimp">Importar</button></div>
@@ -375,6 +404,7 @@ const store={
   day(){try{if(A){A.markDay();A.vibrate();}else navigator.vibrate&&navigator.vibrate([300,150,300,150,600]);}catch(e){}},
   history(){try{const a=JSON.parse(A&&A.history?A.history():LS.get("rutina.history"));return Array.isArray(a)?a:[]}catch(e){return []}},
   saveSession(o){try{if(A&&A.saveSession)A.saveSession(JSON.stringify(o));else{const a=store.history().filter(x=>x.id!==o.id);a.push(o);a.sort((x,y)=>x.start-y.start);LS.set("rutina.history",JSON.stringify(a));}}catch(e){}},
+  setSessionFields(id,f){try{if(A&&A.setSessionFields)A.setSessionFields(id,JSON.stringify(f));else{const a=store.history();const o=a.find(x=>x.id===id);if(o){Object.entries(f).forEach(([k,v])=>{if(v==null)delete o[k];else o[k]=v;});LS.set("rutina.history",JSON.stringify(a));}}}catch(e){}},
   setSessionFeedback(id,fb){try{if(A&&A.setSessionFeedback)A.setSessionFeedback(id,JSON.stringify(fb));else{const a=store.history();const o=a.find(x=>x.id===id);if(o){o.fb=fb;LS.set("rutina.history",JSON.stringify(a));}}}catch(e){}},
   done(rounds,day){try{if(A){A.markDone(rounds,day);A.vibrate();}else{LS.set("rutina.lastDay",day);LS.set("rutina.sessions",store.sessions()+1);navigator.vibrate&&navigator.vibrate([300,150,300,150,600]);}}catch(e){}}
 };
@@ -786,7 +816,7 @@ function setMode(m){
   if(locked()) return;
   if(view!=="main"){view="main";document.body.classList.remove("hist");$("hist").hidden=true;}
   if(m!==mode){
-    mode=m; $("setup").hidden=m!=="rutina"; $("free").hidden=m!=="suelto"; $("fb").hidden=true;
+    mode=m; $("setup").hidden=m!=="rutina"; $("free").hidden=m!=="suelto"; $("fb").hidden=true;$("fin").hidden=true;
     running=false; bplay.textContent="Empezar"; build(); ui();
   }
   paintModes();
@@ -813,14 +843,22 @@ function sessionEl(o){
   if(!o.complete) b.appendChild(mk("span","tag","Incompleta"));
   const n=o.sets.length;
   sm.append(b,mk("small",null,[durTxt(o.end-o.start),n+(n===1?" serie":" series"),o.type==="sueltos"?"Ejercicios sueltos":"Rutina completa",o.src==="widget"?"desde el widget":""].filter(Boolean).join(" · ")));
+  const sk=stravaKey(o,hStrava);
+  if(sk||o.hr){const sts=mk("span","sts");if(sk)sts.appendChild(mk("span","st "+STR[sk][0],"Strava: "+STR[sk][1]));
+    if(o.hr)sts.appendChild(mk("span","st",o.hr.avg+" ppm"));sm.appendChild(sts);}
   d.appendChild(sm);
-  d.addEventListener("toggle",()=>{if(!d.open||d.querySelector(".hb"))return;
+  d.addEventListener("toggle",()=>{if(d.open)hOpen=o.id;else if(hOpen===o.id)hOpen=null;
+    if(!d.open||d.querySelector(".hb"))return;
     const body=mk("div","hb"), groups=new Map();
     o.sets.forEach(x=>{if(!groups.has(x.k))groups.set(x.k,[]);groups.get(x.k).push(x);});
     groups.forEach(list=>{const g=mk("div","hx");g.appendChild(mk("b",null,list[0].name));const ul=mk("ul");
       list.forEach(x=>ul.appendChild(mk("li",null,setLine(x,o.type)+" · "+hhmm(x.start))));g.appendChild(ul);body.appendChild(g);});
     if(o.fb&&Object.keys(o.fb).length) body.appendChild(mk("p","hfb","Cómo te fue: "+Object.entries(o.fb).map(([k,v])=>{const m=D.modules.find(x=>x.key===k);return (m?m.name:k)+" "+FBT[v];}).join(" · ")));
+    const fe=FEEL.find(x=>x[0]===o.feel);
+    if(o.rpe||fe) body.appendChild(mk("p","hfb",[o.rpe?"Esfuerzo "+o.rpe+"/10":"",fe?"Te sentiste "+fe[1].toLowerCase():""].filter(Boolean).join(" · ")));
+    if(sk) body.appendChild(stravaBox(o,sk));
     d.appendChild(body);});
+  if(o.id===hOpen) d.open=true;
   return d;
 }
 /* ---------- Copia de seguridad: en la app la guarda Android (Backup.kt); en el navegador se descarga ---------- */
@@ -844,7 +882,7 @@ function reloadAll(){
 function cloudSt(){try{return A&&A.cloudState?JSON.parse(A.cloudState()):null;}catch(e){return null;}}
 function acmsg(t,ok=true){const e=$("acmsg");e.textContent=t;e.classList.toggle("err",!ok);}
 function renderCloud(st){
-  st=st||cloudSt();
+  st=st||cloudSt(); renderConns(st);
   if(!st){$("acct").hidden=true;return;}  // en el navegador no hay nube
   $("acct").hidden=false;$("acout").hidden=st.signedIn;$("acin").hidden=!st.signedIn;
   if(st.signedIn){
@@ -876,6 +914,51 @@ window.onCloudMsg=(msg,ok,kind)=>{
   if(kind==="verify"&&ok){$("accode").hidden=true;renderCloud();}
 };
 window.onCloud=(st,changed)=>{try{renderCloud(JSON.parse(st));}catch(e){} if(changed)reloadAll();};
+/* ---------- Strava y Polar (S1): conexiones y estado de cada sesión. Provisional, como la cuenta (lo bueno, con C1) ---------- */
+function connOf(p){const st=cloudSt();const c=st&&st.signedIn&&st.conn?st.conn[p]:null;return c&&c.status?c:null;}
+function connmsg(t,ok=true){const e=$("connmsg");e.textContent=t;e.classList.toggle("err",!ok);}
+function renderConns(st){
+  const box=$("conns"); box.hidden=!st||!st.signedIn; if(box.hidden)return;
+  const l=$("connl"); l.innerHTML="";
+  [["strava","Strava","Sube cada sesión con la lista de ejercicios"],["polar","Polar","Trae el pulso del reloj para Strava"]].forEach(([p,name,what])=>{
+    const c=(st.conn||{})[p], on=!!c&&c.status==="connected", bad=!!c&&c.status==="error", m=(c&&c.meta)||{};
+    const r=mk("div","crow"), b=mk("b",null,name);
+    b.appendChild(mk("small",null,on?(m.name?"Conectado como "+m.name:"Conectado"):bad?(m.error||"Hay que volver a conectar"):what));
+    const btn=mk("button",null,on?"Desconectar":"Conectar");
+    btn.onclick=()=>{btn.disabled=true;connmsg(on?"Desconectando…":"Abriendo "+name+"…");if(on)A.connDisconnect(p);else A.connConnect(p);};
+    r.append(b,mk("span","st "+(on?"ok":bad?"bad":""),on?"Conectado":bad?"Error":"Sin conectar"),btn); l.appendChild(r);});
+  const sc=(st.conn||{}).strava, on=!!sc&&sc.status==="connected";
+  $("cfwdw").hidden=!on; $("cfwd").checked=!!(on&&sc.meta&&sc.meta.forward);
+}
+$("cfwd").onchange=()=>{connmsg("Guardando…");A.connForward($("cfwd").checked);};
+window.onConnMsg=(m,ok)=>{connmsg(m,ok);renderCloud();};
+/* Estado de Strava de una sesión: el que puso el servidor, o lo que va a pasar */
+const STR={done:["ok","En Strava"],waiting:["warn","Pendiente"],uploading:["warn","Subiendo"],error:["bad","No se pudo subir"],duplicate:["warn","Ya estaba en Strava"],no:["","Sin enviar"]};
+function stravaKey(o,sc){
+  if(o.strava&&STR[o.strava.s])return o.strava.s;
+  if(!sc||sc.status!=="connected"||(o.src&&o.src!=="app"&&o.src!=="widget"))return null;
+  return o.st!==false&&o.start>=Date.parse(sc.connected_at||0)?"waiting":"no";
+}
+let hOpen=null; const hMsg={};
+function stravaBox(o,k){
+  const w=mk("div","hstr"), row=mk("div","row"), [c,t]=STR[k], id=o.strava&&o.strava.id, sc=connOf("strava");
+  row.append(mk("b",null,"Strava"),mk("span","st "+c,t)); w.appendChild(row);
+  w.appendChild(mk("p",null,{
+    done:"Subida con la lista de ejercicios"+(o.hr?" y el pulso del reloj.":"."),
+    waiting:connOf("polar")?"Se enviará sola cuando llegue la sesión del reloj, para subirla con el pulso (si no llega, a las 3 horas, sin pulso).":"Se enviará sola en unos minutos.",
+    uploading:"Subiendo a Strava…",
+    error:(o.strava&&o.strava.err?o.strava.err+" ":"Strava no respondió. ")+"Se volverá a intentar sola, o envíala ahora.",
+    duplicate:"Strava ya tenía una actividad a esa hora (la del reloj). No se ha subido otra.",
+    no:"No se ha enviado."}[k]));
+  if(o.hr)w.appendChild(mk("p",null,`Pulso del reloj: ${o.hr.avg} ppm de media${o.hr.max?", "+o.hr.max+" de máximo":""}.`));
+  if(id){const a=mk("a",null,"Abrir en Strava");a.href="https://www.strava.com/activities/"+id;a.target="_blank";a.rel="noopener";w.appendChild(a);}
+  if(["waiting","error","no"].includes(k)&&sc&&sc.status==="connected"&&A&&A.stravaSend){
+    const b=mk("button","primary",k==="error"?"Reintentar":"Enviar a Strava");
+    b.onclick=()=>{b.disabled=true;b.textContent="Enviando…";hMsg[o.id]="";A.stravaSend(o.id);};w.appendChild(b);}
+  const m=mk("small","hint",hMsg[o.id]||"");m.setAttribute("role","status");m.setAttribute("aria-live","polite");m.dataset.sid=o.id;w.appendChild(m);
+  return w;
+}
+window.onStravaSent=(id,msg,ok)=>{hMsg[id]=msg;hOpen=id;renderHist();};
 /* La mejor serie: con más kilos (y a igualdad, más repeticiones); sin kilos, más repeticiones o más segundos */
 const better=(a,b)=>!b||((a.kg||0)!==(b.kg||0)?(a.kg||0)>(b.kg||0):(a.reps||a.secs)>(b.reps||b.secs));
 function exSummary(h){
@@ -890,7 +973,9 @@ function lastTxt(e){const L=e.lastSets, hold=!!L[0].planSecs, kgs=[...new Set(L.
   return [dayShort(e.last),L.length+(L.length===1?" serie":" series"),L.map(x=>hold?x.secs:x.reps).join("/")+(hold?" s":" reps"),
     kgs.length?kgs.map(fkg).join("–")+" kg":"",bands.join(", ")].filter(Boolean).join(" · ");}
 function bestTxt(e){const x=e.best;return (x.planSecs?x.secs+" s":x.reps+" reps")+(x.kg!=null?" con "+fkg(x.kg)+" kg":"")+(x.band?" · "+x.band:"")+" · "+dayShort(e.bestAt);}
+let hStrava=null;
 function renderHist(){
+  hStrava=connOf("strava");
   const h=store.history().filter(o=>o&&Array.isArray(o.sets)).sort((a,b)=>b.start-a.start);
   const box=$("hdays"); box.innerHTML="";
   $("hsum").textContent=h.length?`${h.length} ${h.length===1?"sesión":"sesiones"} · desde ${dayShort(h[h.length-1].start)}`:"";
@@ -1019,8 +1104,22 @@ function feedback(mods){
     paint(); row.append(lbl,seg); list.appendChild(row);
   });
 }
+/* Al terminar: esfuerzo (1–10), cómo te has sentido y si se envía a Strava. Se guarda en la sesión y sube con ella */
+const FEEL=[["mal","Mal"],["regular","Regular"],["bien","Bien"],["muybien","Muy bien"]];
+function finUi(){
+  const box=$("fin"); box.hidden=!lastRecId; if(!lastRecId)return;
+  const id=lastRecId, r=$("frpe"), f=$("ffeel"); r.innerHTML=""; f.innerHTML="";
+  const pick=(wrap,b)=>wrap.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b));
+  for(let n=1;n<=10;n++){const b=mk("button",null,String(n));b.setAttribute("aria-pressed","false");b.setAttribute("aria-label","Esfuerzo "+n+" de 10");
+    b.onclick=()=>{pick(r,b);store.setSessionFields(id,{rpe:n});};r.appendChild(b);}
+  FEEL.forEach(([k,t])=>{const b=mk("button",null,t);b.setAttribute("aria-pressed","false");
+    b.onclick=()=>{pick(f,b);store.setSessionFields(id,{feel:k});};f.appendChild(b);});
+  const conn=(cloudSt()||{}).conn||{}, on=conn.strava&&conn.strava.status==="connected";
+  $("fstw").hidden=!on; $("fst").checked=true;
+  $("fst").onchange=()=>store.setSessionFields(id,{st:$("fst").checked?null:false});
+}
 function finish(){running=false;done=true;idx=steps.length-1;left=0;bplay.textContent="Repetir";
-  recSave(true);
+  recSave(true); finUi();
   const free=mode==="suelto", msg=free?"Ejercicios terminados":"Rutina terminada";
   player.classList.add("fin");chime();$("live").textContent=msg;setTimeout(()=>say(msg+". Buen trabajo."),900);
   if(free) store.day();
@@ -1055,13 +1154,13 @@ function cues(st,before){
 bplay.onclick=()=>{
   if(!actx){try{actx=new (window.AudioContext||window.webkitAudioContext)();}catch(e){}}
   try{actx&&actx.resume()}catch(e){}
-  if(done){$("fb").hidden=true;build();}
+  if(done){$("fb").hidden=true;$("fin").hidden=true;build();}
   if(!running&&idx===0&&left===steps[0].s) say(steps[0].say);
   if(!running&&!locked()){$("setup").open=false;player.scrollIntoView({block:"start",behavior:"auto"});}
   running=!running; if(running&&!rec)recStart(); bplay.textContent=running?"Pausa":"Seguir"; last=performance.now(); lock(running); ui();
 };
 bskip.onclick=()=>{if(!done){advance();ui();}};
-breset.onclick=()=>{recSave(false);$("fb").hidden=true;running=false;bplay.textContent="Empezar";build();lock(false);ui();$("setup").open=true;};
+breset.onclick=()=>{recSave(false);$("fb").hidden=true;$("fin").hidden=true;running=false;bplay.textContent="Empezar";build();lock(false);ui();$("setup").open=true;};
 $("wminus").onclick=()=>{if(wcur){wcur.v=Math.max(0.5,wcur.v-0.5);saveWeight();ui();}};
 $("wplus").onclick=()=>{if(wcur){wcur.v=Math.min(60,wcur.v+0.5);saveWeight();ui();}};
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&running)lock(true)});
