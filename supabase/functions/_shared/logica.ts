@@ -35,7 +35,8 @@ export const EJERCICIO_STRAVA: Record<string, string> = {
   remo_goma: "ROW_GENERIC",
   puente_abd: "GLUTE_BRIDGE",
   paso_lateral: "LATERAL_WALKS_WITH_BAND_AT_ANKLES",
-  almeja: "BANDED_CLAMS",
+  almeja: "CLAMS",
+  almeja_banda: "BANDED_CLAMS",
   remo_incl_banda: "BENT_OVER_ROW",
 };
 /** Para un ejercicio que aún no está en la tabla (p. ej. uno nuevo que cree Claude): Strava lo muestra como «Total body». */

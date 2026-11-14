@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Una fase de la figura (imagen WebP de D1, ya recortada). El widget añade una por fase al ViewFlipper -->
+<ImageView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/fig_img"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:importantForAccessibility="no"
+    android:scaleType="fitCenter" />

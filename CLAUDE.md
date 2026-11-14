@@ -24,13 +24,21 @@ La usan Ignasi y su mujer, cada uno con su cuenta. Todo en **español** (código
   el token de Supabase (para aplicar migraciones, desplegar funciones y cambiar ajustes por `api.supabase.com`) y deja bajar
   el SDK de Android (`dl.google.com`) para compilar. Si una conversación está en otro, se cambia a «Coruti» antes de empezar.
 - **Plan por olas** (`ROADMAP.md`): cada prompt dice su ola y qué zonas no puede tocar, porque van otras conversaciones a la vez.
+- **Estado de las fases (lanzada / terminada):** está en la base de datos de la página del plan por olas,
+  https://claude.ai/artifact/LtU45Cz1hmWwYEux1kRRix, no en el repo. Se lee con la herramienta `ArtifactData`
+  (`action: list`, `collection: fases`; cada documento es una fase, p. ej. `B3`, con `lanzado` y `terminado`). Al empezar,
+  mirar ahí en qué ola estamos. Al acabar una fase (pull request abierto y pruebas pasadas), marcarla `terminado: true` con
+  `update` y el `if_version` leído. El usuario también la marca con los botones de la página, desde el móvil o el ordenador.
 - Antes de empezar, mirar si `main` ha cambiado (otras fases se hacen a la vez en otras ramas) y fusionarlo si hace falta.
 - El usuario prefiere respuestas directas: la verdad incómoda primero, nivel de confianza en las afirmaciones clave,
   sin elogios de relleno.
 
 ## Dónde está cada cosa
-- `app/src/main/assets/`: la interfaz (WebView). `index.html` carga `app/motor.js` (datos, planes, historial),
-  `app/app.js` (pantallas y acciones, con el diseño de D2) y `app/fig.js` (figura 3D). Catálogo y rutina: `rutina.json`.
+- `app/src/main/assets/`: la interfaz (WebView). `index.html` carga `app/motor.js` (datos, planes, historial), las pantallas
+  con el diseño de D2, un archivo por zona (B3): `app/comun.js` (iconos, piezas, pintar, acciones compartidas), `entrenar.js`,
+  `reproductor.js`, `ejercicios.js`, `historial.js`, `tu.js` e `inicio.js` (toques, Android, arranque; va el último), y
+  `app/fig.js` (figura 3D). No son módulos: comparten variables y el orden de `index.html` importa. Cada zona añade lo suyo
+  a `P` (pantallas), `ACC` (acciones), `HOJAS` y `FORM`. Catálogo y rutina: `rutina.json`.
 - `app/src/main/java/com/vignasi/rutinacore/`: Android en Kotlin, sin librerías extra.
   `MainActivity` (WebView y puente `Android.*`), `Store` (ajustes y racha), `History` (historial; la forma de cada sesión
   está en su comentario), `Backup` (copia JSON), `Cloud` + `SyncLogic` (Supabase), `Widgets`, `WorkoutService`,
@@ -38,6 +46,8 @@ La usan Ignasi y su mujer, cada uno con su cuenta. Todo en **español** (código
 - `app/src/test/`: pruebas de Kotlin (`gradle testReleaseUnitTest`).
 - `supabase/migrations/`: esquema con RLS por persona. `supabase/functions/`: Edge Functions de Strava y Polar
   (`docs/strava.md`). Proyecto `jlyqtxihsorqczlxvbly`.
+- `supabase/functions/claude/` + `_shared/claude.ts`: servidor MCP del conector de Claude (B2a, `docs/claude.md`); su página
+  de inicio de sesión es `web/claude/` (GitHub Pages, `.github/workflows/pagina.yml`).
 - `docs/supabase.md` (cuentas y nube), `docs/strava.md` (Strava y Polar), `docs/diseno/` (funcionalidades, sistema de
   diseño, validación, prototipo y figura 3D; la figura se copia al APK al compilar).
 - `ejercicios/`: cómo se hace cada ejercicio (bloque E, `docs/diseno/4-ejercicios.md`): `fichas.json` (paso 1),
@@ -49,7 +59,8 @@ La usan Ignasi y su mujer, cada uno con su cuenta. Todo en **español** (código
 ## Comandos
 - Compilar y probar: `gradle assembleRelease testReleaseUnitTest` (necesita el SDK de Android 34 en `local.properties`).
 - Ejercicios: `node ejercicios/comprobar.js`, `node ejercicios/comprobar3d.js` y `node --test ejercicios/reglas3d.test.js`.
-- Pruebas del servidor: `node --experimental-strip-types --test supabase/functions/_shared/logica.test.ts`.
+- Pruebas del servidor: `node --experimental-strip-types --test supabase/functions/_shared/logica.test.ts` y `…/_shared/claude.test.ts`.
+- Desplegar el conector de Claude: `npx supabase functions deploy claude --use-api --project-ref jlyqtxihsorqczlxvbly`.
 - Desplegar funciones: `npx supabase functions deploy conexiones polar-aviso --use-api --project-ref jlyqtxihsorqczlxvbly`.
 
 ## Reglas que no se rompen

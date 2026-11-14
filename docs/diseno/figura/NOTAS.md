@@ -103,20 +103,27 @@ Resumen de la búsqueda de noviembre de 2026. Los precios salen sobre todo de ag
   archivo byte a byte (el orden de algunos vértices cambia).
 - Pesos: `persona_m.glb` 1,6 MB, `persona_f.glb` 2,0 MB (con las 4 deformaciones). three.js r160 con el cargador, ~0,8 MB.
 
-## Imágenes para el widget (D1)
-El widget de Android no puede mostrar 3D. Hoy pinta la figura de cada **fase** (`PoseRenderer.render(ex, phaseIdx)`), así que hay
-una imagen por fase y no dos por ejercicio: 32 ejercicios de 2 fases, psoas con 3 y dead bug con 4 → **71 por sexo**.
-- `widget/{m,f}/{claro,oscuro}/<ejercicio>_<fase>.webp`: la postura al final de cada fase, sin etiquetas, 400 × 249 px (el ancho
-  que usa hoy el widget), WebP con fondo transparente. Oscuro lleva la luz de contorno y los muebles oscuros.
-- **Peso:** ~6 KB cada una; ~430 KB por sexo y tema; **1,7 MB las 284**. Con un solo tema, 0,9 MB.
+## Imágenes para el widget (D1, recortadas en C2)
+El widget de Android no puede mostrar 3D: enseña una imagen por **fase** de cada ejercicio, así que hay una por fase y no dos por
+ejercicio. Con los 30 ejercicios de `rutina.json` (28 de 2 fases, psoas con 3 y dead bug con 4) son **63 por sexo y tema**.
+- `widget/{m,f}/{claro,oscuro}/<ejercicio>_<fase>.webp`: la postura al final de cada fase, sin etiquetas, 249 px de alto, WebP con
+  fondo transparente. Oscuro lleva la luz de contorno y los muebles oscuros.
+- **Recorte (C2, por D3):** se quitan los lados vacíos para que la persona de pie salga grande en el widget. Se mira lo opaco
+  (persona y material, no la sombra ni la línea del suelo) de todas las fases del ejercicio, con un margen del 8 % del alto, y
+  todas las fases quedan del mismo ancho. Los tumbados siguen a 400 px; los de pie, de ~100 px (curl) a ~340 (plancha lateral).
+  Sin recortar: `hacer.html?cortar=no`.
+- **Peso:** ~6 KB cada una; **~1,6 MB las 252** (m y f, claro y oscuro). Las cuatro de TRX (`*_trx_*`, de antes de C1) ya no están
+  en `rutina.json`: se quedan en la carpeta pero no entran en el APK.
+- **En el APK:** `app/build.gradle.kts` las copia como recursos `fig_<m|f>_<ejercicio>_<fase>`: claro en `drawable-nodpi` y oscuro
+  en `drawable-night-nodpi`, así el widget cambia de tema solo. Solo entran las de los ejercicios de `rutina.json`.
 - Cómo se hacen (24 s): servir la raíz del repo (`python3 -m http.server 8000`) y `node docs/diseno/figura/widget/hacer_imagenes.js`.
-  La página es `widget/hacer.html` (`?g=m|f&theme=dark&w=400&q=0.8&ex=a,b`). Hay que rehacerlas si cambian modelos o posturas.
-- **Ojo para D2/C2:** el fondo actual del widget es `#1E6B74`, el mismo color que la camiseta: sobre él, la camiseta de ella
-  desaparece. El widget tiene que ir sobre fondo claro u oscuro (los de la app), o cambiar el color de la ropa.
+  La página es `widget/hacer.html` (`?g=m|f&theme=dark&w=400&q=0.8&ex=a,b`). **Hay que rehacerlas si cambian modelos o posturas,
+  o si se añade un ejercicio** (si no, el widget lo enseña sin figura; `WidgetTextosTest` avisa de las que faltan).
+- Fondo del widget: el de la app, claro u oscuro (opción A, elegida en D2). El de antes (`#1E6B74`) era el color de la camiseta.
 - Si se personaliza la figura (idea de más abajo), el widget necesitaría imágenes de esa figura: hacerlas en el móvil al cambiarla.
 
 ## Peso de la figura 3D en la APK
-three.js ~0,8 MB + modelos 3,6 MB + imágenes del widget 0,9–1,7 MB ≈ **5,3–6,1 MB** sin comprimir (la APK comprime algo más). [estimado]
+three.js ~0,8 MB + modelos 3,6 MB + imágenes del widget ~1,6 MB ≈ **5,3–6,1 MB** sin comprimir (la APK comprime algo más). [estimado]
 
 ## Figura 3D completa (D1)
 - **Material:** banda grande como bucle cerrado de la mano al pie (o por debajo de la espalda en el press), mini banda plana

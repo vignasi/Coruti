@@ -8,3 +8,8 @@ verify_jwt = false
 
 [functions.polar-aviso]
 verify_jwt = false
+
+# El conector de Claude (B2a, docs/claude.md): contesta 401 con la dirección del inicio de sesión OAuth,
+# y comprueba el token por su cuenta con Supabase Auth.
+[functions.claude]
+verify_jwt = false

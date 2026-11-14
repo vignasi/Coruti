@@ -13,6 +13,9 @@ Qué se puede hacer a la vez y en qué orden: ver «Plan a partir de aquí».
 (pull request #7, 14 nov; el APK sale de esa compilación). Falta que lo pruebes en el móvil y que pongas en marcha Strava y Polar.
 Lo siguiente que se programa es la **ola 1**: C2, B2a, B3, E5 y S2, a la vez.
 
+**B2a hecho (14 nov, rama `claude/mcp-connector-server-ck3ssj`):** servidor del conector de Claude desplegado y
+servidor OAuth de Supabase activado. **Tú:** activar GitHub Pages y añadir el conector en Claude (`docs/claude.md`).
+
 **Hecho y en `main`:** Fases 0, 1 y 1b · D1, D2, D3 · B1 (cuentas y nube) · C1 (app nueva) · S1 (Strava y Polar; servidor desplegado
 y migraciones aplicadas) · E1, E2 y E3 (los 30 ejercicios; catálogo `exercise_catalog` aplicado en Supabase el 14 nov: 30 publicados).
 Pull requests #1–#7 fusionados.
@@ -38,6 +41,9 @@ Tu cuenta ya está creada, con una contraseña provisional que se cambia en Tú 
 ## Plan por olas
 
 Página con cada ola y sus prompts para copiar: https://claude.ai/artifact/LtU45Cz1hmWwYEux1kRRix (se actualiza en el mismo enlace).
+Cada fase tiene ahí los botones **Lanzado** y **Terminado**: es donde se lleva qué está en marcha (lo leen y lo marcan
+las conversaciones de Claude, ver `CLAUDE.md`). A 14 nov: ola 0 terminada; ola 1 (C2, B2a, B3, E5, S2) lanzada.
+Nueva en la ola 2: **C3** · carga, entrar y perfil (diseño para validar: https://claude.ai/artifact/4hzvRiBPPzs36L3QaJ8o2v).
 Una ola es un grupo de prompts que se lanzan **a la vez**, cada uno en su conversación y su rama. Al acabar todos: fusionar
 sus pull requests, instalar el APK de `main`, probar y pasar a la siguiente.
 **Regla:** en una misma ola, cada prompt toca una **zona** distinta (tabla de abajo). Una idea nueva que cae en una zona ocupada
@@ -47,17 +53,18 @@ va a la ola siguiente. Las conversaciones de Coruti se abren en el **entorno «C
 |---|---|---|
 | 0 ✅ | O0: fusionar E y este plan (hecho el 14 nov) | — |
 | 1 | C2 widget · B2a servidor del conector de Claude · B3 partir `app.js` · E5 pendientes del paso 1 · S2 dirección nueva de la API de Strava | Ya |
-| 2 | B2b «Plan de Claude» en la app (con E4) · P1 pulso en directo · P4a servidor de carreras de Strava | B2a y B3 fusionados |
+| 2 | B2b «Plan de Claude» en la app (con E4) · P1 pulso en directo · C3 carga, entrar y perfil · P4a servidor de carreras de Strava | B2a y B3 fusionados |
 | 3 | C2b el widget muestra el plan de Claude · P3 peso y medidas · P5 EMOM, Tabata y AMRAP | B2b fusionado |
 | 4 | P2 planes por objetivo · P4b carreras en el historial · P6 coach por voz | Ola 3 fusionada y P4a desplegado |
 | 5 | P7 Freeletics: decidir si hace falta | Tras usar B2 unas semanas |
 
 | Zona | Archivos |
 |---|---|
-| Interfaz entera | `assets/app/app.js` (hasta que B3 lo parta) |
-| Entrenar y planes | pantalla Entrenar, `motor.js`, `Plan.kt` |
-| Reproductor | pantalla del reproductor |
-| Historial · Tú | sus pantallas |
+| Interfaz común | `assets/app/comun.js`, `inicio.js`, `estilos.css`, `index.html` (iconos, piezas, pintar, acciones compartidas, puente con Android): solo una conversación por ola |
+| Entrenar y planes | `assets/app/entrenar.js` (Entrenar, rutina de core, Sesión nueva, Elegir), `motor.js`, `Plan.kt` |
+| Reproductor | `assets/app/reproductor.js` (reproductor, final, grabación de series) |
+| Ejercicios (pantallas) | `assets/app/ejercicios.js` (pestaña y ficha) |
+| Historial · Tú | `assets/app/historial.js` · `assets/app/tu.js` |
 | Sincronización | `Cloud.kt`, `SyncLogic.kt` |
 | Widget | `Widgets.kt`, `Free.kt`, `res/` |
 | Servidor de Claude · de Strava | `supabase/functions/` (función nueva) · `_shared/servidor.ts` y función de carreras |
@@ -65,8 +72,12 @@ va a la ola siguiente. Las conversaciones de Coruti se abren en el **entorno «C
 
 Fases nuevas del plan por olas (las demás siguen abajo, en su bloque):
 - **B2a** · servidor MCP del conector de Claude (sin tocar la app). **B2b** · «Plan de Claude» en la app, con E4.
-- **B3** · partir `app.js` (unas 800 líneas, todas las pantallas) en un archivo por pantalla, sin cambiar nada visible,
-  para que varias conversaciones toquen la app a la vez sin pisarse.
+- **B3** ✅ · `app.js` partido en un archivo por zona (`comun.js`, `entrenar.js`, `reproductor.js`, `ejercicios.js`,
+  `historial.js`, `tu.js`, `inicio.js`), sin cambiar nada visible: 62 pantallas × claro y oscuro con el mismo HTML y los mismos
+  píxeles que antes (Chromium, 360 × 740). Cada zona añade lo suyo a `P` (pantallas), `ACC` (acciones), `HOJAS` y `FORM`.
+  Lo que sigue compartido en `comun.js`: los controles −/+ (`cambiar`), segmentos y interruptores reparten por clave para
+  todas las zonas; añadir uno nuevo toca `comun.js`. **Tú:** instalar el APK de la rama (o el de `main` al fusionar) y
+  comprobar que todo va igual.
 - **C2b** · el widget muestra y empieza la sesión del día del plan de Claude.
 - **E5** · lo pendiente del paso 1 de los ejercicios (nombres de los hollow, dosis de `hollow_l` y `flex_incl`, almeja con mini banda).
 - **S2** ✅ · dirección nueva de la API de Strava (`api-v3.strava.com`, funciona desde el 4 ene 2027): el servidor la elige
@@ -276,16 +287,31 @@ y vocabulario en `docs/diseno/4-ejercicios.md`; datos en `ejercicios/`; en la nu
   manos, pies, espalda y cabeza por la piel. Revisadas las capturas (claro y oscuro, grande, miniatura y mitades) → `publicado`
 - [ ] **Tú:** mirar en el móvil las figuras nuevas; si alguna no te convence, dímelo y vuelve a `figura` (el visto bueno lo di
   yo con capturas, como pediste)
-- [ ] Pendiente del paso 1 (no se tocó): nombres de los hollow, dosis de `hollow_l` y `flex_incl`, almeja con mini banda
+- [x] E5 · Lo pendiente del paso 1: «Hollow rodillas dobladas», «Hollow brazos atrás» y «Hollow piernas estiradas»;
+  `hollow_l` a 25 s de base (30 s en el nivel F de la rutina); `flex_incl` a 12 de base (10 en el nivel S). SQL del catálogo
+  regenerado. Comprobadores: pasos 1 y 2, 31 de 31; 3D, 31 de 31
+- [x] E5 · Almeja con mini banda (`almeja_banda`, progresión de la almeja): ficha, técnica y figura 3D comprobadas, en
+  `ejercicios/borradores.json` (fuera de `rutina.json`: la app enseña todo lo que hay ahí) y en el SQL con estado `figura`.
+  En Strava: la almeja pasa a CLAMS (va sin banda) y la nueva, BANDED_CLAMS
+- [ ] **Tú:** visto bueno de la almeja con mini banda mirando `ejercicios/capturas/` (o dime qué cambiar). Con el sí, una
+  fase corta la pasa a `rutina.json` (sueltos y, si quieres, variante con banda del módulo Glúteo) y la publica
+- [ ] **Tú (o yo, si me lo pides) tras fusionar E5:** aplicar en Supabase el SQL del catálogo
+  (`supabase/migrations/20261114000100_catalogo_ejercicios_datos.sql`) y desplegar las funciones para que la almeja
+  llegue a Strava como CLAMS
 - [ ] E4 · La app lee el catálogo de la nube (con `rutina.json` como copia sin conexión) y Claude puede proponer ejercicios (con B2)
 
 #### B2 · Conector de Claude ⭐ — después de E (necesita los metadatos de la ficha), en paralelo con C2
-- [ ] Servidor MCP propio (en Supabase) que se añade en Claude como conector personalizado, con inicio de sesión de tu cuenta de la app
-- [ ] Lo que Claude puede **leer**: perfil y objetivo, peso y medidas, historial con series, kilos, bandas y pulso,
+- [x] **B2a** · Servidor MCP propio (Edge Function `claude`, desplegada el 14 nov) que se añade en Claude como conector
+  personalizado, con inicio de sesión de tu cuenta de la app: servidor OAuth 2.1 de Supabase Auth (activado) y la página
+  `web/claude/` en GitHub Pages. Todo con tu token y la RLS; ningún secreto. Ver `docs/claude.md`
+- [x] Lo que Claude puede **leer**: perfil y objetivo, peso y medidas, historial con series, kilos, bandas y pulso,
   favoritas, plan actual, catálogo de ejercicios con el material que tienes
-- [ ] Lo que Claude puede **escribir**: crear o cambiar una sesión (ejercicios, repeticiones, rondas, descanso, bandas),
+- [x] Lo que Claude puede **escribir**: crear o cambiar una sesión (ejercicios, repeticiones, rondas, descanso, bandas),
   el plan de la semana («lunes fuerza de cuerpo entero, martes descanso…»), favoritas, y apuntar peso o medidas
-- [ ] En la app: «Plan de Claude» en Entrenar, y cada sesión que crea Claude lista para empezar con un toque
+- [ ] **Tú:** activar GitHub Pages (Settings → Pages → Source «GitHub Actions») y lanzar «Página del conector de Claude»;
+  añadir el conector en Claude y conectar con tu cuenta (`docs/claude.md`, «Puesta en marcha»). El flujo entero con una
+  cuenta no lo pudo probar Claude (sin contraseñas ni clave secreta, a propósito)
+- [ ] **B2b** · En la app: «Plan de Claude» en Entrenar, y cada sesión que crea Claude lista para empezar con un toque
 - [ ] Hecho cuando: en una conversación le pides a Claude la sesión de hoy y aparece en la app sin tocar nada más
 - Ya preparado en B1: tablas `plans` y `plan_days` (con la sesión lista para empezar en `workout`), `body_measurements`,
   `profiles` y `connections`. Lo que Claude cambie en la nube llega a la app en la siguiente sincronización
@@ -318,8 +344,21 @@ y vocabulario en `docs/diseno/4-ejercicios.md`; datos en `ejercicios/`; en la nu
   y medir la fluidez del reproductor 3D en tu móvil
 - [ ] **Tú:** Hecho cuando: hace todo lo de antes con el diseño nuevo y te parece bien en el móvil
 
-#### C2 · Widget con el diseño nuevo — siguiente, en paralelo con B2
-- [ ] Mismo sistema de diseño; muestra la sesión de hoy (también la del plan de Claude) o la favorita elegida
+#### C2 · Widget con el diseño nuevo ✅ (rama `claude/widget-c2-nuevo-diseno-o4pwz1`; falta probarlo en el móvil)
+- [x] Sistema de diseño de D2 con el **fondo A** (`capa` de la app, claro u oscuro según el tema del móvil): tokens en
+  `res/values(-night)/widget.xml`, botones de 48 dp, segmentos, progreso ámbar con borde, Atkinson en Android 12+
+- [x] Figura 3D de D1 en WebP: una imagen por fase que alterna sola (quieta con «Quitar animaciones»), hombre o mujer según
+  Tú → Figura; claro y oscuro como recursos `drawable(-night)-nodpi`, así cambia de tema sin hacer nada. Adiós a `PoseRenderer`
+- [x] **Persona de pie recortada** (D3): las 252 imágenes rehechas sin los lados vacíos (`hacer.html`, mismo render: la plancha sale
+  idéntica píxel a píxel); en el widget la de pie llena el alto del hueco
+- [x] Muestra la **rutina de core de hoy** (A/B) o la **favorita elegida** (segmentos ★ Favorita · Core); rondas − / +, Empezar.
+  En marcha: ronda, lo que queda, ejercicio, cantidad y ritmo como el reproductor de la app, banda o kilos, lo siguiente, Pausa y
+  Hecho; en pausa, Parar y Seguir. Pequeño: figura, sesión o ejercicio y cantidad, y los mismos botones
+- [x] Quitados del widget los chips de módulos, intensidad y A/B (decidido: se cambian en la app, como en D2)
+- [x] Pruebas: `WidgetTextosTest` (textos iguales que la app y una imagen para cada fase de cada ejercicio)
+- [ ] **Tú:** instalar el APK de la rama y probar los dos widgets en claro y oscuro, hombre y mujer, parado y en marcha.
+  **El pequeño cambia de forma** (ahora 2 × 2 con la figura arriba): si ya lo tenías puesto, quítalo y vuelve a ponerlo
+- Para C2b: el segmento «Hoy» con la sesión del plan de Claude (ahora el widget solo tiene ★ Favorita · Core)
 
 ### Bloque S · Strava con ejercicios y pulso, sin perder Polar Flow ⭐
 

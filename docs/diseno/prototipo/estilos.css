@@ -268,7 +268,7 @@ a { color: var(--accion); }
 .w-arriba { display: flex; justify-content: space-between; gap: var(--e2); }
 .w-arriba .meta svg { width: 14px; height: 14px; color: var(--error); vertical-align: -2px; margin-right: 2px; }
 .w-cuerpo { align-items: center; }
-.w-fig { width: 46%; max-width: 168px; aspect-ratio: 400 / 249; flex: none; display: block; }
+.w-fig { width: 46%; max-width: 168px; aspect-ratio: 400 / 249; flex: none; display: block; object-fit: contain; } /* las de pie vienen recortadas (C2) */
 .w-peq .w-fig { width: 100%; max-width: none; }
 .w-nombre { display: block; font-weight: 700; font-size: var(--t2); line-height: 1.25; }
 .w span.crece { display: flex; flex-direction: column; gap: 2px; }
