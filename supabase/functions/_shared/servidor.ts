@@ -10,8 +10,9 @@ export const PROYECTO = Deno.env.get("SUPABASE_URL") ?? "https://jlyqtxihsorqczl
 /** La dirección a la que vuelven Strava y Polar al conectar (hay que ponerla igual en sus webs de desarrolladores). */
 export const VUELTA = `${PROYECTO}/functions/v1/conexiones`;
 export const AVISO_POLAR = `${PROYECTO}/functions/v1/polar-aviso`;
-// La API de Strava pasa a https://api-v3.strava.com a partir del 4 de enero de 2027; hasta entonces, esta
-const STRAVA_API = "https://www.strava.com/api/v3";
+// La API de Strava pasa a https://api-v3.strava.com, que funciona a partir del 4 de enero de 2027 (changelog de Strava,
+// 1 jun 2026). Se cambia sola ese día, así que desplegar antes no rompe nada; la antigua sigue sin fecha de cierre.
+const STRAVA_API = Date.now() >= Date.UTC(2027, 0, 4) ? "https://api-v3.strava.com" : "https://www.strava.com/api/v3";
 const POLAR_API = "https://www.polaraccesslink.com/v3";
 
 function claveServicio(): string {
