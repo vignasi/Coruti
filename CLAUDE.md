@@ -20,6 +20,10 @@ La usan Ignasi y su mujer, cada uno con su cuenta. Todo en **español** (código
 - **GitHub Actions solo cuando es imprescindible:** para que el usuario tenga un APK que instalar. Claude compila y prueba
   en local (`gradle …`), nunca con Actions. Las ramas no compilan solas: si el usuario necesita el APK de una rama,
   se lanza «Compilar APK» a mano en esa rama, una sola vez. En `main` compila al fusionar si cambia algo del APK.
+- **Entorno «Coruti»:** las conversaciones de este repo se abren en el entorno «Coruti», no en «Predeterminado». Solo ese tiene
+  el token de Supabase (para aplicar migraciones, desplegar funciones y cambiar ajustes por `api.supabase.com`) y deja bajar
+  el SDK de Android (`dl.google.com`) para compilar. Si una conversación está en otro, se cambia a «Coruti» antes de empezar.
+- **Plan por olas** (`ROADMAP.md`): cada prompt dice su ola y qué zonas no puede tocar, porque van otras conversaciones a la vez.
 - Antes de empezar, mirar si `main` ha cambiado (otras fases se hacen a la vez en otras ramas) y fusionarlo si hace falta.
 - El usuario prefiere respuestas directas: la verdad incómoda primero, nivel de confianza en las afirmaciones clave,
   sin elogios de relleno.
