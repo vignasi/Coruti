@@ -7,40 +7,71 @@ marca aquí lo hecho y termina dando el prompt de la fase siguiente.
 Cada conversación nueva parte de `main`; si no se fusiona, empieza sin los cambios anteriores.
 Qué se puede hacer a la vez y en qué orden: ver «Plan a partir de aquí».
 
-## Estado (13 nov 2026)
+## Estado (14 nov 2026)
 
-**Dónde estamos:** todo lo construido está en `main` (APK 1.0.31 en Releases); falta que lo pruebes en el móvil
-y que pongas en marcha Supabase, Strava y Polar. Lo siguiente que se programa es B2 y C2, a la vez.
+**Dónde estamos:** ola 0 del plan por olas (abajo) casi cerrada. Todo lo construido está en `main`, también el bloque E
+(pull request #7, 14 nov; el APK sale de esa compilación). Falta que lo pruebes en el móvil y que pongas en marcha Strava y Polar.
+Lo siguiente que se programa es la **ola 1**: C2, B2a, B3, E5 y S2, a la vez.
 
 **Hecho y en `main`:** Fases 0, 1 y 1b · D1, D2, D3 · B1 (cuentas y nube) · C1 (app nueva) · S1 (Strava y Polar; servidor desplegado
-y migraciones aplicadas) · CLAUDE.md y Actions solo cuando hace falta un APK. Pull requests #1–#6 fusionados; último APK: 1.0.31.
+y migraciones aplicadas) · E1, E2 y E3 (los 30 ejercicios; catálogo `exercise_catalog` aplicado en Supabase el 14 nov: 30 publicados).
+Pull requests #1–#7 fusionados.
 
-**Hecho pero sin fusionar:** E1, E2 y E3 (los 30 ejercicios revisados y publicados) en la rama
-`claude/confident-ritchie-box0z4`, que ya lleva dentro E1 (`claude/coruti-c1-app-android-2vhnk1`): basta fusionar esta. Las ramas que quedan con commits fuera de `main` son trabajo viejo ya superado
-(`claude/elegant-bardeen-9nk8c1` y `claude/vigilant-lovelace-hb4acy`: D1 y D2 rehechos después;
-`claude/affectionate-shannon-9oa7zz`: plan de producto de octubre, sustituido por este ROADMAP). Se pueden borrar.
+**⚠️ Entrar en la cuenta no funciona todavía.** El plan gratuito de Supabase **no deja cambiar las plantillas de email**
+con el correo que trae Supabase (lo dice su API: «Email template modification is not available for free tier projects
+using the default email provider»). El email manda un enlace y la app pide un código. Solución elegida: un correo propio (SMTP),
+gratis con Gmail. Pasos en `docs/supabase.md`, apartado 2. En cuanto esté, Claude cambia las plantillas por la API.
 
 **Tú, en este orden:**
-1. Plantillas de email de Supabase para que llegue el código: `docs/supabase.md`, apartado 2. Sin esto no puedes entrar en la cuenta.
-2. Instalar el APK 1.0.31 de Releases (es el de `main`; donde `docs/strava.md` dice «el APK de la rama», usa este).
-3. Probar en el móvil la app nueva: lo de siempre (rutina, sueltos, favorita en el widget, historial, exportar e importar),
-   TalkBack y la fluidez del reproductor 3D (C1, Fases 1 y 1b más abajo).
-4. Entrar con tu cuenta; luego reinstalar u otro móvil y comprobar que aparece todo; tu mujer con su cuenta ve solo lo suyo (B1).
-5. Registrar la app en Strava y en Polar AccessLink y poner las 4 claves en Supabase: `docs/strava.md`, pasos 1–3.
-6. Conectar Strava y Polar en Tú → Conexiones: `docs/strava.md`, paso 4.
-7. Polar Flow → Strava solo carreras (o quitarlo y marcar «Reenviar también carreras y paseos»): `docs/strava.md`, paso 5; y el reloj, paso 6.
-8. Comprobar con una sesión real: en Polar Flow como siempre y en Strava con ejercicios y pulso; una carrera sigue llegando (S1).
-9. Para tu mujer en Strava: pedir más plazas de atletas en strava.com/settings/api (la app nueva solo admite 1).
-- Sin confirmar: el visto bueno de D3 en el móvil (C1 se construyó encima, así que se dio por bueno; dime si lo hiciste).
+1. Correo propio en Supabase (Gmail con contraseña de aplicación): `docs/supabase.md`, apartado 2. Sin esto no puedes entrar en la cuenta.
+2. Instalar el APK nuevo de Releases (el de `main` tras el pull request #7) y probar lo de siempre: rutina, sueltos, favorita
+   en el widget, historial, exportar e importar, las figuras nuevas de E, TalkBack y la fluidez del reproductor 3D.
+3. Entrar con tu cuenta; luego reinstalar u otro móvil y comprobar que aparece todo; tu mujer con su cuenta ve solo lo suyo (B1).
+4. Registrar la app en Strava y en Polar AccessLink y poner las 4 claves en Supabase: `docs/strava.md`, pasos 1–3.
+5. Conectar Strava y Polar en Tú → Conexiones: `docs/strava.md`, paso 4.
+6. Polar Flow → Strava solo carreras (o quitarlo y marcar «Reenviar también carreras y paseos»): `docs/strava.md`, paso 5; y el reloj, paso 6.
+7. Comprobar con una sesión real: en Polar Flow como siempre y en Strava con ejercicios y pulso; una carrera sigue llegando (S1).
+8. Para tu mujer en Strava: pedir más plazas de atletas en strava.com/settings/api (la app nueva solo admite 1).
+- Sin confirmar: el visto bueno de D3 y de las figuras de E en el móvil.
 
-10. Catálogo de ejercicios en Supabase (bloque E): pegar en SQL Editor `supabase/migrations/20261114000000_catalogo_ejercicios.sql`
-   y después `20261114000100_catalogo_ejercicios_datos.sql` (`docs/supabase.md`, apartado 1). Ya lleva los 30 publicados.
-11. Fusionar la rama de E1–E3 y probar el APK: figuras nuevas (almeja, tumbados, planchas, fondos…) y textos corregidos.
+**Siguiente:** la ola 1 del plan por olas.
 
-**Siguiente fase:** B2 (conector de Claude), que ya tiene los metadatos de los ejercicios, y C2 (widget con el diseño
-nuevo) a la vez. E4 (la app lee el catálogo de la nube) va con B2.
-Después, el bloque P. Casi todo el bloque P toca `app/app.js`, igual que B2 (que añade «Plan de Claude» en Entrenar):
-mejor empezarlo cuando B2 esté fusionado.
+## Plan por olas
+
+Página con cada ola y sus prompts para copiar: https://claude.ai/artifact/LtU45Cz1hmWwYEux1kRRix (se actualiza en el mismo enlace).
+Una ola es un grupo de prompts que se lanzan **a la vez**, cada uno en su conversación y su rama. Al acabar todos: fusionar
+sus pull requests, instalar el APK de `main`, probar y pasar a la siguiente.
+**Regla:** en una misma ola, cada prompt toca una **zona** distinta (tabla de abajo). Una idea nueva que cae en una zona ocupada
+va a la ola siguiente. Las conversaciones de Coruti se abren en el **entorno «Coruti»** (ver `CLAUDE.md`).
+
+| Ola | A la vez | Empieza cuando |
+|---|---|---|
+| 0 ✅ | O0: fusionar E y este plan (hecho el 14 nov) | — |
+| 1 | C2 widget · B2a servidor del conector de Claude · B3 partir `app.js` · E5 pendientes del paso 1 · S2 dirección nueva de la API de Strava | Ya |
+| 2 | B2b «Plan de Claude» en la app (con E4) · P1 pulso en directo · P4a servidor de carreras de Strava | B2a y B3 fusionados |
+| 3 | C2b el widget muestra el plan de Claude · P3 peso y medidas · P5 EMOM, Tabata y AMRAP | B2b fusionado |
+| 4 | P2 planes por objetivo · P4b carreras en el historial · P6 coach por voz | Ola 3 fusionada y P4a desplegado |
+| 5 | P7 Freeletics: decidir si hace falta | Tras usar B2 unas semanas |
+
+| Zona | Archivos |
+|---|---|
+| Interfaz entera | `assets/app/app.js` (hasta que B3 lo parta) |
+| Entrenar y planes | pantalla Entrenar, `motor.js`, `Plan.kt` |
+| Reproductor | pantalla del reproductor |
+| Historial · Tú | sus pantallas |
+| Sincronización | `Cloud.kt`, `SyncLogic.kt` |
+| Widget | `Widgets.kt`, `Free.kt`, `res/` |
+| Servidor de Claude · de Strava | `supabase/functions/` (función nueva) · `_shared/servidor.ts` y función de carreras |
+| Ejercicios | `ejercicios/`, `rutina.json`, SQL del catálogo |
+
+Fases nuevas del plan por olas (las demás siguen abajo, en su bloque):
+- **B2a** · servidor MCP del conector de Claude (sin tocar la app). **B2b** · «Plan de Claude» en la app, con E4.
+- **B3** · partir `app.js` (unas 800 líneas, todas las pantallas) en un archivo por pantalla, sin cambiar nada visible,
+  para que varias conversaciones toquen la app a la vez sin pisarse.
+- **C2b** · el widget muestra y empieza la sesión del día del plan de Claude.
+- **E5** · lo pendiente del paso 1 de los ejercicios (nombres de los hollow, dosis de `hollow_l` y `flex_incl`, almeja con mini banda).
+- **S2** · dirección nueva de la API de Strava antes del 4 de enero de 2027.
+- **P4a / P4b** · P4 partido: el servidor que trae las actividades de Strava, y mostrarlas en el historial.
 
 ## Decisiones tomadas
 
@@ -215,8 +246,9 @@ Después: P1 Pulso · P2 Planes por objetivo · P3 Peso y medidas · P4 Carreras
 - Decidido: la Edge Function para secretos pasa a S1, cuando haya un secreto real (Strava) y algo que la use.
   La tabla `connection_secrets` ya está lista y la app no puede leerla
 - [x] Migración de B1 aplicada en Supabase (13 nov, desde la conversación de S1)
-- [ ] **Tú:** cambiar las plantillas de email para que traigan el código (pasos en `docs/supabase.md`, apartado 2).
-  Ahora mismo mandan un enlace en inglés y la longitud del código es 8 (la app acepta de 6 a 10)
+- [ ] **Tú:** correo propio (SMTP) en Supabase para que el email pueda traer el código (`docs/supabase.md`, apartado 2).
+  Las plantillas no se pueden cambiar en el plan gratuito con el correo de Supabase (comprobado por la API el 14 nov).
+  Ahora mismo mandan un enlace en inglés. La longitud del código se puso en 6 el 14 nov (la app acepta de 6 a 10)
 - [x] **Tú:** fusionar la rama en `main` (pull request #4, versión 1.0.12)
 - [ ] **Tú:** probar en el móvil con el APK de `main` (1.0.31)
 - [ ] **Tú:** Hecho cuando: con otro móvil, o tras reinstalar, entras y aparece todo; y tu mujer con su cuenta ve solo lo suyo
@@ -232,7 +264,7 @@ y vocabulario en `docs/diseno/4-ejercicios.md`; datos en `ejercicios/`; en la nu
   (almeja con la figura mal, press con banda que habla de mancuernas, dosis raras en hollow y flexiones inclinadas…)
 - [x] E1 · Tabla `exercise_catalog` y SQL con los 30 (ficha hecha; técnica y figura de hoy marcadas «sin revisar»),
   probados en un Postgres local: se crea, se puede repetir, las cuentas leen y no escriben, sin cuenta no se lee
-- [ ] **Tú:** pegar los dos SQL en Supabase (`docs/supabase.md`, apartado 1)
+- [x] Los dos SQL aplicados en Supabase (14 nov, por la API): 30 ejercicios publicados; las cuentas solo leen
 - [x] E2 · Paso 2 de los 30 (`ejercicios/tecnicas.json`): inicio, fases con apoyos, claves, errores, respiración, dónde se nota
   y condiciones; comprobador frase por frase en `node ejercicios/comprobar.js` (218 frases); textos corregidos pasados a
   `rutina.json` (`node ejercicios/a_rutina.js`): press con banda sin «mancuernas», fuera claves de dosis, plancha sin «Así NO»

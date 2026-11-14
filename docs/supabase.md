@@ -11,18 +11,31 @@ es la seguridad por persona (RLS) de las tablas. La clave secreta (`sb_secret_�
    Se puede volver a ejecutar sin romper nada. Los avisos «does not exist, skipping» son normales.
 3. Después, igual, cada archivo nuevo de `supabase/migrations/` en orden de nombre. Para el catálogo de ejercicios (bloque E):
    `20261114000000_catalogo_ejercicios.sql` y luego `20261114000100_catalogo_ejercicios_datos.sql` (los 30 ejercicios).
-   En **Table Editor** → `exercise_catalog` tienen que salir 30 filas con estado `ficha`.
+   En **Table Editor** → `exercise_catalog` tienen que salir 30 filas con estado `publicado`. (Aplicados el 14 nov.)
 4. Comprueba en **Table Editor** que están `profiles`, `app_state`, `workout_sessions`, `workout_sets`, `favorites`,
    `body_measurements`, `exercises`, `plans`, `plan_days`, `connections` y `connection_secrets`, y que ninguna pone
    «RLS disabled» ni «Unrestricted».
 
 ## 2. Que el email traiga un código (obligatorio)
 
-La app pide un código de 6 cifras; por defecto Supabase manda un enlace. En **Authentication → Emails → Templates**
-cambia **dos** plantillas: **Confirm signup** (la primera vez de cada email) y **Magic Link** (las siguientes).
+La app pide un código; por defecto Supabase manda un enlace. **En el plan gratuito, con el correo que trae Supabase,
+las plantillas no se pueden cambiar** (comprobado el 14 nov: la API responde «Email template modification is not available
+for free tier projects using the default email provider»). Hace falta un correo propio (SMTP). Con Gmail es gratis:
 
-- Asunto: `Tu código para Rutina core`
-- Mensaje:
+**Tú (unos 10 minutos):**
+1. En tu cuenta de Google, activa la **verificación en dos pasos** si no la tienes (myaccount.google.com → Seguridad).
+2. En myaccount.google.com/apppasswords crea una **contraseña de aplicación** llamada «Supabase». Te da 16 letras.
+   No la pegues en ningún chat.
+3. En supabase.com → el proyecto → **Authentication → Emails → SMTP Settings** → **Enable custom SMTP**:
+   - Sender email: tu Gmail · Sender name: `Rutina core`
+   - Host: `smtp.gmail.com` · Port: `465`
+   - Username: tu Gmail · Password: las 16 letras
+   - Guardar.
+4. Dile a Claude (en una conversación del entorno «Coruti») que ponga las plantillas: las cambia por la API con lo de abajo.
+
+**Claude, con el token del entorno «Coruti»:** `PATCH https://api.supabase.com/v1/projects/jlyqtxihsorqczlxvbly/config/auth`
+con `mailer_subjects_confirmation` y `mailer_subjects_magic_link` = `Tu código para Rutina core`,
+`mailer_templates_confirmation_content` y `mailer_templates_magic_link_content` =
 
 ```html
 <h2>Tu código para Rutina core</h2>
@@ -31,8 +44,8 @@ cambia **dos** plantillas: **Confirm signup** (la primera vez de cada email) y *
 <p>Caduca en una hora. Si no lo has pedido tú, ignora este correo.</p>
 ```
 
-En **Authentication → Sign In / Providers → Email**: el proveedor Email activado y «Allow new users to sign up» activado
-(registro abierto). Si «Email OTP Length» no es 6, da igual: la app acepta de 6 a 10 cifras.
+y `mailer_otp_length` = 6. Se cambian dos plantillas: **Confirm signup** (la primera vez de cada email) y **Magic Link**
+(las siguientes). El proveedor Email ya está activado y el registro abierto (comprobado el 14 nov).
 
 ## 3. Límites del plan gratuito
 
