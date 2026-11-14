@@ -9,20 +9,32 @@ Qué se puede hacer a la vez y en qué orden: ver «Plan a partir de aquí».
 
 ## Estado (14 nov 2026)
 
-**Dónde estamos:** ola 0 del plan por olas (abajo) casi cerrada. Todo lo construido está en `main`, también el bloque E
-(pull request #7, 14 nov; el APK sale de esa compilación). Falta que lo pruebes en el móvil y que pongas en marcha Strava y Polar.
-Lo siguiente que se programa es la **ola 1**: C2, B2a, B3, E5 y S2, a la vez.
+**Dónde estamos:** **ola 1 cerrada** (14 nov): B3, C2, E5, B2a y S2 fusionados en `main` (pull requests #14, #13, #15, #12
+y #10, en ese orden, sin conflictos). APK **1.0.38** en Releases. Lo siguiente es la **ola 2**: B2b, P1, C3 y P4a, a la vez.
 
-**B2a hecho:** servidor del conector de Claude desplegado y servidor OAuth de Supabase activado. **Tú:** añadir el conector en
-Claude (`docs/claude.md`, «Puesta en marcha»).
+**Cierre de la ola 1 (14 nov):** batería completa en local sobre `main` en verde (compilación y 23 pruebas de Kotlin; ejercicios
+pasos 1–3, 31 de 31; `reglas3d` 7; servidor: `logica` 9 y `claude` 20). App recorrida en Chromium a 360 px sin errores de JavaScript.
+En Supabase: SQL del catálogo de E5 aplicado (30 publicados + `almeja_banda` en `figura`) y funciones `conexiones`, `polar-aviso`
+y `claude` desplegadas desde `main` (responden). La dirección nueva de Strava (S2) ya está desplegada: el servidor la usa solo
+desde el **4 ene 2027**.
+
+**Tú, de la ola 1** (además de lo de abajo):
+1. Instalar el APK 1.0.38 y probar el widget nuevo (C2): los dos tamaños, claro y oscuro, hombre y mujer, parado y en marcha.
+   El pequeño cambia a 2 × 2: quítalo y vuelve a ponerlo.
+2. La app tiene que ir **igual que antes** (B3 movió todo `app.js`): Entrenar, rutina, sueltos, reproductor, Historial, Tú.
+3. Ejercicios (E5): nombres nuevos de los hollow y dosis de `hollow_l` (25 s) y `flex_incl` (12). Visto bueno de la almeja con
+   mini banda mirando `ejercicios/capturas/`.
+4. Conector de Claude (B2a): ya no hace falta GitHub Pages (la página está en Vercel). Entrar con tu cuenta en la app para que
+   suba el historial (a 15 nov la nube tiene 0 sesiones) y añadir el conector en Claude (`docs/claude.md`). Pedirle que lea tu historial.
+5. El 4 ene 2027 (S2): mirar que una subida a Strava llega bien.
 
 **Repo privado (15 nov):** el APK de Releases solo se descarga con la sesión de GitHub iniciada (en el móvil, desde
 github.com con tu cuenta, o desde el ordenador y pasarlo). La página de entrar del conector de Claude ya no va en GitHub
 Pages (en privado es de pago) sino en **Vercel**, proyecto `coruti-conector`: https://coruti-conector.vercel.app/claude/. La única GitHub Action es la del APK.
 
 **Hecho y en `main`:** Fases 0, 1 y 1b · D1, D2, D3 · B1 (cuentas y nube) · C1 (app nueva) · S1 (Strava y Polar; servidor desplegado
-y migraciones aplicadas) · E1, E2 y E3 (los 30 ejercicios; catálogo `exercise_catalog` aplicado en Supabase el 14 nov: 30 publicados).
-Pull requests #1–#7 fusionados.
+y migraciones aplicadas) · E1, E2 y E3 (los 30 ejercicios; catálogo `exercise_catalog` aplicado en Supabase el 14 nov: 30 publicados)
+· ola 1: B3, C2, E5, B2a y S2. Pull requests #1–#15 fusionados (el #11 es el plan por olas).
 
 **Cuentas con contraseña (14 nov):** el plan gratuito de Supabase no deja que el email traiga el código, así que la app
 entra con **email y contraseña**, el registro está cerrado y las cuentas las creas tú en Supabase (`docs/supabase.md`, apartado 2).
@@ -40,13 +52,13 @@ Tu cuenta ya está creada, con una contraseña provisional que se cambia en Tú 
 8. Para tu mujer en Strava: pedir más plazas de atletas en strava.com/settings/api (la app nueva solo admite 1).
 - Sin confirmar: el visto bueno de D3 y de las figuras de E en el móvil.
 
-**Siguiente:** la ola 1 del plan por olas.
+**Siguiente:** la ola 2 del plan por olas (B2b, P1, C3 y P4a).
 
 ## Plan por olas
 
 Página con cada ola y sus prompts para copiar: https://claude.ai/artifact/LtU45Cz1hmWwYEux1kRRix (se actualiza en el mismo enlace).
 Cada fase tiene ahí los botones **Lanzado** y **Terminado**: es donde se lleva qué está en marcha (lo leen y lo marcan
-las conversaciones de Claude, ver `CLAUDE.md`). A 14 nov: ola 0 terminada; ola 1 (C2, B2a, B3, E5, S2) lanzada.
+las conversaciones de Claude, ver `CLAUDE.md`). A 14 nov: olas 0 y 1 terminadas y fusionadas; la siguiente es la ola 2.
 Nueva en la ola 2: **C3** · carga, entrar y perfil (diseño para validar: https://claude.ai/artifact/4hzvRiBPPzs36L3QaJ8o2v).
 Una ola es un grupo de prompts que se lanzan **a la vez**, cada uno en su conversación y su rama. Al acabar todos: fusionar
 sus pull requests, instalar el APK de `main`, probar y pasar a la siguiente.
@@ -56,8 +68,8 @@ va a la ola siguiente. Las conversaciones de Coruti se abren en el **entorno «C
 | Ola | A la vez | Empieza cuando |
 |---|---|---|
 | 0 ✅ | O0: fusionar E y este plan (hecho el 14 nov) | — |
-| 1 | C2 widget · B2a servidor del conector de Claude · B3 partir `app.js` · E5 pendientes del paso 1 · S2 dirección nueva de la API de Strava | Ya |
-| 2 | B2b «Plan de Claude» en la app (con E4) · P1 pulso en directo · C3 carga, entrar y perfil · P4a servidor de carreras de Strava | B2a y B3 fusionados |
+| 1 ✅ | C2 widget · B2a servidor del conector de Claude · B3 partir `app.js` · E5 pendientes del paso 1 · S2 dirección nueva de la API de Strava (fusionada el 14 nov, APK 1.0.38) | — |
+| 2 | B2b «Plan de Claude» en la app (con E4) · P1 pulso en directo · C3 carga, entrar y perfil · P4a servidor de carreras de Strava | Ya (B2a y B3 fusionados) |
 | 3 | C2b el widget muestra el plan de Claude · P3 peso y medidas · P5 EMOM, Tabata y AMRAP | B2b fusionado |
 | 4 | P2 planes por objetivo · P4b carreras en el historial · P6 coach por voz | Ola 3 fusionada y P4a desplegado |
 | 5 | P7 Freeletics: decidir si hace falta | Tras usar B2 unas semanas |
@@ -75,7 +87,7 @@ va a la ola siguiente. Las conversaciones de Coruti se abren en el **entorno «C
 | Ejercicios | `ejercicios/`, `rutina.json`, SQL del catálogo |
 
 Fases nuevas del plan por olas (las demás siguen abajo, en su bloque):
-- **B2a** · servidor MCP del conector de Claude (sin tocar la app). **B2b** · «Plan de Claude» en la app, con E4.
+- **B2a** ✅ · servidor MCP del conector de Claude (sin tocar la app; en `main`, desplegado). **B2b** · «Plan de Claude» en la app, con E4.
 - **B3** ✅ · `app.js` partido en un archivo por zona (`comun.js`, `entrenar.js`, `reproductor.js`, `ejercicios.js`,
   `historial.js`, `tu.js`, `inicio.js`), sin cambiar nada visible: 62 pantallas × claro y oscuro con el mismo HTML y los mismos
   píxeles que antes (Chromium, 360 × 740). Cada zona añade lo suyo a `P` (pantallas), `ACC` (acciones), `HOJAS` y `FORM`.
@@ -83,10 +95,10 @@ Fases nuevas del plan por olas (las demás siguen abajo, en su bloque):
   todas las zonas; añadir uno nuevo toca `comun.js`. **Tú:** instalar el APK de la rama (o el de `main` al fusionar) y
   comprobar que todo va igual.
 - **C2b** · el widget muestra y empieza la sesión del día del plan de Claude.
-- **E5** · lo pendiente del paso 1 de los ejercicios (nombres de los hollow, dosis de `hollow_l` y `flex_incl`, almeja con mini banda).
+- **E5** ✅ · lo pendiente del paso 1 de los ejercicios (nombres de los hollow, dosis de `hollow_l` y `flex_incl`, almeja con mini banda).
 - **S2** ✅ · dirección nueva de la API de Strava (`api-v3.strava.com`, funciona desde el 4 ene 2027): el servidor la elige
-  solo según la fecha. **Tú:** fusionar el pull request y que las funciones estén desplegadas con él **antes del 4 ene 2027**;
-  ese día, mirar que una subida a Strava llega bien.
+  solo según la fecha. Fusionado y desplegado el 14 nov (`conexiones` y `polar-aviso`):
+  hasta el 3 ene 2027 sigue usando `www.strava.com/api/v3`. **Tú:** el **4 ene 2027**, mirar que una subida a Strava llega bien.
 - **S3** · antes del 1 jun 2027: `oauth/deauthorize` pasa a `oauth/revoke` y los tokens solo van en cabeceras
   (`conexiones/index.ts`, al desconectar Strava).
 - **P4a / P4b** · P4 partido: el servidor que trae las actividades de Strava, y mostrarlas en el historial.
@@ -299,9 +311,9 @@ y vocabulario en `docs/diseno/4-ejercicios.md`; datos en `ejercicios/`; en la nu
   En Strava: la almeja pasa a CLAMS (va sin banda) y la nueva, BANDED_CLAMS
 - [ ] **Tú:** visto bueno de la almeja con mini banda mirando `ejercicios/capturas/` (o dime qué cambiar). Con el sí, una
   fase corta la pasa a `rutina.json` (sueltos y, si quieres, variante con banda del módulo Glúteo) y la publica
-- [ ] **Tú (o yo, si me lo pides) tras fusionar E5:** aplicar en Supabase el SQL del catálogo
-  (`supabase/migrations/20261114000100_catalogo_ejercicios_datos.sql`) y desplegar las funciones para que la almeja
-  llegue a Strava como CLAMS
+- [x] Tras fusionar E5 (14 nov): SQL del catálogo aplicado en Supabase
+  (`supabase/migrations/20261114000100_catalogo_ejercicios_datos.sql`: 30 publicados y `almeja_banda` en `figura`) y funciones
+  desplegadas, así que la almeja llega a Strava como CLAMS
 - [ ] E4 · La app lee el catálogo de la nube (con `rutina.json` como copia sin conexión) y Claude puede proponer ejercicios (con B2)
 
 #### B2 · Conector de Claude ⭐ — después de E (necesita los metadatos de la ficha), en paralelo con C2
@@ -348,7 +360,7 @@ y vocabulario en `docs/diseno/4-ejercicios.md`; datos en `ejercicios/`; en la nu
   y medir la fluidez del reproductor 3D en tu móvil
 - [ ] **Tú:** Hecho cuando: hace todo lo de antes con el diseño nuevo y te parece bien en el móvil
 
-#### C2 · Widget con el diseño nuevo ✅ (rama `claude/widget-c2-nuevo-diseno-o4pwz1`; falta probarlo en el móvil)
+#### C2 · Widget con el diseño nuevo ✅ (en `main`, pull request #13, versión 1.0.38; falta probarlo en el móvil)
 - [x] Sistema de diseño de D2 con el **fondo A** (`capa` de la app, claro u oscuro según el tema del móvil): tokens en
   `res/values(-night)/widget.xml`, botones de 48 dp, segmentos, progreso ámbar con borde, Atkinson en Android 12+
 - [x] Figura 3D de D1 en WebP: una imagen por fase que alterna sola (quieta con «Quitar animaciones»), hombre o mujer según
@@ -360,7 +372,7 @@ y vocabulario en `docs/diseno/4-ejercicios.md`; datos en `ejercicios/`; en la nu
   Hecho; en pausa, Parar y Seguir. Pequeño: figura, sesión o ejercicio y cantidad, y los mismos botones
 - [x] Quitados del widget los chips de módulos, intensidad y A/B (decidido: se cambian en la app, como en D2)
 - [x] Pruebas: `WidgetTextosTest` (textos iguales que la app y una imagen para cada fase de cada ejercicio)
-- [ ] **Tú:** instalar el APK de la rama y probar los dos widgets en claro y oscuro, hombre y mujer, parado y en marcha.
+- [ ] **Tú:** instalar el APK 1.0.38 de `main` y probar los dos widgets en claro y oscuro, hombre y mujer, parado y en marcha.
   **El pequeño cambia de forma** (ahora 2 × 2 con la figura arriba): si ya lo tenías puesto, quítalo y vuelve a ponerlo
 - Para C2b: el segmento «Hoy» con la sesión del plan de Claude (ahora el widget solo tiene ★ Favorita · Core)
 
@@ -394,7 +406,7 @@ Todo explicado en `docs/strava.md`.
 - [ ] **Tú:** Hecho cuando: una sesión real está en Polar Flow como siempre y en Strava con la lista de ejercicios y el pulso,
   y una carrera sigue llegando a Strava
 - Ojo: una app nueva de Strava solo admite 1 atleta; para tu mujer hay que pedir más plazas en strava.com/settings/api.
-  La API de Strava cambia de dirección el 4 de enero de 2027 (una línea en `_shared/servidor.ts`)
+  La API de Strava cambia de dirección el 4 de enero de 2027: hecho en S2 (el servidor cambia solo ese día)
 - Si se añade un ejercicio a `rutina.json`, hay que añadirlo en `EJERCICIO_STRAVA` (la prueba lo avisa; se ejecuta con Node,
   no en GitHub Actions)
 
