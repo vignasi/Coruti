@@ -24,10 +24,13 @@ desde el **4 ene 2027**.
 2. La app tiene que ir **igual que antes** (B3 movió todo `app.js`): Entrenar, rutina, sueltos, reproductor, Historial, Tú.
 3. Ejercicios (E5): nombres nuevos de los hollow y dosis de `hollow_l` (25 s) y `flex_incl` (12). Visto bueno de la almeja con
    mini banda mirando `ejercicios/capturas/`.
-4. Conector de Claude (B2a): GitHub → Settings → Pages → Source «GitHub Actions»; Actions → «Página del conector de Claude» →
-   Run workflow en `main` (la ejecución al fusionar falló porque Pages aún no está activado); y añadir el conector en Claude
-   (`docs/claude.md`). Pedirle que lea tu historial.
+4. Conector de Claude (B2a): ya no hace falta GitHub Pages (la página está en Vercel). Entrar con tu cuenta en la app para que
+   suba el historial (a 15 nov la nube tiene 0 sesiones) y añadir el conector en Claude (`docs/claude.md`). Pedirle que lea tu historial.
 5. El 4 ene 2027 (S2): mirar que una subida a Strava llega bien.
+
+**Repo privado (15 nov):** el APK de Releases solo se descarga con la sesión de GitHub iniciada (en el móvil, desde
+github.com con tu cuenta, o desde el ordenador y pasarlo). La página de entrar del conector de Claude ya no va en GitHub
+Pages (en privado es de pago) sino en **Vercel**, proyecto `coruti-conector`: https://coruti-conector.vercel.app/claude/. La única GitHub Action es la del APK.
 
 **Hecho y en `main`:** Fases 0, 1 y 1b · D1, D2, D3 · B1 (cuentas y nube) · C1 (app nueva) · S1 (Strava y Polar; servidor desplegado
 y migraciones aplicadas) · E1, E2 y E3 (los 30 ejercicios; catálogo `exercise_catalog` aplicado en Supabase el 14 nov: 30 publicados)
@@ -316,14 +319,14 @@ y vocabulario en `docs/diseno/4-ejercicios.md`; datos en `ejercicios/`; en la nu
 #### B2 · Conector de Claude ⭐ — después de E (necesita los metadatos de la ficha), en paralelo con C2
 - [x] **B2a** · Servidor MCP propio (Edge Function `claude`, desplegada el 14 nov) que se añade en Claude como conector
   personalizado, con inicio de sesión de tu cuenta de la app: servidor OAuth 2.1 de Supabase Auth (activado) y la página
-  `web/claude/` en GitHub Pages. Todo con tu token y la RLS; ningún secreto. Ver `docs/claude.md`
+  `web/claude/` en Vercel (`coruti-conector`). Todo con tu token y la RLS; ningún secreto. Ver `docs/claude.md`
 - [x] Lo que Claude puede **leer**: perfil y objetivo, peso y medidas, historial con series, kilos, bandas y pulso,
   favoritas, plan actual, catálogo de ejercicios con el material que tienes
 - [x] Lo que Claude puede **escribir**: crear o cambiar una sesión (ejercicios, repeticiones, rondas, descanso, bandas),
   el plan de la semana («lunes fuerza de cuerpo entero, martes descanso…»), favoritas, y apuntar peso o medidas
-- [ ] **Tú:** activar GitHub Pages (Settings → Pages → Source «GitHub Actions») y lanzar «Página del conector de Claude»;
-  añadir el conector en Claude y conectar con tu cuenta (`docs/claude.md`, «Puesta en marcha»). El flujo entero con una
-  cuenta no lo pudo probar Claude (sin contraseñas ni clave secreta, a propósito)
+- [ ] **Tú:** entrar con tu cuenta en la app para que suba el historial (a 15 nov la nube tiene 0 sesiones), y añadir el
+  conector en Claude y conectar con tu cuenta (`docs/claude.md`, «Puesta en marcha»). Claude no puede
+  hacer el inicio de sesión por ti (sin contraseñas, a propósito)
 - [ ] **B2b** · En la app: «Plan de Claude» en Entrenar, y cada sesión que crea Claude lista para empezar con un toque
 - [ ] Hecho cuando: en una conversación le pides a Claude la sesión de hoy y aparece en la app sin tocar nada más
 - Ya preparado en B1: tablas `plans` y `plan_days` (con la sesión lista para empezar en `workout`), `body_measurements`,

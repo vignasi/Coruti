@@ -9,7 +9,7 @@ llegan a la app al sincronizar, y los planes quedan guardados en la nube.
 ```
 Claude ──MCP──► Edge Function «claude» ──(tu token, RLS)──► tablas de Supabase
    │                       │ 401 + dónde iniciar sesión
-   └──OAuth 2.1──► Supabase Auth (servidor OAuth) ──► página web/claude/ (GitHub Pages): email, contraseña y «Permitir»
+   └──OAuth 2.1──► Supabase Auth (servidor OAuth) ──► página web/claude/ (Vercel): email, contraseña y «Permitir»
 ```
 
 - **Servidor MCP:** `supabase/functions/claude/index.ts` (la puerta) y `supabase/functions/_shared/claude.ts` (herramientas,
@@ -17,9 +17,13 @@ Claude ──MCP──► Edge Function «claude» ──(tu token, RLS)──�
   Dirección: `https://jlyqtxihsorqczlxvbly.supabase.co/functions/v1/claude`.
 - **Inicio de sesión:** el servidor OAuth 2.1 de Supabase Auth (Authentication → OAuth Server), con registro dinámico de
   clientes (Claude se registra solo). Supabase manda a `Site URL` + `/claude/` =
-  `https://vignasi.github.io/Coruti/claude/`, una página estática (`web/claude/index.html`) donde entras con el email y la
-  contraseña de la app y das permiso. Va en GitHub Pages porque Supabase sirve el HTML de las Edge Functions como texto
-  (comprobado: `text/plain` y `sandbox`).
+  `https://coruti-conector.vercel.app/claude/`, una página estática (`web/claude/index.html`) donde entras con el email y la
+  contraseña de la app y das permiso. Va fuera de Supabase porque Supabase sirve el HTML de las Edge Functions como texto
+  (comprobado: `text/plain` y `sandbox`), y en Vercel (no en GitHub Pages) porque el repo es privado y Pages en privado es de pago.
+- **Vercel:** proyecto `coruti-conector` (plan Hobby, gratis) enlazado al repo, con `web/` como raíz y sin compilar nada.
+  Se publica solo al fusionar en `main`, y solo si cambia `web/` (Ignored Build Step: `git diff HEAD^ HEAD --quiet -- .`).
+  Las ramas no publican (previews desactivadas). Para volver a publicarla a mano: vercel.com → `coruti-conector` →
+  Deployments → la última → **Redeploy**, o desde una conversación de Claude con el conector de Vercel.
 - **Seguridad:** el token que recibe Claude es un token normal de tu cuenta. La función lo comprueba con Supabase Auth y
   hace cada consulta con él y la clave pública: la RLS (`user_id = auth.uid()`) manda igual que en la app. **Ningún secreto**
   ni clave de servicio en la función, la página o el repo. Tu mujer, con su cuenta, solo ve y cambia lo suyo.
@@ -52,23 +56,21 @@ banda no es tuya, se guarda igual y Claude recibe el aviso. Un día de tipo `cor
 
 ## Puesta en marcha
 
-Hecho por Claude el 14 nov: servidor OAuth activado (registro dinámico, ruta `/claude/`, Site URL
-`https://vignasi.github.io/Coruti`) y la función `claude` desplegada. El Site URL antes era `http://localhost:3000`, que no
-se usaba (la app entra con contraseña).
+Hecho por Claude: servidor OAuth activado (registro dinámico, ruta `/claude/`, Site URL `https://coruti-conector.vercel.app`), la función `claude`
+desplegada y la página publicada en Vercel. El Site URL antes era `http://localhost:3000`, que no se usaba (la app entra con
+contraseña), y del 14 al 15 nov `https://vignasi.github.io/Coruti` (GitHub Pages, abandonado al pasar el repo a privado).
 
 **Tú, una vez:**
-1. Fusionar el pull request de B2a.
-2. GitHub → el repo → **Settings → Pages → Build and deployment → Source: «GitHub Actions»**. Luego **Actions →
-   «Página del conector de Claude» → Run workflow** (rama `main`). Comprueba que
-   `https://vignasi.github.io/Coruti/claude/` enseña «Esta página se abre desde Claude…».
-3. En Claude (web o escritorio; hace falta un plan que admita conectores personalizados): **Ajustes → Conectores →
+1. Que la app suba tu historial: en el móvil, entra con tu cuenta en la pantalla Tú y abre la app; sincroniza sola. A 15 nov
+   la nube tiene **0 sesiones**, así que hasta entonces Claude verá el historial vacío (no es un fallo del conector).
+2. En Claude (web o escritorio; hace falta un plan que admita conectores personalizados): **Ajustes → Conectores →
    Añadir conector personalizado**. Nombre: `Rutina core`. URL: `https://jlyqtxihsorqczlxvbly.supabase.co/functions/v1/claude`.
    Sin ID ni secreto de cliente (se registra solo). **Añadir → Conectar**: se abre la página, entras con tu email y
    contraseña de la app y pulsas **Permitir**.
-4. En una conversación, con el conector activado: «¿Qué ves de mi perfil?», «Apunta que hoy peso 78,4», «Guárdame una
+3. En una conversación, con el conector activado: «¿Qué has visto de mis últimas sesiones?» (usa `ver_historial`), «¿Qué ves de mi perfil?», «Apunta que hoy peso 78,4», «Guárdame una
    favorita de pecho con lo que tengo». Lo que escriba sale en Supabase → Table Editor (`plans`, `plan_days`,
    `favorites`, `body_measurements`), y las favoritas en la app tras sincronizar.
-5. Tu mujer igual, desde su Claude y con su cuenta.
+4. Tu mujer igual, desde su Claude y con su cuenta.
 
 **Quitar el acceso:** en Claude, Ajustes → Conectores → Desconectar. Para cortarlo del todo, en Supabase →
 Authentication → OAuth Server → Clients, borra el cliente de Claude.
@@ -79,10 +81,11 @@ Authentication → OAuth Server → Clients, borra el cliente de Claude.
   herramienta contra una base simulada, comprobación de sesiones y medidas, que no escribe nada si los datos no valen y que
   un plan nuevo no queda a medias) y `deno check` de la función.
 - Contra el proyecto real: metadatos OAuth (los de la función y los de Supabase Auth), registro dinámico de un cliente,
-  `authorize` que lleva a `…/Coruti/claude/?authorization_id=…`, 401 con `WWW-Authenticate`, y que las 7 consultas de
-  lectura son válidas para PostgREST. La página, con Playwright, hasta «Email o contraseña incorrectos».
+  `authorize` que lleva a `https://coruti-conector.vercel.app/claude/?authorization_id=…` (15 nov), 401 con
+  `WWW-Authenticate`, y que las 7 consultas de lectura son válidas para PostgREST. La página publicada en Vercel responde
+  200 `text/html`; con Playwright (14 nov), hasta «Email o contraseña incorrectos». Los clientes OAuth de prueba, borrados.
 - **Sin probar:** el flujo entero con una cuenta (Claude no tiene contraseñas ni la clave secreta, a propósito). Se prueba
-  en el paso 3. Si al conectar falla algo, mira Supabase → Edge Functions → `claude` → Logs y Authentication → Logs.
+  en los pasos 2 y 3. Si al conectar falla algo, mira Supabase → Edge Functions → `claude` → Logs y Authentication → Logs.
 
 ## Para B2b (la app)
 
