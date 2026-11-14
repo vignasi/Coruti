@@ -13,6 +13,9 @@ Qué se puede hacer a la vez y en qué orden: ver «Plan a partir de aquí».
 (pull request #7, 14 nov; el APK sale de esa compilación). Falta que lo pruebes en el móvil y que pongas en marcha Strava y Polar.
 Lo siguiente que se programa es la **ola 1**: C2, B2a, B3, E5 y S2, a la vez.
 
+**B2a hecho (14 nov, rama `claude/mcp-connector-server-ck3ssj`):** servidor del conector de Claude desplegado y
+servidor OAuth de Supabase activado. **Tú:** activar GitHub Pages y añadir el conector en Claude (`docs/claude.md`).
+
 **Hecho y en `main`:** Fases 0, 1 y 1b · D1, D2, D3 · B1 (cuentas y nube) · C1 (app nueva) · S1 (Strava y Polar; servidor desplegado
 y migraciones aplicadas) · E1, E2 y E3 (los 30 ejercicios; catálogo `exercise_catalog` aplicado en Supabase el 14 nov: 30 publicados).
 Pull requests #1–#7 fusionados.
@@ -294,12 +297,17 @@ y vocabulario en `docs/diseno/4-ejercicios.md`; datos en `ejercicios/`; en la nu
 - [ ] E4 · La app lee el catálogo de la nube (con `rutina.json` como copia sin conexión) y Claude puede proponer ejercicios (con B2)
 
 #### B2 · Conector de Claude ⭐ — después de E (necesita los metadatos de la ficha), en paralelo con C2
-- [ ] Servidor MCP propio (en Supabase) que se añade en Claude como conector personalizado, con inicio de sesión de tu cuenta de la app
-- [ ] Lo que Claude puede **leer**: perfil y objetivo, peso y medidas, historial con series, kilos, bandas y pulso,
+- [x] **B2a** · Servidor MCP propio (Edge Function `claude`, desplegada el 14 nov) que se añade en Claude como conector
+  personalizado, con inicio de sesión de tu cuenta de la app: servidor OAuth 2.1 de Supabase Auth (activado) y la página
+  `web/claude/` en GitHub Pages. Todo con tu token y la RLS; ningún secreto. Ver `docs/claude.md`
+- [x] Lo que Claude puede **leer**: perfil y objetivo, peso y medidas, historial con series, kilos, bandas y pulso,
   favoritas, plan actual, catálogo de ejercicios con el material que tienes
-- [ ] Lo que Claude puede **escribir**: crear o cambiar una sesión (ejercicios, repeticiones, rondas, descanso, bandas),
+- [x] Lo que Claude puede **escribir**: crear o cambiar una sesión (ejercicios, repeticiones, rondas, descanso, bandas),
   el plan de la semana («lunes fuerza de cuerpo entero, martes descanso…»), favoritas, y apuntar peso o medidas
-- [ ] En la app: «Plan de Claude» en Entrenar, y cada sesión que crea Claude lista para empezar con un toque
+- [ ] **Tú:** activar GitHub Pages (Settings → Pages → Source «GitHub Actions») y lanzar «Página del conector de Claude»;
+  añadir el conector en Claude y conectar con tu cuenta (`docs/claude.md`, «Puesta en marcha»). El flujo entero con una
+  cuenta no lo pudo probar Claude (sin contraseñas ni clave secreta, a propósito)
+- [ ] **B2b** · En la app: «Plan de Claude» en Entrenar, y cada sesión que crea Claude lista para empezar con un toque
 - [ ] Hecho cuando: en una conversación le pides a Claude la sesión de hoy y aparece en la app sin tocar nada más
 - Ya preparado en B1: tablas `plans` y `plan_days` (con la sesión lista para empezar en `workout`), `body_measurements`,
   `profiles` y `connections`. Lo que Claude cambie en la nube llega a la app en la siguiente sincronización
