@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Widget en tema oscuro: los mismos tokens que la app en oscuro -->
+<resources>
+    <color name="w_capa">#16262A</color>
+    <color name="w_capa2">#1E3236</color>
+    <color name="w_tinta">#E4EEEC</color>
+    <color name="w_tinta2">#9DB3B1</color>
+    <color name="w_linea">#2A4044</color>
+    <color name="w_accion">#5FB3BC</color>
+    <color name="w_sobre_accion">#06272B</color>
+    <color name="w_accion_suave">#173D42</color>
+    <color name="w_trabajo">#F0B04A</color>
+</resources>

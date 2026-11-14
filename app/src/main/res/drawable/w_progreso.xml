@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Progreso de la serie en marcha: ámbar (`trabajo`) sobre `capa-2` con borde; el tiempo va además en cifras -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@android:id/background">
+        <shape><solid android:color="@color/w_capa2" /><stroke android:width="1dp" android:color="@color/w_tinta2" /><corners android:radius="4dp" /></shape>
+    </item>
+    <item android:id="@android:id/progress">
+        <clip><shape><solid android:color="@color/w_trabajo" /><stroke android:width="1dp" android:color="@color/w_tinta2" /><corners android:radius="4dp" /></shape></clip>
+    </item>
+</layer-list>

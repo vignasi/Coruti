@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Atkinson Hyperlegible Next (OFL, la misma de la app: assets/app/fuente/). Solo la usa el widget en Android 12+
+     (values-v31/widget.xml). Pesos 400 y 700 sacados de la fuente variable con fontTools (docs/diseno/2-sistema-de-diseno.md). -->
+<font-family xmlns:android="http://schemas.android.com/apk/res/android">
+    <font android:font="@font/atkinson_regular" android:fontStyle="normal" android:fontWeight="400" />
+    <font android:font="@font/atkinson_bold" android:fontStyle="normal" android:fontWeight="700" />
+</font-family>
