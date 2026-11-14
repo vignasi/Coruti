@@ -102,5 +102,8 @@ Strava no deja poner el esfuerzo por la API: va en la descripción.
 - Funciones: `npx supabase functions deploy conexiones polar-aviso --use-api --project-ref jlyqtxihsorqczlxvbly`
   con `SUPABASE_ACCESS_TOKEN` (token personal `sbp_…` de Account → Access Tokens). `supabase/config.toml` ya pone
   `verify_jwt = false` en las dos (Strava y Polar vuelven sin JWT; cada función comprueba quién llama).
-- La API de Strava cambia de dirección a `https://api-v3.strava.com` a partir del 4 de enero de 2027
-  (`STRAVA_API` en `_shared/servidor.ts`). La antigua debería seguir funcionando un tiempo; conviene cambiarla entonces.
+- La API de Strava cambia de dirección a `https://api-v3.strava.com`, que funciona a partir del 4 de enero de 2027
+  ([changelog de Strava](https://developers.strava.com/docs/changelog/), entrada del 1 jun 2026; la antigua no tiene fecha de cierre).
+  `STRAVA_API` en `_shared/servidor.ts` elige sola la dirección según la fecha (S2), así que basta con que las funciones
+  estén desplegadas con ese código antes del 4 de enero. El 1 jun 2027 Strava cambia más cosas (tokens solo en cabeceras,
+  `oauth/deauthorize` pasa a `oauth/revoke`): lo usa `conexiones/index.ts` al desconectar.

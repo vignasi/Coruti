@@ -69,7 +69,11 @@ Fases nuevas del plan por olas (las demás siguen abajo, en su bloque):
   para que varias conversaciones toquen la app a la vez sin pisarse.
 - **C2b** · el widget muestra y empieza la sesión del día del plan de Claude.
 - **E5** · lo pendiente del paso 1 de los ejercicios (nombres de los hollow, dosis de `hollow_l` y `flex_incl`, almeja con mini banda).
-- **S2** · dirección nueva de la API de Strava antes del 4 de enero de 2027.
+- **S2** ✅ · dirección nueva de la API de Strava (`api-v3.strava.com`, funciona desde el 4 ene 2027): el servidor la elige
+  solo según la fecha. **Tú:** fusionar el pull request y que las funciones estén desplegadas con él **antes del 4 ene 2027**;
+  ese día, mirar que una subida a Strava llega bien.
+- **S3** · antes del 1 jun 2027: `oauth/deauthorize` pasa a `oauth/revoke` y los tokens solo van en cabeceras
+  (`conexiones/index.ts`, al desconectar Strava).
 - **P4a / P4b** · P4 partido: el servidor que trae las actividades de Strava, y mostrarlas en el historial.
 
 ## Decisiones tomadas
