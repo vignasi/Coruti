@@ -24,6 +24,11 @@ La usan Ignasi y su mujer, cada uno con su cuenta. Todo en **español** (código
   el token de Supabase (para aplicar migraciones, desplegar funciones y cambiar ajustes por `api.supabase.com`) y deja bajar
   el SDK de Android (`dl.google.com`) para compilar. Si una conversación está en otro, se cambia a «Coruti» antes de empezar.
 - **Plan por olas** (`ROADMAP.md`): cada prompt dice su ola y qué zonas no puede tocar, porque van otras conversaciones a la vez.
+- **Estado de las fases (lanzada / terminada):** está en la base de datos de la página del plan por olas,
+  https://claude.ai/artifact/LtU45Cz1hmWwYEux1kRRix, no en el repo. Se lee con la herramienta `ArtifactData`
+  (`action: list`, `collection: fases`; cada documento es una fase, p. ej. `B3`, con `lanzado` y `terminado`). Al empezar,
+  mirar ahí en qué ola estamos. Al acabar una fase (pull request abierto y pruebas pasadas), marcarla `terminado: true` con
+  `update` y el `if_version` leído. El usuario también la marca con los botones de la página, desde el móvil o el ordenador.
 - Antes de empezar, mirar si `main` ha cambiado (otras fases se hacen a la vez en otras ramas) y fusionarlo si hace falta.
 - El usuario prefiere respuestas directas: la verdad incómoda primero, nivel de confianza en las afirmaciones clave,
   sin elogios de relleno.
