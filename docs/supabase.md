@@ -16,36 +16,19 @@ es la seguridad por persona (RLS) de las tablas. La clave secreta (`sb_secret_�
    `body_measurements`, `exercises`, `plans`, `plan_days`, `connections` y `connection_secrets`, y que ninguna pone
    «RLS disabled» ni «Unrestricted».
 
-## 2. Que el email traiga un código (obligatorio)
+## 2. Cuentas: las creas tú, con contraseña (desde el 14 nov)
 
-La app pide un código; por defecto Supabase manda un enlace. **En el plan gratuito, con el correo que trae Supabase,
-las plantillas no se pueden cambiar** (comprobado el 14 nov: la API responde «Email template modification is not available
-for free tier projects using the default email provider»). Hace falta un correo propio (SMTP). Con Gmail es gratis:
+El plan gratuito de Supabase no deja cambiar las plantillas de email si se envía con su correo, así que el email no podía
+traer el código que pedía la app. Desde el 14 nov la app **entra con email y contraseña**, y el **registro está cerrado**
+(`disable_signup`; comprobado: la app no puede crear cuentas). El APK es público, y así nadie más puede crearse una cuenta.
 
-**Tú (unos 10 minutos):**
-1. En tu cuenta de Google, activa la **verificación en dos pasos** si no la tienes (myaccount.google.com → Seguridad).
-2. En myaccount.google.com/apppasswords crea una **contraseña de aplicación** llamada «Supabase». Te da 16 letras.
-   No la pegues en ningún chat.
-3. En supabase.com → el proyecto → **Authentication → Emails → SMTP Settings** → **Enable custom SMTP**:
-   - Sender email: tu Gmail · Sender name: `Rutina core`
-   - Host: `smtp.gmail.com` · Port: `465`
-   - Username: tu Gmail · Password: las 16 letras
-   - Guardar.
-4. Dile a Claude (en una conversación del entorno «Coruti») que ponga las plantillas: las cambia por la API con lo de abajo.
+**Crear una cuenta (tu mujer, por ejemplo):** supabase.com → el proyecto → **Authentication → Users → Add user →
+Create new user** → email, contraseña y **«Auto Confirm User»** marcado. Las contraseñas no se pegan en ningún chat.
+Dentro de la app, cada persona la cambia en **Tú → Cambiar la contraseña** (mínimo 8 caracteres).
 
-**Claude, con el token del entorno «Coruti»:** `PATCH https://api.supabase.com/v1/projects/jlyqtxihsorqczlxvbly/config/auth`
-con `mailer_subjects_confirmation` y `mailer_subjects_magic_link` = `Tu código para Rutina core`,
-`mailer_templates_confirmation_content` y `mailer_templates_magic_link_content` =
-
-```html
-<h2>Tu código para Rutina core</h2>
-<p>Escribe este código en la app:</p>
-<p style="font-size:28px;font-weight:bold;letter-spacing:4px">{{ .Token }}</p>
-<p>Caduca en una hora. Si no lo has pedido tú, ignora este correo.</p>
-```
-
-y `mailer_otp_length` = 6. Se cambian dos plantillas: **Confirm signup** (la primera vez de cada email) y **Magic Link**
-(las siguientes). El proveedor Email ya está activado y el registro abierto (comprobado el 14 nov).
+Si algún día se abre a más gente: correo propio (SMTP, p. ej. Gmail con contraseña de aplicación) en
+Authentication → Emails → SMTP Settings, plantillas con `{{ .Token }}` y volver a abrir el registro. `Cloud.sendCode`
+y `Cloud.verify` siguen en el código para eso. La longitud del código ya está en 6.
 
 ## 3. Límites del plan gratuito
 
