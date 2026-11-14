@@ -272,7 +272,17 @@ y vocabulario en `docs/diseno/4-ejercicios.md`; datos en `ejercicios/`; en la nu
   manos, pies, espalda y cabeza por la piel. Revisadas las capturas (claro y oscuro, grande, miniatura y mitades) → `publicado`
 - [ ] **Tú:** mirar en el móvil las figuras nuevas; si alguna no te convence, dímelo y vuelve a `figura` (el visto bueno lo di
   yo con capturas, como pediste)
-- [ ] Pendiente del paso 1 (no se tocó): nombres de los hollow, dosis de `hollow_l` y `flex_incl`, almeja con mini banda
+- [x] E5 · Lo pendiente del paso 1: «Hollow rodillas dobladas», «Hollow brazos atrás» y «Hollow piernas estiradas»;
+  `hollow_l` a 25 s de base (30 s en el nivel F de la rutina); `flex_incl` a 12 de base (10 en el nivel S). SQL del catálogo
+  regenerado. Comprobadores: pasos 1 y 2, 31 de 31; 3D, 31 de 31
+- [x] E5 · Almeja con mini banda (`almeja_banda`, progresión de la almeja): ficha, técnica y figura 3D comprobadas, en
+  `ejercicios/borradores.json` (fuera de `rutina.json`: la app enseña todo lo que hay ahí) y en el SQL con estado `figura`.
+  En Strava: la almeja pasa a CLAMS (va sin banda) y la nueva, BANDED_CLAMS
+- [ ] **Tú:** visto bueno de la almeja con mini banda mirando `ejercicios/capturas/` (o dime qué cambiar). Con el sí, una
+  fase corta la pasa a `rutina.json` (sueltos y, si quieres, variante con banda del módulo Glúteo) y la publica
+- [ ] **Tú (o yo, si me lo pides) tras fusionar E5:** aplicar en Supabase el SQL del catálogo
+  (`supabase/migrations/20261114000100_catalogo_ejercicios_datos.sql`) y desplegar las funciones para que la almeja
+  llegue a Strava como CLAMS
 - [ ] E4 · La app lee el catálogo de la nube (con `rutina.json` como copia sin conexión) y Claude puede proponer ejercicios (con B2)
 
 #### B2 · Conector de Claude ⭐ — después de E (necesita los metadatos de la ficha), en paralelo con C2
