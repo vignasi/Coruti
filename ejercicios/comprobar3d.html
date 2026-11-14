@@ -16,6 +16,8 @@ import * as THREE from 'three';
 import {crear} from '../docs/diseno/figura/figura3d.js';
 const q = new URLSearchParams(location.search), g = q.get('g') || 'm';
 const D = await (await fetch('../app/src/main/assets/rutina.json')).json();
+// y los borradores (ejercicios/datos.js): se comprueban igual aunque aún no salgan en la app
+for (const [k, b] of Object.entries(await (await fetch('borradores.json')).json())) { D.exercises[k] = b.ejercicio; D.catalog.ex[k] = b.catalogo; }
 const T = await (await fetch('tecnicas.json')).json();
 const f3 = await crear({modelo: '../docs/diseno/figura/modelos/persona_' + g + '.glb', gender: g});
 const B = f3.bones, wp = n => B[n].getWorldPosition(new THREE.Vector3());

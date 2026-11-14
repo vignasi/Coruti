@@ -17,7 +17,15 @@
 <main class="movil" id="movil" aria-live="off"></main>
 <div class="oculto-visual" id="anuncio" aria-live="polite"></div>
 <script src="app/motor.js"></script>
-<script src="app/app.js"></script>
+<!-- La interfaz, un archivo por zona (B3). No son módulos: comparten variables, así que el orden importa:
+     comun.js primero, inicio.js el último -->
+<script src="app/comun.js"></script>
+<script src="app/entrenar.js"></script>
+<script src="app/reproductor.js"></script>
+<script src="app/ejercicios.js"></script>
+<script src="app/historial.js"></script>
+<script src="app/tu.js"></script>
+<script src="app/inicio.js"></script>
 <script type="module" src="app/fig.js"></script>
 </body>
 </html>

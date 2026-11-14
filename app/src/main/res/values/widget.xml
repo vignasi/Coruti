@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Widget (C2): los tokens del sistema de diseño (docs/diseno/2-sistema-de-diseno.md). Fondo A: `capa` de la app,
+     claro aquí y oscuro en values-night, siguiendo al tema del móvil. -->
+<resources>
+    <color name="w_capa">#FFFFFF</color>
+    <color name="w_capa2">#E1E8E7</color>
+    <color name="w_tinta">#13292C</color>
+    <color name="w_tinta2">#4A5F61</color>
+    <color name="w_linea">#C9D5D3</color>
+    <color name="w_accion">#1E6B74</color>
+    <color name="w_sobre_accion">#FFFFFF</color>
+    <color name="w_accion_suave">#D5E6E6</color>
+    <color name="w_trabajo">#F0B04A</color>
+
+    <dimen name="w_radio">16dp</dimen>
+
+    <!-- Letra: t1 14 sp, t2 16 sp, t3 20 sp, t4 28 sp. En Android 12+ con Atkinson (values-v31) -->
+    <style name="WTexto">
+        <item name="android:textColor">@color/w_tinta</item>
+        <item name="android:includeFontPadding">false</item>
+    </style>
+    <style name="WT1" parent="WTexto">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/w_tinta2</item>
+    </style>
+    <style name="WT2" parent="WTexto">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="WT3" parent="WT2">
+        <item name="android:textSize">20sp</item>
+    </style>
+    <style name="WT4" parent="WT2">
+        <item name="android:textSize">28sp</item>
+        <item name="android:fontFeatureSettings">tnum</item>
+    </style>
+    <style name="WSegmento" parent="WT1">
+        <item name="android:textColor">@color/w_tinta</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:paddingStart">8dp</item>
+        <item name="android:paddingEnd">8dp</item>
+    </style>
+</resources>

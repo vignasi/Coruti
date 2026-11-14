@@ -1,0 +1,183 @@
+{
+ "almeja_banda": {
+  "estado": "figura",
+  "catalogo": {
+   "zone": "Glúteo",
+   "needs": "banda",
+   "reps": 12,
+   "sides": [
+    "Lado derecho",
+    "Lado izquierdo"
+   ]
+  },
+  "ejercicio": {
+   "view": "frente",
+   "apoya": "tronco",
+   "name": "Almeja con mini banda",
+   "rep": 3,
+   "unit": "Repetición",
+   "vid": "almeja con mini banda glúteo medio técnica",
+   "cues": [
+    "Mini banda por encima de las rodillas y la cabeza apoyada en el brazo de abajo",
+    "Cadera y rodillas dobladas, pies juntos",
+    "Abre la rodilla de arriba contra la banda sin separar los pies",
+    "La cadera de arriba no se va hacia atrás"
+   ],
+   "marks": {
+    "glm": {
+     "at": [
+      "p"
+     ],
+     "off": [
+      0,
+      -6
+     ],
+     "lab": [
+      86,
+      22
+     ],
+     "text": "GLÚTEO DE LADO"
+    }
+   },
+   "equip": [
+    {
+     "t": "band",
+     "at": "k1",
+     "to": "k2",
+     "label": "BANDA"
+    }
+   ],
+   "poses": [
+    {
+     "h": [
+      30,
+      98.5
+     ],
+     "s": [
+      44,
+      95
+     ],
+     "c": [
+      68,
+      97.3
+     ],
+     "p": [
+      92,
+      97.6
+     ],
+     "k1": [
+      107.5,
+      104.4,
+      15.5
+     ],
+     "a1": [
+      123,
+      103.5
+     ],
+     "k2": [
+      107.5,
+      96.5,
+      15.5
+     ],
+     "a2": [
+      123,
+      99
+     ],
+     "e1": [
+      26,
+      93
+     ],
+     "w1": [
+      8,
+      93
+     ],
+     "e2": [
+      66,
+      78
+     ],
+     "w2": [
+      90,
+      86
+     ]
+    },
+    {
+     "h": [
+      30,
+      98.5
+     ],
+     "s": [
+      44,
+      95
+     ],
+     "c": [
+      68,
+      97.3
+     ],
+     "p": [
+      92,
+      97.6
+     ],
+     "k1": [
+      107.5,
+      104.4,
+      15.5
+     ],
+     "a1": [
+      123,
+      103.5
+     ],
+     "k2": [
+      107.5,
+      86.5,
+      11.9
+     ],
+     "a2": [
+      123,
+      99
+     ],
+     "e1": [
+      26,
+      93
+     ],
+     "w1": [
+      8,
+      93
+     ],
+     "e2": [
+      66,
+      78
+     ],
+     "w2": [
+      90,
+      86
+     ]
+    }
+   ],
+   "phases": [
+    {
+     "pose": 1,
+     "move": 1,
+     "hold": 0.5,
+     "tone": "up",
+     "sq": [
+      "glm"
+     ],
+     "arrow": [
+      118,
+      84,
+      116,
+      66
+     ],
+     "cap": "Abre la rodilla de arriba contra la banda, pies juntos"
+    },
+    {
+     "pose": 0,
+     "move": 1,
+     "hold": 0.5,
+     "tone": "down",
+     "cap": "Cierra despacio, sin dejar que la banda tire de la rodilla"
+    }
+   ]
+  }
+ }
+}

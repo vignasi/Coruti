@@ -60,10 +60,11 @@ va a la ola siguiente. Las conversaciones de Coruti se abren en el **entorno «C
 
 | Zona | Archivos |
 |---|---|
-| Interfaz entera | `assets/app/app.js` (hasta que B3 lo parta) |
-| Entrenar y planes | pantalla Entrenar, `motor.js`, `Plan.kt` |
-| Reproductor | pantalla del reproductor |
-| Historial · Tú | sus pantallas |
+| Interfaz común | `assets/app/comun.js`, `inicio.js`, `estilos.css`, `index.html` (iconos, piezas, pintar, acciones compartidas, puente con Android): solo una conversación por ola |
+| Entrenar y planes | `assets/app/entrenar.js` (Entrenar, rutina de core, Sesión nueva, Elegir), `motor.js`, `Plan.kt` |
+| Reproductor | `assets/app/reproductor.js` (reproductor, final, grabación de series) |
+| Ejercicios (pantallas) | `assets/app/ejercicios.js` (pestaña y ficha) |
+| Historial · Tú | `assets/app/historial.js` · `assets/app/tu.js` |
 | Sincronización | `Cloud.kt`, `SyncLogic.kt` |
 | Widget | `Widgets.kt`, `Free.kt`, `res/` |
 | Servidor de Claude · de Strava | `supabase/functions/` (función nueva) · `_shared/servidor.ts` y función de carreras |
@@ -71,8 +72,12 @@ va a la ola siguiente. Las conversaciones de Coruti se abren en el **entorno «C
 
 Fases nuevas del plan por olas (las demás siguen abajo, en su bloque):
 - **B2a** · servidor MCP del conector de Claude (sin tocar la app). **B2b** · «Plan de Claude» en la app, con E4.
-- **B3** · partir `app.js` (unas 800 líneas, todas las pantallas) en un archivo por pantalla, sin cambiar nada visible,
-  para que varias conversaciones toquen la app a la vez sin pisarse.
+- **B3** ✅ · `app.js` partido en un archivo por zona (`comun.js`, `entrenar.js`, `reproductor.js`, `ejercicios.js`,
+  `historial.js`, `tu.js`, `inicio.js`), sin cambiar nada visible: 62 pantallas × claro y oscuro con el mismo HTML y los mismos
+  píxeles que antes (Chromium, 360 × 740). Cada zona añade lo suyo a `P` (pantallas), `ACC` (acciones), `HOJAS` y `FORM`.
+  Lo que sigue compartido en `comun.js`: los controles −/+ (`cambiar`), segmentos y interruptores reparten por clave para
+  todas las zonas; añadir uno nuevo toca `comun.js`. **Tú:** instalar el APK de la rama (o el de `main` al fusionar) y
+  comprobar que todo va igual.
 - **C2b** · el widget muestra y empieza la sesión del día del plan de Claude.
 - **E5** · lo pendiente del paso 1 de los ejercicios (nombres de los hollow, dosis de `hollow_l` y `flex_incl`, almeja con mini banda).
 - **S2** · dirección nueva de la API de Strava antes del 4 de enero de 2027.
@@ -278,7 +283,17 @@ y vocabulario en `docs/diseno/4-ejercicios.md`; datos en `ejercicios/`; en la nu
   manos, pies, espalda y cabeza por la piel. Revisadas las capturas (claro y oscuro, grande, miniatura y mitades) → `publicado`
 - [ ] **Tú:** mirar en el móvil las figuras nuevas; si alguna no te convence, dímelo y vuelve a `figura` (el visto bueno lo di
   yo con capturas, como pediste)
-- [ ] Pendiente del paso 1 (no se tocó): nombres de los hollow, dosis de `hollow_l` y `flex_incl`, almeja con mini banda
+- [x] E5 · Lo pendiente del paso 1: «Hollow rodillas dobladas», «Hollow brazos atrás» y «Hollow piernas estiradas»;
+  `hollow_l` a 25 s de base (30 s en el nivel F de la rutina); `flex_incl` a 12 de base (10 en el nivel S). SQL del catálogo
+  regenerado. Comprobadores: pasos 1 y 2, 31 de 31; 3D, 31 de 31
+- [x] E5 · Almeja con mini banda (`almeja_banda`, progresión de la almeja): ficha, técnica y figura 3D comprobadas, en
+  `ejercicios/borradores.json` (fuera de `rutina.json`: la app enseña todo lo que hay ahí) y en el SQL con estado `figura`.
+  En Strava: la almeja pasa a CLAMS (va sin banda) y la nueva, BANDED_CLAMS
+- [ ] **Tú:** visto bueno de la almeja con mini banda mirando `ejercicios/capturas/` (o dime qué cambiar). Con el sí, una
+  fase corta la pasa a `rutina.json` (sueltos y, si quieres, variante con banda del módulo Glúteo) y la publica
+- [ ] **Tú (o yo, si me lo pides) tras fusionar E5:** aplicar en Supabase el SQL del catálogo
+  (`supabase/migrations/20261114000100_catalogo_ejercicios_datos.sql`) y desplegar las funciones para que la almeja
+  llegue a Strava como CLAMS
 - [ ] E4 · La app lee el catálogo de la nube (con `rutina.json` como copia sin conexión) y Claude puede proponer ejercicios (con B2)
 
 #### B2 · Conector de Claude ⭐ — después de E (necesita los metadatos de la ficha), en paralelo con C2
@@ -325,8 +340,21 @@ y vocabulario en `docs/diseno/4-ejercicios.md`; datos en `ejercicios/`; en la nu
   y medir la fluidez del reproductor 3D en tu móvil
 - [ ] **Tú:** Hecho cuando: hace todo lo de antes con el diseño nuevo y te parece bien en el móvil
 
-#### C2 · Widget con el diseño nuevo — siguiente, en paralelo con B2
-- [ ] Mismo sistema de diseño; muestra la sesión de hoy (también la del plan de Claude) o la favorita elegida
+#### C2 · Widget con el diseño nuevo ✅ (rama `claude/widget-c2-nuevo-diseno-o4pwz1`; falta probarlo en el móvil)
+- [x] Sistema de diseño de D2 con el **fondo A** (`capa` de la app, claro u oscuro según el tema del móvil): tokens en
+  `res/values(-night)/widget.xml`, botones de 48 dp, segmentos, progreso ámbar con borde, Atkinson en Android 12+
+- [x] Figura 3D de D1 en WebP: una imagen por fase que alterna sola (quieta con «Quitar animaciones»), hombre o mujer según
+  Tú → Figura; claro y oscuro como recursos `drawable(-night)-nodpi`, así cambia de tema sin hacer nada. Adiós a `PoseRenderer`
+- [x] **Persona de pie recortada** (D3): las 252 imágenes rehechas sin los lados vacíos (`hacer.html`, mismo render: la plancha sale
+  idéntica píxel a píxel); en el widget la de pie llena el alto del hueco
+- [x] Muestra la **rutina de core de hoy** (A/B) o la **favorita elegida** (segmentos ★ Favorita · Core); rondas − / +, Empezar.
+  En marcha: ronda, lo que queda, ejercicio, cantidad y ritmo como el reproductor de la app, banda o kilos, lo siguiente, Pausa y
+  Hecho; en pausa, Parar y Seguir. Pequeño: figura, sesión o ejercicio y cantidad, y los mismos botones
+- [x] Quitados del widget los chips de módulos, intensidad y A/B (decidido: se cambian en la app, como en D2)
+- [x] Pruebas: `WidgetTextosTest` (textos iguales que la app y una imagen para cada fase de cada ejercicio)
+- [ ] **Tú:** instalar el APK de la rama y probar los dos widgets en claro y oscuro, hombre y mujer, parado y en marcha.
+  **El pequeño cambia de forma** (ahora 2 × 2 con la figura arriba): si ya lo tenías puesto, quítalo y vuelve a ponerlo
+- Para C2b: el segmento «Hoy» con la sesión del plan de Claude (ahora el widget solo tiene ★ Favorita · Core)
 
 ### Bloque S · Strava con ejercicios y pulso, sin perder Polar Flow ⭐
 

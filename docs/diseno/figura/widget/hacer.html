@@ -7,7 +7,8 @@
      Una imagen por fase de cada ejercicio (como hoy PoseRenderer.kt: render(ex, phaseIdx)), con el fondo transparente,
      sin etiquetas, en claro y en oscuro (la luz cambia: en oscuro lleva luz de contorno). Las guarda hacer_imagenes.js.
      ?g=m|f &theme=dark &w=400 (ancho en píxeles; alto = ancho·112/180) &ex=a,b &q=0.8 (calidad WebP)
-     &top=%23RRGGBB (otro color de camiseta, para probar el fondo del widget en D2) -->
+     &top=%23RRGGBB (otro color de camiseta, para probar el fondo del widget en D2)
+     &cortar=no (sin recortar los lados; por defecto se recortan, ver abajo) -->
 <style>body{margin:0;background:#888;font:12px system-ui}canvas{display:block}#out{display:flex;flex-wrap:wrap;gap:4px}</style>
 </head>
 <body>
@@ -24,11 +25,29 @@ const g=q.get("g")||"m",dark=q.get("theme")==="dark",w=+(q.get("w")||400),Q=+(q.
 const f3=await crear({modelo:"../modelos/persona_"+g+".glb",gender:g});
 if(q.get("top"))f3.scene.traverse(o=>{if(o.isMesh)[].concat(o.material).forEach(m=>{if(m.name==="top")m.color.set(q.get("top"));});});
 const keys=(q.get("ex")||Object.keys(D.exercises).join(",")).split(",").filter(k=>D.exercises[k]);
-const out=document.getElementById("out"),imgs={};
-for(const k of keys){const ex=D.exercises[k];
-  ex.phases.forEach((ph,i)=>{const c=document.createElement("canvas");c.style.width=w+"px";out.append(c);
-    f3.draw(c,ex,Figura.phaseT(ex,i),true,{key:k,dark});
-    imgs[k+"_"+i]=c.toDataURL("image/webp",Q);});}
+const out=document.getElementById("out"),imgs={},cortes={};
+/* Recorte (C2): los lados vacíos se quitan, para que la persona de pie salga grande en el widget (D3).
+   Se mira lo opaco (persona y material; no la sombra ni el suelo) de todas las fases del ejercicio, así todas tienen
+   el mismo ancho y la figura no salta al cambiar de fase. Se deja un margen y nunca se recorta el alto. */
+function opaco(c){const x=c.getContext("2d")||null;let d;
+  if(x)d=x.getImageData(0,0,c.width,c.height).data;else{const t=document.createElement("canvas");t.width=c.width;t.height=c.height;
+    const tx=t.getContext("2d");tx.drawImage(c,0,0);d=tx.getImageData(0,0,c.width,c.height).data;}
+  // una columna cuenta si tiene al menos 4 píxeles opacos: así no cuenta la línea del suelo, que es fina
+  let a=c.width,b=-1;for(let X=0;X<c.width;X++){let n=0;for(let y=0;y<c.height;y++)if(d[(y*c.width+X)*4+3]>=250)n++;
+    if(n>=4){if(X<a)a=X;b=X;}}
+  return [a,b];}
+for(const k of keys){const ex=D.exercises[k],cs=[];
+  ex.phases.forEach((ph,i)=>{const c=document.createElement("canvas");c.style.width=w+"px";out.append(c); // en la página, para que tenga tamaño
+    f3.draw(c,ex,Figura.phaseT(ex,i),true,{key:k,dark});cs.push(c);});
+  const W=cs[0].width,H=cs[0].height,m=Math.round(H*0.08);let a=W,b=-1;
+  for(const c of cs){const [x0,x1]=opaco(c);a=Math.min(a,x0);b=Math.max(b,x1);}
+  let x0=q.get("cortar")==="no"||b<0?0:Math.max(0,a-m),x1=q.get("cortar")==="no"||b<0?W:Math.min(W,b+1+m);
+  if(x1-x0>W*0.9){x0=0;x1=W;}
+  cortes[k]=[x0,x1];
+  cs.forEach((c,i)=>{c.remove();const r=document.createElement("canvas");r.width=x1-x0;r.height=H;
+    r.getContext("2d").drawImage(c,x0,0,x1-x0,H,0,0,x1-x0,H);out.append(r);
+    imgs[k+"_"+i]=r.toDataURL("image/webp",Q);});}
+window.cortes=cortes;
 window.imgs=imgs;window.__done=true;
 </script>
 </body>

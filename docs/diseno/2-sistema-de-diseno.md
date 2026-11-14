@@ -108,15 +108,21 @@ Mismos tokens; Android limita lo que se puede dibujar, así que:
     (si no, la persona cambia de ropa entre la app y el widget), el coral compite con el ámbar de la zona que trabaja y hay que rehacer las 284 imágenes.
     Imágenes de prueba en `prototipo/widget-ropa-coral/` (`figura/widget/hacer.html?top=%23D9634C`).
 - Radio del sistema (Android 12+), padding 16 dp (12 en el pequeño).
-- **Figura:** imagen WebP de la fase actual (`widget/{m,f}/{claro,oscuro}/<ejercicio>_<fase>.webp`, 400 × 249), sin etiquetas,
-  alternando fases al ritmo del ejercicio; la de la persona y el tema elegidos. En el grande, a la izquierda (~45 % del ancho);
-  en el pequeño, arriba a todo el ancho.
-- Letra: `t1` para datos, `t2` para el nombre, `t4` para la cantidad. Atkinson en el widget solo si el `RemoteViews`
-  lo permite (Android 12+ con `fontFamily` de recurso); si no, la del sistema: es lo único que cambia.
-- Botones de 48 dp: Empezar y Hecho en `accion`; Pausa en `capa-2`.
-- **Grande, antes de empezar:** segmentos Hoy · ★ Favorita · Core, figura del primer ejercicio, nombre y origen de la sesión, duración, rondas (− / +), Empezar.
-- **Grande, en marcha:** ronda y pulso arriba; figura, ejercicio, cantidad, banda y siguiente; rayas de progreso; Pausa y **Hecho**.
-- **Pequeño:** antes, figura, «Hoy · 19 min» y Empezar; en marcha, figura, ejercicio, cantidad y Hecho.
+- **Figura:** imagen WebP de la fase actual (`widget/{m,f}/{claro,oscuro}/<ejercicio>_<fase>.webp`, 249 px de alto), sin etiquetas,
+  alternando fases cada 1,4 s (quieta con «Quitar animaciones»); la de la persona y el tema elegidos. **Recortada a los lados** (C2):
+  la persona de pie llena el alto del hueco en vez de salir pequeña (D3). En el grande, a la izquierda (~45 % del ancho);
+  en el pequeño, arriba a todo el ancho. En el descanso, la del ejercicio siguiente.
+- Letra: `t1` para datos, `t2` para el nombre, `t4` para la cantidad. Atkinson en Android 12+ (`res/font/`, pesos 400 y 700
+  sacados con fontTools de la variable de la app); antes, la del sistema: es lo único que cambia.
+- Botones de 48 dp: Empezar y Hecho en `accion`; Pausa, Parar y − / + en `capa-2`.
+- En Android: tokens en `res/values/widget.xml` (claro) y `values-night/` (oscuro), código en `Widgets.kt` y textos en `WidgetTextos.kt`.
+- **Grande, antes de empezar:** segmentos ★ Favorita · Core (solo si hay favorita; «Hoy», el plan de Claude, llega en C2b),
+  figura del primer ejercicio, nombre y origen de la sesión, ejercicios y duración, rondas (− / +), Empezar («Hacer otra» si hoy ya entrenaste).
+  Módulos, intensidad y A/B se cambian en la app (antes estaban en el widget).
+- **Grande, en marcha:** ronda y lo que queda arriba (el pulso, con P1); figura, ejercicio, cantidad, ritmo o tiempo con la banda
+  o los kilos, y lo siguiente; progreso de la serie (ámbar con borde); Pausa y **Hecho** («Saltar» en el descanso). En pausa, Parar
+  (se guarda como incompleta) y Seguir.
+- **Pequeño:** antes, figura, «Core · 19 min» (o la favorita) y Empezar; en marcha, figura, ejercicio, cantidad, Pausa y Hecho.
 
 ## Textos
 - Tuteo, frases cortas, verbos en los botones (Empezar, Enviar a Strava, Crear plan, Guardar y volver).

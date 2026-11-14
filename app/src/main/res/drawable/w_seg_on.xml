@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Segmento elegido: fondo `accion-suave` y raya de 3 dp en `accion` abajo (como en la app) -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle"><solid android:color="@color/w_accion" /><corners android:radius="7dp" /></shape>
+    </item>
+    <item android:bottom="3dp">
+        <shape android:shape="rectangle"><solid android:color="@color/w_accion_suave" />
+            <corners android:topLeftRadius="7dp" android:topRightRadius="7dp" /></shape>
+    </item>
+</layer-list>
