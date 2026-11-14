@@ -161,7 +161,7 @@
     "hollow_k": {
       "retro": 22,
       "apoya": "tronco",
-      "name": "Hollow hold",
+      "name": "Hollow rodillas dobladas",
       "hold": true,
       "vid": "hollow hold rodillas dobladas principiante",
       "cues": [
@@ -386,7 +386,7 @@
     "hollow_kb": {
       "retro": 22,
       "apoya": "tronco",
-      "name": "Hollow hold con brazos atrás",
+      "name": "Hollow brazos atrás",
       "hold": true,
       "vid": "hollow hold rodillas dobladas brazos atrás",
       "cues": [
@@ -408,7 +408,7 @@
     "hollow_l": {
       "retro": 26,
       "apoya": "tronco",
-      "name": "Hollow hold con piernas estiradas",
+      "name": "Hollow piernas estiradas",
       "hold": true,
       "vid": "hollow hold técnica correcta",
       "cues": [
@@ -714,11 +714,11 @@
       "crunch_inv": {"zone":"Core","reps":15},
       "hollow_k": {"zone":"Core","secs":20},
       "hollow_kb": {"zone":"Core","secs":30},
-      "hollow_l": {"zone":"Core","secs":40},
+      "hollow_l": {"zone":"Core","secs":25},
       "plancha_lat": {"zone":"Core","secs":30,"sides":["Lado derecho","Lado izquierdo"]},
       "plancha_lat_k": {"zone":"Core","secs":20,"sides":["Lado derecho","Lado izquierdo"]},
       "flex": {"zone":"Pecho","reps":10},
-      "flex_incl": {"zone":"Pecho","reps":8},
+      "flex_incl": {"zone":"Pecho","reps":12},
       "flex_pies": {"zone":"Pecho","reps":10},
       "press_db": {"zone":"Pecho","needs":"mancuernas","reps":10,"kg":[8,10]},
       "press_goma": {"zone":"Pecho","needs":"gomas","reps":12},
@@ -785,7 +785,7 @@
               "ex": "hollow_k",
               "S": {"secs":20,"note":"Rodillas dobladas"},
               "N": {"ex":"hollow_kb","secs":30,"note":"Rodillas dobladas, brazos atrás"},
-              "F": {"ex":"hollow_l","secs":40,"note":"Piernas estiradas"}
+              "F": {"ex":"hollow_l","secs":30,"note":"Piernas estiradas"}
             }
           ]
         }
@@ -800,7 +800,7 @@
           "variants": [
             {
               "ex": "flex",
-              "S": {"ex":"flex_incl","reps":8,"note":"Manos en el sofá o una mesa"},
+              "S": {"ex":"flex_incl","reps":10,"note":"Manos en el sofá o una mesa"},
               "N": {"reps":10,"note":"En el suelo"},
               "F": {"ex":"flex_pies","reps":10,"note":"Pies en una silla"}
             }

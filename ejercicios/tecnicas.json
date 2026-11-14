@@ -2284,5 +2284,73 @@
   "no_medible": [
    "pegados al cuerpo: es la distancia del codo al costado, que no se mide"
   ]
+ },
+ "almeja_banda": {
+  "inicio": "Tumbado de lado, con la mini banda por encima de las rodillas, el brazo de abajo estirado por encima de la cabeza y la cabeza apoyada en él. Cadera doblada unos 45° y rodillas a 90°, una pierna encima de la otra y los pies juntos, en línea con la espalda.",
+  "fases": [
+   {
+    "texto": "Abre la rodilla de arriba contra la banda, pies juntos",
+    "segundos": 1.5,
+    "tono": "up",
+    "apoyos": [
+     "lado_cuerpo",
+     "brazo_abajo",
+     "pierna_abajo",
+     "cabeza@brazo_abajo"
+    ]
+   },
+   {
+    "texto": "Cierra despacio, sin dejar que la banda tire de la rodilla",
+    "segundos": 1.5,
+    "tono": "down",
+    "apoyos": [
+     "lado_cuerpo",
+     "brazo_abajo",
+     "pierna_abajo",
+     "cabeza@brazo_abajo"
+    ]
+   }
+  ],
+  "claves": [
+   "Mini banda por encima de las rodillas y la cabeza apoyada en el brazo de abajo",
+   "Cadera y rodillas dobladas, pies juntos",
+   "Abre la rodilla de arriba contra la banda sin separar los pies",
+   "La cadera de arriba no se va hacia atrás"
+  ],
+  "errores": [
+   "Girar el tronco hacia atrás al abrir: la cadera de arriba se va atrás y el glúteo trabaja menos",
+   "Separar los pies al abrir",
+   "Dejar que la banda cierre la rodilla de golpe en vez de bajarla despacio",
+   "Banda sobre la rodilla o por debajo: aprieta la articulación"
+  ],
+  "respiracion": "Suelta el aire al abrir la rodilla y cógelo al cerrar.",
+  "lo_notas_en": "En el lateral del glúteo de la pierna de arriba; no en la zona lumbar ni en la ingle.",
+  "condiciones": [
+   {
+    "juntos": [
+     "pie_izq",
+     "pie_der"
+    ]
+   },
+   {
+    "angulo": {
+     "articulacion": "rodilla",
+     "entre": [
+      70,
+      110
+     ]
+    }
+   },
+   {
+    "angulo": {
+     "articulacion": "cadera",
+     "entre": [
+      30,
+      70
+     ]
+    }
+   }
+  ],
+  "no_medible": []
  }
 }

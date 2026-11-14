@@ -115,6 +115,13 @@ se prueban con `node --test ejercicios/reglas3d.test.js`):
 2. Una sesión de Claude Code hace los pasos 2 y 3 con sus comprobaciones.
 3. Tú miras las capturas y lo publicas. La app lo baja de la nube sin APK nuevo (cuando la app lea el catálogo de la nube).
 
+**Borradores (hasta E4):** la app enseña todo lo que hay en `rutina.json → exercises`, así que un ejercicio con los pasos
+hechos pero sin tu visto bueno no va ahí, sino en `ejercicios/borradores.json`: su `estado` (`ficha`, `tecnica` o `figura`),
+su `catalogo` (lo de `catalog.ex`) y su `ejercicio` (lo de `exercises`). Los comprobadores, `a_rutina.js` y `a_sql.js` lo
+leen igual que si estuviera en `rutina.json` (`ejercicios/datos.js`), y el SQL lo sube con su estado, sin publicar.
+Las capturas van en `ejercicios/capturas/`. Con el visto bueno: se pasa a `rutina.json` (y a un módulo de la rutina si
+toca), se quita de `borradores.json` y se regenera el SQL (sale `publicado`).
+
 ## Vocabulario
 - `patron`: `puente_cadera`, `bisagra_cadera`, `abduccion_cadera`, `desplazamiento_lateral`, `empuje_horizontal`,
   `tiron_horizontal`, `flexion_codo`, `extension_codo`, `anti_extension`, `anti_flexion_lateral`, `flexion_tronco`,
@@ -138,8 +145,11 @@ Qué se hizo con los apuntes del paso 1:
 - Crunch inverso, flexiones cerradas, curl y press con banda: fuera las claves de dosis o nivel.
 - Press con banda: las fases dicen «manos», no «mancuernas»; la banda pasa por debajo de la espalda.
 - Fondos, flexiones inclinadas y remo con mancuerna: las manos llegan al mueble (antes no) y el brazo de apoyo no se dobla.
-- Sin hacer (son del paso 1, no de técnica ni figura): renombrar los hollow, la dosis de `hollow_l` y `flex_incl`,
-  la variante de almeja con mini banda, las etiquetas de la esquina en ángel y remo inclinado (D3).
+- Hecho en E5 (14 nov), lo del paso 1: los hollow se llaman «Hollow rodillas dobladas», «Hollow brazos atrás» y «Hollow
+  piernas estiradas»; `hollow_l` pasa a 25 s de base (rango 15–40) y a 30 s en el nivel F de la rutina; `flex_incl`, a 12
+  de base (rango 8–20) y a 10 en el nivel S; y la almeja con mini banda (`almeja_banda`, progresión de la almeja) tiene los
+  tres pasos comprobados y está en borradores, pendiente de tu visto bueno.
+- Sin hacer: las etiquetas de la esquina en ángel y remo inclinado (D3).
 - Límite que queda: abrir las rodillas en el puente es un giro 3D correcto, pero de perfil apenas se ve.
 
 Apuntes del paso 1 (para la historia):
@@ -156,22 +166,22 @@ Apuntes del paso 1 (para la historia):
 | Plancha con retroversión (`plancha`) | Core · anti extension · 1 | La primera fase enseña el error («Así NO»): en el paso 2 decidir si se queda |
 | Plancha lateral con rodillas (`plancha_lat_k`) | Core · anti flexion lateral · 1 | — |
 | Crunch inverso (`crunch_inv`) | Core · flexion tronco · 2 | La clave «Las 2–3 últimas tienen que costar» es de dosis, no de técnica |
-| Hollow hold (`hollow_k`) | Core · anti extension · 2 | Nombre en inglés y casi igual a los otros dos hollow: el nombre no dice qué cambia (rodillas dobladas) |
-| Hollow hold con brazos atrás (`hollow_kb`) | Core · anti extension · 2 | — |
+| Hollow rodillas dobladas (`hollow_k`) | Core · anti extension · 2 | Nombre en inglés y casi igual a los otros dos hollow: el nombre no dice qué cambia (rodillas dobladas) → renombrado en E5 |
+| Hollow brazos atrás (`hollow_kb`) | Core · anti extension · 2 | — |
 | Plancha lateral (`plancha_lat`) | Core · anti flexion lateral · 2 | La fase dice «estira el brazo de arriba al techo» y ninguna clave lo dice: decidir en el paso 2 |
-| Hollow hold con piernas estiradas (`hollow_l`) | Core · anti extension · 3 | La dosis base (40 s) es la mayor de los tres siendo el más difícil: revisar |
+| Hollow piernas estiradas (`hollow_l`) | Core · anti extension · 3 | La dosis base (40 s) es la mayor de los tres siendo el más difícil: revisar → 25 s en E5 |
 | Remo a una mano con mancuerna (`remo_db`) | Espalda · tiron horizontal · 1 | — |
 | Remo sentado con banda (`remo_goma`) | Espalda · tiron horizontal · 1 | — |
 | Ángel en pared (`angel`) | Espalda · movilidad hombro · 1 | La flecha y la etiqueta están en la esquina del dibujo y no dejan agrandar la figura (D3) |
 | Remo inclinado con banda (`remo_incl_banda`) | Espalda · tiron horizontal · 2 | No está en ningún módulo de la rutina de core: solo en sesiones sueltas<br>Las etiquetas están en la esquina y no dejan agrandar la figura (D3) |
-| Almeja (`almeja`) | Glúteo · abduccion cadera · 1 | Figura 3D mal: piernas casi rectas en vez de cadera y rodillas dobladas<br>Figura 3D mal: al abrir, el pie de arriba se separa (la clave dice pies juntos)<br>Figura 3D mal: la cabeza no apoya en el brazo y el tronco flota (solo toca el brazo)<br>Causa: la apertura es un giro fuera del plano del dibujo 2D; necesita postura 3D<br>Con mini banda sería la variante natural: no existe |
+| Almeja (`almeja`) | Glúteo · abduccion cadera · 1 | Figura 3D mal: piernas casi rectas en vez de cadera y rodillas dobladas<br>Figura 3D mal: al abrir, el pie de arriba se separa (la clave dice pies juntos)<br>Figura 3D mal: la cabeza no apoya en el brazo y el tronco flota (solo toca el brazo)<br>Causa: la apertura es un giro fuera del plano del dibujo 2D; necesita postura 3D<br>Con mini banda sería la variante natural: no existe → `almeja_banda` en E5 (borrador) |
 | Puente de glúteo (`puente`) | Glúteo · puente cadera · 1 | — |
 | Puente de glúteo con banda (`puente_banda`) | Glúteo · puente cadera · 1 | — |
 | Paso lateral con banda (`paso_lateral`) | Glúteo · desplazamiento lateral · 2 | — |
 | Puente con apertura de rodillas (`puente_abd`) | Glúteo · abduccion cadera · 2 | — |
 | Estiramiento de psoas (`psoas`) | Movilidad · estiramiento cadera · 1 | — |
 | Gato-camello (`gato`) | Movilidad · movilidad columna · 1 | — |
-| Flexiones inclinadas (`flex_incl`) | Pecho · empuje horizontal · 1 | Dosis base 8, menor que la de las flexiones normales (10) siendo más fáciles: revisar |
+| Flexiones inclinadas (`flex_incl`) | Pecho · empuje horizontal · 1 | Dosis base 8, menor que la de las flexiones normales (10) siendo más fáciles: revisar → 12 en E5 |
 | Press de suelo con banda (`press_goma`) | Pecho · empuje horizontal · 1 | Las fases dicen «Empuja las mancuernas»: copiadas del press con mancuernas<br>La banda va por la espalda: comprobar en la figura que pasa por debajo de los omóplatos |
 | Press de suelo con mancuernas (`press_db`) | Pecho · empuje horizontal · 1 | — |
 | Flexiones (`flex`) | Pecho · empuje horizontal · 2 | — |

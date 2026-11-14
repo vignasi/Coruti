@@ -1,4 +1,5 @@
-# Paso 1 de los 30 ejercicios de rutina.json (C1, noviembre de 2026). Genera fichas.json; se edita aquí o en fichas.json.
+# Paso 1 de los 30 ejercicios de rutina.json (C1, noviembre de 2026). Generó fichas.json.
+# Desde E5 se edita fichas.json directamente: este script ya no tiene los cambios de E5 y no se vuelve a ejecutar.
 import json
 C=lambda lumbar=0,rodilla=0,hombro=0,muneca=0,cuello=0: dict(lumbar=lumbar,rodilla=rodilla,hombro=hombro,muneca=muneca,cuello=cuello)
 def F(k,zona,para,patron,pri,sec,pos,tipo,lados,mat,nivel,reg,prog,sust,carga,evitar,usos,base,rango,tempo,apuntes=(),kg=None):
