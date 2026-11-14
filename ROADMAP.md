@@ -314,8 +314,21 @@ y vocabulario en `docs/diseno/4-ejercicios.md`; datos en `ejercicios/`; en la nu
   y medir la fluidez del reproductor 3D en tu móvil
 - [ ] **Tú:** Hecho cuando: hace todo lo de antes con el diseño nuevo y te parece bien en el móvil
 
-#### C2 · Widget con el diseño nuevo — siguiente, en paralelo con B2
-- [ ] Mismo sistema de diseño; muestra la sesión de hoy (también la del plan de Claude) o la favorita elegida
+#### C2 · Widget con el diseño nuevo ✅ (rama `claude/widget-c2-nuevo-diseno-o4pwz1`; falta probarlo en el móvil)
+- [x] Sistema de diseño de D2 con el **fondo A** (`capa` de la app, claro u oscuro según el tema del móvil): tokens en
+  `res/values(-night)/widget.xml`, botones de 48 dp, segmentos, progreso ámbar con borde, Atkinson en Android 12+
+- [x] Figura 3D de D1 en WebP: una imagen por fase que alterna sola (quieta con «Quitar animaciones»), hombre o mujer según
+  Tú → Figura; claro y oscuro como recursos `drawable(-night)-nodpi`, así cambia de tema sin hacer nada. Adiós a `PoseRenderer`
+- [x] **Persona de pie recortada** (D3): las 252 imágenes rehechas sin los lados vacíos (`hacer.html`, mismo render: la plancha sale
+  idéntica píxel a píxel); en el widget la de pie llena el alto del hueco
+- [x] Muestra la **rutina de core de hoy** (A/B) o la **favorita elegida** (segmentos ★ Favorita · Core); rondas − / +, Empezar.
+  En marcha: ronda, lo que queda, ejercicio, cantidad y ritmo como el reproductor de la app, banda o kilos, lo siguiente, Pausa y
+  Hecho; en pausa, Parar y Seguir. Pequeño: figura, sesión o ejercicio y cantidad, y los mismos botones
+- [x] Quitados del widget los chips de módulos, intensidad y A/B (decidido: se cambian en la app, como en D2)
+- [x] Pruebas: `WidgetTextosTest` (textos iguales que la app y una imagen para cada fase de cada ejercicio)
+- [ ] **Tú:** instalar el APK de la rama y probar los dos widgets en claro y oscuro, hombre y mujer, parado y en marcha.
+  **El pequeño cambia de forma** (ahora 2 × 2 con la figura arriba): si ya lo tenías puesto, quítalo y vuelve a ponerlo
+- Para C2b: el segmento «Hoy» con la sesión del plan de Claude (ahora el widget solo tiene ★ Favorita · Core)
 
 ### Bloque S · Strava con ejercicios y pulso, sin perder Polar Flow ⭐
 
