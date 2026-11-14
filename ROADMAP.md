@@ -17,16 +17,15 @@ Lo siguiente que se programa es la **ola 1**: C2, B2a, B3, E5 y S2, a la vez.
 y migraciones aplicadas) · E1, E2 y E3 (los 30 ejercicios; catálogo `exercise_catalog` aplicado en Supabase el 14 nov: 30 publicados).
 Pull requests #1–#7 fusionados.
 
-**⚠️ Entrar en la cuenta no funciona todavía.** El plan gratuito de Supabase **no deja cambiar las plantillas de email**
-con el correo que trae Supabase (lo dice su API: «Email template modification is not available for free tier projects
-using the default email provider»). El email manda un enlace y la app pide un código. Solución elegida: un correo propio (SMTP),
-gratis con Gmail. Pasos en `docs/supabase.md`, apartado 2. En cuanto esté, Claude cambia las plantillas por la API.
+**Cuentas con contraseña (14 nov):** el plan gratuito de Supabase no deja que el email traiga el código, así que la app
+entra con **email y contraseña**, el registro está cerrado y las cuentas las creas tú en Supabase (`docs/supabase.md`, apartado 2).
+Tu cuenta ya está creada, con una contraseña provisional que se cambia en Tú → Cambiar la contraseña.
 
 **Tú, en este orden:**
-1. Correo propio en Supabase (Gmail con contraseña de aplicación): `docs/supabase.md`, apartado 2. Sin esto no puedes entrar en la cuenta.
-2. Instalar el APK nuevo de Releases (el de `main` tras el pull request #7) y probar lo de siempre: rutina, sueltos, favorita
+1. Crear la cuenta de tu mujer en Supabase (`docs/supabase.md`, apartado 2); la tuya ya está.
+2. Instalar el APK nuevo de Releases (el de `main` tras el pull request #9) y probar lo de siempre: rutina, sueltos, favorita
    en el widget, historial, exportar e importar, las figuras nuevas de E, TalkBack y la fluidez del reproductor 3D.
-3. Entrar con tu cuenta; luego reinstalar u otro móvil y comprobar que aparece todo; tu mujer con su cuenta ve solo lo suyo (B1).
+3. Entrar con tu cuenta y cambiar la contraseña provisional (Tú → Cambiar la contraseña); luego reinstalar u otro móvil y comprobar que aparece todo; tu mujer con su cuenta ve solo lo suyo (B1).
 4. Registrar la app en Strava y en Polar AccessLink y poner las 4 claves en Supabase: `docs/strava.md`, pasos 1–3.
 5. Conectar Strava y Polar en Tú → Conexiones: `docs/strava.md`, paso 4.
 6. Polar Flow → Strava solo carreras (o quitarlo y marcar «Reenviar también carreras y paseos»): `docs/strava.md`, paso 5; y el reloj, paso 6.
@@ -246,8 +245,8 @@ Después: P1 Pulso · P2 Planes por objetivo · P3 Peso y medidas · P4 Carreras
 - Decidido: la Edge Function para secretos pasa a S1, cuando haya un secreto real (Strava) y algo que la use.
   La tabla `connection_secrets` ya está lista y la app no puede leerla
 - [x] Migración de B1 aplicada en Supabase (13 nov, desde la conversación de S1)
-- [ ] **Tú:** correo propio (SMTP) en Supabase para que el email pueda traer el código (`docs/supabase.md`, apartado 2).
-  Las plantillas no se pueden cambiar en el plan gratuito con el correo de Supabase (comprobado por la API el 14 nov).
+- [x] Entrar con email y contraseña y registro cerrado (14 nov): el plan gratuito no deja que el email traiga el código.
+  Las cuentas se crean en Supabase (`docs/supabase.md`, apartado 2); la de Ignasi ya está creada
   Ahora mismo mandan un enlace en inglés. La longitud del código se puso en 6 el 14 nov (la app acepta de 6 a 10)
 - [x] **Tú:** fusionar la rama en `main` (pull request #4, versión 1.0.12)
 - [ ] **Tú:** probar en el móvil con el APK de `main` (1.0.31)

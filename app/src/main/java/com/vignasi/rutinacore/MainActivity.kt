@@ -306,6 +306,16 @@ class MainActivity : Activity() {
         }
 
         @JavascriptInterface
+        fun cloudSignIn(email: String, password: String) = Cloud.signIn(this@MainActivity, email, password) { msg, ok ->
+            if (pageReady) js("window.onCloudMsg && window.onCloudMsg(${org.json.JSONObject.quote(msg)}, $ok, 'verify')")
+        }
+
+        @JavascriptInterface
+        fun cloudChangePassword(password: String) = Cloud.changePassword(this@MainActivity, password) { msg, ok ->
+            if (pageReady) js("window.onCloudMsg && window.onCloudMsg(${org.json.JSONObject.quote(msg)}, $ok, 'clave')")
+        }
+
+        @JavascriptInterface
         fun cloudSync() = Cloud.syncNow(this@MainActivity)
 
         @JavascriptInterface

@@ -198,11 +198,25 @@ object Cloud {
     }
 
     /** Comprueba el código; si es correcto, guarda la sesión y sincroniza. */
-    fun verify(c: Context, email: String, code: String, done: (String, Boolean) -> Unit) = exec.execute {
+    fun verify(c: Context, email: String, code: String, done: (String, Boolean) -> Unit) = entrar(c, email, done) {
+        http("POST", "/auth/v1/verify",
+            JSONObject().put("type", "email").put("email", email.trim()).put("token", code.trim()).toString(), null)
+    }
+
+    /**
+     * Entra con email y contraseña. Las cuentas las crea el dueño del proyecto en Supabase
+     * (Authentication → Users → Add user, con «Auto Confirm User»): el registro desde la app está cerrado.
+     */
+    fun signIn(c: Context, email: String, password: String, done: (String, Boolean) -> Unit) = entrar(c, email, done) {
+        http("POST", "/auth/v1/token?grant_type=password",
+            JSONObject().put("email", email.trim()).put("password", password).toString(), null)
+    }
+
+    /** Lo común a entrar con código o con contraseña: guarda la sesión, cambia de cuenta si toca y sincroniza. */
+    private fun entrar(c: Context, email: String, done: (String, Boolean) -> Unit, pedir: () -> Resp) = exec.execute {
         val (msg, ok) = try {
-            val r = http("POST", "/auth/v1/verify",
-                JSONObject().put("type", "email").put("email", email.trim()).put("token", code.trim()).toString(), null)
-            if (r.code !in 200..299) errorText(r) to false else {
+            val r = pedir()
+            if (r.code !in 200..299) loginError(r) to false else {
                 val o = JSONObject(r.body)
                 val user = o.optJSONObject("user") ?: JSONObject()
                 val uid = user.optString("id")
@@ -225,6 +239,29 @@ object Cloud {
         catch (e: Exception) { "No se pudo entrar: ${e.message}" to false }
         Handler(Looper.getMainLooper()).post { done(msg, ok) }
         if (ok) { setMsg(c, msg, true); syncNow(c) }
+    }
+
+    /** Errores al entrar: con contraseña, Supabase responde «invalid_credentials» o «Invalid login credentials». */
+    private fun loginError(r: Resp): String =
+        if (r.code == 400 && (r.body.contains("invalid_credentials") || r.body.contains("Invalid login credentials")))
+            "El email o la contraseña no son correctos."
+        else if (r.code == 400 && r.body.contains("email_not_confirmed"))
+            "Esta cuenta aún no está confirmada. En Supabase, confírmala (Authentication → Users)."
+        else errorText(r)
+
+    /** Cambia la contraseña de la cuenta con la que se ha entrado (mínimo 8 caracteres). */
+    fun changePassword(c: Context, password: String, done: (String, Boolean) -> Unit) = exec.execute {
+        val (msg, ok) = try {
+            if (password.length < 8) "La contraseña tiene que tener al menos 8 caracteres." to false else {
+                val r = http("PUT", "/auth/v1/user", JSONObject().put("password", password).toString(), token(c))
+                if (r.code in 200..299) "Contraseña cambiada." to true
+                else if (r.body.contains("same_password")) "Es la misma contraseña que ya tienes." to false
+                else if (r.body.contains("weak_password")) "Esa contraseña es demasiado débil. Prueba otra más larga." to false
+                else errorText(r) to false
+            }
+        } catch (e: IOException) { "Sin conexión. Prueba otra vez cuando tengas internet." to false }
+        catch (e: Exception) { (e.message ?: "No se pudo cambiar la contraseña.") to false }
+        Handler(Looper.getMainLooper()).post { done(msg, ok) }
     }
 
     /** Sale de la cuenta. Los datos se quedan en el móvil. */
