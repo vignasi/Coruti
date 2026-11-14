@@ -47,14 +47,16 @@ La usan Ignasi y su mujer, cada uno con su cuenta. Todo en **español** (código
 - `supabase/migrations/`: esquema con RLS por persona. `supabase/functions/`: Edge Functions de Strava y Polar
   (`docs/strava.md`). Proyecto `jlyqtxihsorqczlxvbly`.
 - `supabase/functions/claude/` + `_shared/claude.ts`: servidor MCP del conector de Claude (B2a, `docs/claude.md`); su página
-  de inicio de sesión es `web/claude/` (GitHub Pages, `.github/workflows/pagina.yml`).
+  de inicio de sesión es `web/claude/`, publicada en **Vercel** (proyecto `coruti-conector`, https://coruti-conector.vercel.app/claude/): se publica sola
+  al fusionar en `main` si cambia `web/`; no usa GitHub Actions.
 - `docs/supabase.md` (cuentas y nube), `docs/strava.md` (Strava y Polar), `docs/diseno/` (funcionalidades, sistema de
   diseño, validación, prototipo y figura 3D; la figura se copia al APK al compilar).
 - `ejercicios/`: cómo se hace cada ejercicio (bloque E, `docs/diseno/4-ejercicios.md`): `fichas.json` (paso 1),
   `tecnicas.json` (paso 2; `a_rutina.js` pasa claves y textos de fase a `rutina.json`), `comprobar.js` (pasos 1 y 2) y
   `comprobar3d.js` + `reglas3d.js` (paso 3, figura 3D con Playwright): los dos tienen que dar 0 fallos.
   `a_sql.js` genera el SQL del catálogo `exercise_catalog`; `pose.js` y `ver.js` ayudan a ajustar posturas.
-- `.github/workflows/build.yml`: en `main` (al fusionar cambios del APK) publica el APK en Releases; en una rama, solo a mano, lo deja como artefacto.
+- `.github/workflows/build.yml`: la **única** GitHub Action. En `main` (al fusionar cambios del APK) publica el APK en Releases;
+  en una rama, solo a mano, lo deja como artefacto. El repo es privado: el APK de Releases se descarga con la sesión de GitHub iniciada.
 
 ## Comandos
 - Compilar y probar: `gradle assembleRelease testReleaseUnitTest` (necesita el SDK de Android 34 en `local.properties`).
@@ -64,7 +66,7 @@ La usan Ignasi y su mujer, cada uno con su cuenta. Todo en **español** (código
 - Desplegar funciones: `npx supabase functions deploy conexiones polar-aviso --use-api --project-ref jlyqtxihsorqczlxvbly`.
 
 ## Reglas que no se rompen
-- **Ningún secreto en el APK ni en el repo** (el APK es público en Releases). Las claves van en los secretos de Supabase;
+- **Ningún secreto en el APK ni en el repo** (el APK se puede descompilar). Las claves van en los secretos de Supabase;
   los tokens, en `connection_secrets`. En la app solo va la clave pública de Supabase.
 - Sin cuenta, la app funciona igual, solo en el móvil.
 - Polar Flow tiene que seguir recibiendo todas las sesiones del reloj.
