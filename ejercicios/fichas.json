@@ -282,7 +282,7 @@
   ]
  },
  "hollow_k": {
-  "nombre": "Hollow hold",
+  "nombre": "Hollow rodillas dobladas",
   "zona": "Core",
   "para_que": "Hollow fácil: lumbar pegada con hombros y rodillas en el aire.",
   "patron": "anti_extension",
@@ -324,12 +324,10 @@
    ],
    "tempo_s": null
   },
-  "apuntes": [
-   "Nombre en inglés y casi igual a los otros dos hollow: el nombre no dice qué cambia (rodillas dobladas)"
-  ]
+  "apuntes": []
  },
  "hollow_kb": {
-  "nombre": "Hollow hold con brazos atrás",
+  "nombre": "Hollow brazos atrás",
   "zona": "Core",
   "para_que": "Hollow medio: como el fácil, con los brazos estirados atrás (más palanca).",
   "patron": "anti_extension",
@@ -375,7 +373,7 @@
   "apuntes": []
  },
  "hollow_l": {
-  "nombre": "Hollow hold con piernas estiradas",
+  "nombre": "Hollow piernas estiradas",
   "zona": "Core",
   "para_que": "Hollow difícil: brazos atrás y piernas estiradas.",
   "patron": "anti_extension",
@@ -411,16 +409,14 @@
    "core"
   ],
   "dosis": {
-   "secs": 40,
+   "secs": 25,
    "rango": [
     15,
-    45
+    40
    ],
    "tempo_s": null
   },
-  "apuntes": [
-   "La dosis base (40 s) es la mayor de los tres siendo el más difícil: revisar"
-  ]
+  "apuntes": []
  },
  "plancha_lat": {
   "nombre": "Plancha lateral",
@@ -596,16 +592,14 @@
    "fuerza"
   ],
   "dosis": {
-   "reps": 8,
+   "reps": 12,
    "rango": [
     8,
     20
    ],
    "tempo_s": 4
   },
-  "apuntes": [
-   "Dosis base 8, menor que la de las flexiones normales (10) siendo más fáciles: revisar"
-  ]
+  "apuntes": []
  },
  "flex_pies": {
   "nombre": "Flexiones con pies elevados",
