@@ -34,8 +34,11 @@ La usan Ignasi y su mujer, cada uno con su cuenta. Todo en **español** (código
   sin elogios de relleno.
 
 ## Dónde está cada cosa
-- `app/src/main/assets/`: la interfaz (WebView). `index.html` carga `app/motor.js` (datos, planes, historial),
-  `app/app.js` (pantallas y acciones, con el diseño de D2) y `app/fig.js` (figura 3D). Catálogo y rutina: `rutina.json`.
+- `app/src/main/assets/`: la interfaz (WebView). `index.html` carga `app/motor.js` (datos, planes, historial), las pantallas
+  con el diseño de D2, un archivo por zona (B3): `app/comun.js` (iconos, piezas, pintar, acciones compartidas), `entrenar.js`,
+  `reproductor.js`, `ejercicios.js`, `historial.js`, `tu.js` e `inicio.js` (toques, Android, arranque; va el último), y
+  `app/fig.js` (figura 3D). No son módulos: comparten variables y el orden de `index.html` importa. Cada zona añade lo suyo
+  a `P` (pantallas), `ACC` (acciones), `HOJAS` y `FORM`. Catálogo y rutina: `rutina.json`.
 - `app/src/main/java/com/vignasi/rutinacore/`: Android en Kotlin, sin librerías extra.
   `MainActivity` (WebView y puente `Android.*`), `Store` (ajustes y racha), `History` (historial; la forma de cada sesión
   está en su comentario), `Backup` (copia JSON), `Cloud` + `SyncLogic` (Supabase), `Widgets`, `WorkoutService`,
