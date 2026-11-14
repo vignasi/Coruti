@@ -2,7 +2,8 @@
 // y del paso 2 (técnica). Falla (código 1) si algo no cumple. El paso 3 (figura 3D) es ejercicios/comprobar3d.js.
 const fs = require('fs'), path = require('path');
 const F = JSON.parse(fs.readFileSync(path.join(__dirname, 'fichas.json'), 'utf8'));
-const D = JSON.parse(fs.readFileSync(path.join(__dirname, '../app/src/main/assets/rutina.json'), 'utf8'));
+// rutina.json y los borradores (ejercicios/datos.js): los borradores se comprueban igual aunque no salgan en la app
+const {D} = require('./datos').cargar();
 const V = {
   patron: ['puente_cadera', 'bisagra_cadera', 'abduccion_cadera', 'desplazamiento_lateral', 'empuje_horizontal', 'tiron_horizontal', 'flexion_codo', 'extension_codo', 'anti_extension', 'anti_flexion_lateral', 'flexion_tronco', 'movilidad_columna', 'movilidad_hombro', 'estiramiento_cadera'],
   musculo: ['gluteo_mayor', 'gluteo_medio', 'isquios', 'cuadriceps', 'psoas', 'recto_abdominal', 'transverso', 'oblicuos', 'erectores', 'dorsal', 'escapulares', 'deltoides_anterior', 'deltoides_posterior', 'pectoral', 'triceps', 'biceps', 'antebrazo', 'serrato', 'manguito_rotador'],
