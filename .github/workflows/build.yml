@@ -53,7 +53,8 @@ jobs:
       - name: Comprobar que el APK lleva la figura y la letra
         run: |
           unzip -l rutina-core.apk > contenido.txt
-          for f in assets/index.html assets/rutina.json assets/app/app.js assets/app/fig.js assets/app/fuente/atkinson-hyperlegible-next.woff2 \
+          for f in assets/index.html assets/rutina.json assets/app/motor.js assets/app/comun.js assets/app/entrenar.js assets/app/reproductor.js \
+                   assets/app/ejercicios.js assets/app/historial.js assets/app/tu.js assets/app/inicio.js assets/app/fig.js assets/app/fuente/atkinson-hyperlegible-next.woff2 \
                    assets/figura/figura.js assets/figura/figura3d.js assets/figura/three/build/three.module.min.js \
                    assets/figura/three/examples/jsm/loaders/GLTFLoader.js assets/figura/modelos/persona_m.glb assets/figura/modelos/persona_f.glb; do
             grep -q " $f$" contenido.txt || { echo "Falta $f en el APK"; exit 1; }
