@@ -1414,7 +1414,7 @@
   "material": [],
   "nivel": 1,
   "regresion": null,
-  "progresion": null,
+  "progresion": "almeja_banda",
   "sustitutos": [
    "puente_abd",
    "paso_lateral"
@@ -1443,8 +1443,57 @@
    "Figura 3D mal: piernas casi rectas en vez de cadera y rodillas dobladas",
    "Figura 3D mal: al abrir, el pie de arriba se separa (la clave dice pies juntos)",
    "Figura 3D mal: la cabeza no apoya en el brazo y el tronco flota (solo toca el brazo)",
-   "Causa: la apertura es un giro fuera del plano del dibujo 2D; necesita postura 3D",
-   "Con mini banda sería la variante natural: no existe"
+   "Causa: la apertura es un giro fuera del plano del dibujo 2D; necesita postura 3D"
+  ]
+ },
+ "almeja_banda": {
+  "nombre": "Almeja con mini banda",
+  "zona": "Glúteo",
+  "para_que": "Almeja con la mini banda por encima de las rodillas: más carga para el glúteo medio cuando la almeja sin banda ya es fácil.",
+  "patron": "abduccion_cadera",
+  "musculos": {
+   "principales": [
+    "gluteo_medio"
+   ],
+   "secundarios": [
+    "gluteo_mayor"
+   ]
+  },
+  "posicion": "de_lado",
+  "tipo": "reps",
+  "lados": "por_lado",
+  "material": [
+   "banda"
+  ],
+  "nivel": 2,
+  "regresion": "almeja",
+  "progresion": null,
+  "sustitutos": [
+   "puente_abd",
+   "paso_lateral"
+  ],
+  "carga": {
+   "lumbar": 0,
+   "rodilla": 0,
+   "hombro": 0,
+   "muneca": 0,
+   "cuello": 0
+  },
+  "evitar_si": "Si la banda aprieta la rodilla o la cadera se va hacia atrás, vuelve a la almeja sin banda.",
+  "usos": [
+   "fuerza",
+   "calentar"
+  ],
+  "dosis": {
+   "reps": 12,
+   "rango": [
+    8,
+    15
+   ],
+   "tempo_s": 3
+  },
+  "apuntes": [
+   "Nuevo en E5 (variante de la almeja): sin publicar hasta el visto bueno del usuario con las capturas"
   ]
  }
 }
