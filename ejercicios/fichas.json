@@ -1,0 +1,1456 @@
+{
+ "psoas": {
+  "nombre": "Estiramiento de psoas",
+  "zona": "Movilidad",
+  "para_que": "Estira la parte delantera de la cadera (psoas) para que la pelvis quede neutra; contrarresta estar sentado.",
+  "patron": "estiramiento_cadera",
+  "musculos": {
+   "principales": [
+    "psoas"
+   ],
+   "secundarios": [
+    "gluteo_mayor"
+   ]
+  },
+  "posicion": "rodilla_en_suelo",
+  "tipo": "isometrico",
+  "lados": "por_lado",
+  "material": [],
+  "nivel": 1,
+  "regresion": null,
+  "progresion": null,
+  "sustitutos": [],
+  "carga": {
+   "lumbar": 0,
+   "rodilla": 1,
+   "hombro": 0,
+   "muneca": 0,
+   "cuello": 0
+  },
+  "evitar_si": "Si duele la rodilla de apoyo, pon una toalla doblada debajo.",
+  "usos": [
+   "movilidad",
+   "calentar",
+   "recuperar"
+  ],
+  "dosis": {
+   "secs": 30,
+   "rango": [
+    20,
+    60
+   ],
+   "tempo_s": null
+  },
+  "apuntes": []
+ },
+ "puente": {
+  "nombre": "Puente de glúteo",
+  "zona": "Glúteo",
+  "para_que": "Activa el glúteo y enseña a subir la cadera sin arquear la lumbar.",
+  "patron": "puente_cadera",
+  "musculos": {
+   "principales": [
+    "gluteo_mayor"
+   ],
+   "secundarios": [
+    "isquios",
+    "transverso"
+   ]
+  },
+  "posicion": "boca_arriba",
+  "tipo": "reps",
+  "lados": "bilateral",
+  "material": [],
+  "nivel": 1,
+  "regresion": null,
+  "progresion": "puente_banda",
+  "sustitutos": [
+   "puente_banda"
+  ],
+  "carga": {
+   "lumbar": 1,
+   "rodilla": 0,
+   "hombro": 0,
+   "muneca": 0,
+   "cuello": 0
+  },
+  "evitar_si": "Si notas la lumbar más que el culo, sube menos.",
+  "usos": [
+   "core",
+   "fuerza",
+   "calentar"
+  ],
+  "dosis": {
+   "reps": 15,
+   "rango": [
+    10,
+    20
+   ],
+   "tempo_s": 4
+  },
+  "apuntes": []
+ },
+ "deadbug": {
+  "nombre": "Dead bug",
+  "zona": "Core",
+  "para_que": "Abdomen profundo: mover brazos y piernas sin que se despegue la lumbar.",
+  "patron": "anti_extension",
+  "musculos": {
+   "principales": [
+    "recto_abdominal",
+    "transverso"
+   ],
+   "secundarios": [
+    "oblicuos",
+    "psoas"
+   ]
+  },
+  "posicion": "boca_arriba",
+  "tipo": "reps",
+  "lados": "alterno",
+  "material": [],
+  "nivel": 1,
+  "regresion": null,
+  "progresion": "hollow_k",
+  "sustitutos": [
+   "hollow_k"
+  ],
+  "carga": {
+   "lumbar": 0,
+   "rodilla": 0,
+   "hombro": 0,
+   "muneca": 0,
+   "cuello": 0
+  },
+  "evitar_si": "",
+  "usos": [
+   "core",
+   "calentar"
+  ],
+  "dosis": {
+   "reps": 16,
+   "rango": [
+    8,
+    20
+   ],
+   "tempo_s": 4
+  },
+  "apuntes": [
+   "Comprobar en 3D que la espalda apoya en el suelo (la comprobación 2D no sirve para los tumbados)"
+  ]
+ },
+ "plancha": {
+  "nombre": "Plancha con retroversión",
+  "zona": "Core",
+  "para_que": "Aguantar el tronco recto contra la gravedad (anti-extensión) con la pelvis metida.",
+  "patron": "anti_extension",
+  "musculos": {
+   "principales": [
+    "recto_abdominal",
+    "transverso"
+   ],
+   "secundarios": [
+    "gluteo_mayor",
+    "deltoides_anterior",
+    "serrato"
+   ]
+  },
+  "posicion": "boca_abajo",
+  "tipo": "isometrico",
+  "lados": "bilateral",
+  "material": [],
+  "nivel": 1,
+  "regresion": null,
+  "progresion": null,
+  "sustitutos": [
+   "deadbug",
+   "hollow_k"
+  ],
+  "carga": {
+   "lumbar": 1,
+   "rodilla": 0,
+   "hombro": 1,
+   "muneca": 0,
+   "cuello": 0
+  },
+  "evitar_si": "Si notas la lumbar, cambia a dead bug.",
+  "usos": [
+   "core"
+  ],
+  "dosis": {
+   "secs": 30,
+   "rango": [
+    15,
+    60
+   ],
+   "tempo_s": null
+  },
+  "apuntes": [
+   "La primera fase enseña el error («Así NO»): en el paso 2 decidir si se queda"
+  ]
+ },
+ "gato": {
+  "nombre": "Gato-camello",
+  "zona": "Movilidad",
+  "para_que": "Mueve la columna entera, vértebra a vértebra, al ritmo de la respiración.",
+  "patron": "movilidad_columna",
+  "musculos": {
+   "principales": [
+    "erectores",
+    "recto_abdominal"
+   ],
+   "secundarios": []
+  },
+  "posicion": "cuadrupedia",
+  "tipo": "reps",
+  "lados": "bilateral",
+  "material": [],
+  "nivel": 1,
+  "regresion": null,
+  "progresion": null,
+  "sustitutos": [],
+  "carga": {
+   "lumbar": 0,
+   "rodilla": 1,
+   "hombro": 0,
+   "muneca": 1,
+   "cuello": 0
+  },
+  "evitar_si": "Si duelen las muñecas, apóyate en los puños.",
+  "usos": [
+   "movilidad",
+   "calentar",
+   "recuperar"
+  ],
+  "dosis": {
+   "reps": 6,
+   "rango": [
+    5,
+    10
+   ],
+   "tempo_s": 7
+  },
+  "apuntes": []
+ },
+ "crunch_inv": {
+  "nombre": "Crunch inverso",
+  "zona": "Core",
+  "para_que": "Abdomen con flexión de tronco desde abajo: sube la pelvis, no las piernas.",
+  "patron": "flexion_tronco",
+  "musculos": {
+   "principales": [
+    "recto_abdominal"
+   ],
+   "secundarios": [
+    "transverso",
+    "oblicuos"
+   ]
+  },
+  "posicion": "boca_arriba",
+  "tipo": "reps",
+  "lados": "bilateral",
+  "material": [],
+  "nivel": 2,
+  "regresion": null,
+  "progresion": null,
+  "sustitutos": [
+   "hollow_k",
+   "deadbug"
+  ],
+  "carga": {
+   "lumbar": 1,
+   "rodilla": 0,
+   "hombro": 0,
+   "muneca": 0,
+   "cuello": 0
+  },
+  "evitar_si": "Si tiras con las piernas o con impulso, haz menos.",
+  "usos": [
+   "core",
+   "fuerza"
+  ],
+  "dosis": {
+   "reps": 15,
+   "rango": [
+    8,
+    20
+   ],
+   "tempo_s": 5
+  },
+  "apuntes": [
+   "La clave «Las 2–3 últimas tienen que costar» es de dosis, no de técnica"
+  ]
+ },
+ "hollow_k": {
+  "nombre": "Hollow hold",
+  "zona": "Core",
+  "para_que": "Hollow fácil: lumbar pegada con hombros y rodillas en el aire.",
+  "patron": "anti_extension",
+  "musculos": {
+   "principales": [
+    "recto_abdominal",
+    "transverso"
+   ],
+   "secundarios": [
+    "psoas"
+   ]
+  },
+  "posicion": "boca_arriba",
+  "tipo": "isometrico",
+  "lados": "bilateral",
+  "material": [],
+  "nivel": 2,
+  "regresion": "deadbug",
+  "progresion": "hollow_kb",
+  "sustitutos": [
+   "plancha"
+  ],
+  "carga": {
+   "lumbar": 1,
+   "rodilla": 0,
+   "hombro": 0,
+   "muneca": 0,
+   "cuello": 1
+  },
+  "evitar_si": "Si se despega la lumbar o tira el cuello, vuelve al dead bug.",
+  "usos": [
+   "core"
+  ],
+  "dosis": {
+   "secs": 20,
+   "rango": [
+    15,
+    40
+   ],
+   "tempo_s": null
+  },
+  "apuntes": [
+   "Nombre en inglés y casi igual a los otros dos hollow: el nombre no dice qué cambia (rodillas dobladas)"
+  ]
+ },
+ "hollow_kb": {
+  "nombre": "Hollow hold con brazos atrás",
+  "zona": "Core",
+  "para_que": "Hollow medio: como el fácil, con los brazos estirados atrás (más palanca).",
+  "patron": "anti_extension",
+  "musculos": {
+   "principales": [
+    "recto_abdominal",
+    "transverso"
+   ],
+   "secundarios": [
+    "psoas",
+    "serrato"
+   ]
+  },
+  "posicion": "boca_arriba",
+  "tipo": "isometrico",
+  "lados": "bilateral",
+  "material": [],
+  "nivel": 2,
+  "regresion": "hollow_k",
+  "progresion": "hollow_l",
+  "sustitutos": [
+   "plancha"
+  ],
+  "carga": {
+   "lumbar": 1,
+   "rodilla": 0,
+   "hombro": 1,
+   "muneca": 0,
+   "cuello": 1
+  },
+  "evitar_si": "Si se despega la lumbar, baja los brazos hacia las rodillas.",
+  "usos": [
+   "core"
+  ],
+  "dosis": {
+   "secs": 30,
+   "rango": [
+    15,
+    40
+   ],
+   "tempo_s": null
+  },
+  "apuntes": []
+ },
+ "hollow_l": {
+  "nombre": "Hollow hold con piernas estiradas",
+  "zona": "Core",
+  "para_que": "Hollow difícil: brazos atrás y piernas estiradas.",
+  "patron": "anti_extension",
+  "musculos": {
+   "principales": [
+    "recto_abdominal",
+    "transverso"
+   ],
+   "secundarios": [
+    "psoas",
+    "serrato"
+   ]
+  },
+  "posicion": "boca_arriba",
+  "tipo": "isometrico",
+  "lados": "bilateral",
+  "material": [],
+  "nivel": 3,
+  "regresion": "hollow_kb",
+  "progresion": null,
+  "sustitutos": [
+   "plancha"
+  ],
+  "carga": {
+   "lumbar": 2,
+   "rodilla": 0,
+   "hombro": 1,
+   "muneca": 0,
+   "cuello": 1
+  },
+  "evitar_si": "Con dolor lumbar, mejor el hollow fácil.",
+  "usos": [
+   "core"
+  ],
+  "dosis": {
+   "secs": 40,
+   "rango": [
+    15,
+    45
+   ],
+   "tempo_s": null
+  },
+  "apuntes": [
+   "La dosis base (40 s) es la mayor de los tres siendo el más difícil: revisar"
+  ]
+ },
+ "plancha_lat": {
+  "nombre": "Plancha lateral",
+  "zona": "Core",
+  "para_que": "Costado (oblicuos) aguantando el cuerpo de lado sin que caiga la cadera.",
+  "patron": "anti_flexion_lateral",
+  "musculos": {
+   "principales": [
+    "oblicuos"
+   ],
+   "secundarios": [
+    "gluteo_medio",
+    "transverso"
+   ]
+  },
+  "posicion": "de_lado",
+  "tipo": "isometrico",
+  "lados": "por_lado",
+  "material": [],
+  "nivel": 2,
+  "regresion": "plancha_lat_k",
+  "progresion": null,
+  "sustitutos": [],
+  "carga": {
+   "lumbar": 0,
+   "rodilla": 0,
+   "hombro": 1,
+   "muneca": 0,
+   "cuello": 0
+  },
+  "evitar_si": "Si molesta el hombro de apoyo, hazla con rodillas.",
+  "usos": [
+   "core"
+  ],
+  "dosis": {
+   "secs": 30,
+   "rango": [
+    15,
+    45
+   ],
+   "tempo_s": null
+  },
+  "apuntes": [
+   "La fase dice «estira el brazo de arriba al techo» y ninguna clave lo dice: decidir en el paso 2"
+  ]
+ },
+ "plancha_lat_k": {
+  "nombre": "Plancha lateral con rodillas",
+  "zona": "Core",
+  "para_que": "Plancha lateral fácil, apoyando las rodillas.",
+  "patron": "anti_flexion_lateral",
+  "musculos": {
+   "principales": [
+    "oblicuos"
+   ],
+   "secundarios": [
+    "gluteo_medio"
+   ]
+  },
+  "posicion": "de_lado",
+  "tipo": "isometrico",
+  "lados": "por_lado",
+  "material": [],
+  "nivel": 1,
+  "regresion": null,
+  "progresion": "plancha_lat",
+  "sustitutos": [],
+  "carga": {
+   "lumbar": 0,
+   "rodilla": 0,
+   "hombro": 1,
+   "muneca": 0,
+   "cuello": 0
+  },
+  "evitar_si": "",
+  "usos": [
+   "core"
+  ],
+  "dosis": {
+   "secs": 20,
+   "rango": [
+    15,
+    40
+   ],
+   "tempo_s": null
+  },
+  "apuntes": []
+ },
+ "flex": {
+  "nombre": "Flexiones",
+  "zona": "Pecho",
+  "para_que": "Empuje horizontal con el cuerpo como tabla: pecho, tríceps y core a la vez.",
+  "patron": "empuje_horizontal",
+  "musculos": {
+   "principales": [
+    "pectoral",
+    "triceps"
+   ],
+   "secundarios": [
+    "deltoides_anterior",
+    "transverso",
+    "serrato"
+   ]
+  },
+  "posicion": "boca_abajo",
+  "tipo": "reps",
+  "lados": "bilateral",
+  "material": [],
+  "nivel": 2,
+  "regresion": "flex_incl",
+  "progresion": "flex_pies",
+  "sustitutos": [
+   "press_goma",
+   "press_db"
+  ],
+  "carga": {
+   "lumbar": 0,
+   "rodilla": 0,
+   "hombro": 1,
+   "muneca": 1,
+   "cuello": 0
+  },
+  "evitar_si": "Si duelen las muñecas, apóyate en los puños.",
+  "usos": [
+   "fuerza"
+  ],
+  "dosis": {
+   "reps": 10,
+   "rango": [
+    5,
+    20
+   ],
+   "tempo_s": 4
+  },
+  "apuntes": []
+ },
+ "flex_incl": {
+  "nombre": "Flexiones inclinadas",
+  "zona": "Pecho",
+  "para_que": "Flexiones fáciles con las manos en alto (sofá o mesa).",
+  "patron": "empuje_horizontal",
+  "musculos": {
+   "principales": [
+    "pectoral",
+    "triceps"
+   ],
+   "secundarios": [
+    "deltoides_anterior",
+    "transverso"
+   ]
+  },
+  "posicion": "boca_abajo",
+  "tipo": "reps",
+  "lados": "bilateral",
+  "material": [
+   "sofa"
+  ],
+  "nivel": 1,
+  "regresion": null,
+  "progresion": "flex",
+  "sustitutos": [
+   "press_goma"
+  ],
+  "carga": {
+   "lumbar": 0,
+   "rodilla": 0,
+   "hombro": 0,
+   "muneca": 1,
+   "cuello": 0
+  },
+  "evitar_si": "",
+  "usos": [
+   "fuerza"
+  ],
+  "dosis": {
+   "reps": 8,
+   "rango": [
+    8,
+    20
+   ],
+   "tempo_s": 4
+  },
+  "apuntes": [
+   "Dosis base 8, menor que la de las flexiones normales (10) siendo más fáciles: revisar"
+  ]
+ },
+ "flex_pies": {
+  "nombre": "Flexiones con pies elevados",
+  "zona": "Pecho",
+  "para_que": "Flexiones difíciles con los pies en una silla: más carga en pecho alto y hombro.",
+  "patron": "empuje_horizontal",
+  "musculos": {
+   "principales": [
+    "pectoral",
+    "triceps"
+   ],
+   "secundarios": [
+    "deltoides_anterior",
+    "transverso"
+   ]
+  },
+  "posicion": "boca_abajo",
+  "tipo": "reps",
+  "lados": "bilateral",
+  "material": [
+   "silla"
+  ],
+  "nivel": 3,
+  "regresion": "flex",
+  "progresion": null,
+  "sustitutos": [
+   "flex"
+  ],
+  "carga": {
+   "lumbar": 1,
+   "rodilla": 0,
+   "hombro": 2,
+   "muneca": 1,
+   "cuello": 0
+  },
+  "evitar_si": "Con molestias de hombro, quédate en las normales.",
+  "usos": [
+   "fuerza"
+  ],
+  "dosis": {
+   "reps": 10,
+   "rango": [
+    5,
+    15
+   ],
+   "tempo_s": 4
+  },
+  "apuntes": []
+ },
+ "flex_cerr": {
+  "nombre": "Flexiones cerradas",
+  "zona": "Brazos",
+  "para_que": "Flexiones con las manos juntas: más tríceps.",
+  "patron": "empuje_horizontal",
+  "musculos": {
+   "principales": [
+    "triceps",
+    "pectoral"
+   ],
+   "secundarios": [
+    "deltoides_anterior",
+    "transverso"
+   ]
+  },
+  "posicion": "boca_abajo",
+  "tipo": "reps",
+  "lados": "bilateral",
+  "material": [],
+  "nivel": 3,
+  "regresion": null,
+  "progresion": null,
+  "sustitutos": [
+   "fondos",
+   "ext_db",
+   "flex"
+  ],
+  "carga": {
+   "lumbar": 0,
+   "rodilla": 0,
+   "hombro": 1,
+   "muneca": 2,
+   "cuello": 0
+  },
+  "evitar_si": "Si duelen las muñecas o el codo, cambia a extensión tumbado.",
+  "usos": [
+   "fuerza"
+  ],
+  "dosis": {
+   "reps": 8,
+   "rango": [
+    5,
+    15
+   ],
+   "tempo_s": 4
+  },
+  "apuntes": [
+   "La clave «si cuesta, apoya las rodillas» es una variante que no existe como ejercicio"
+  ]
+ },
+ "press_db": {
+  "nombre": "Press de suelo con mancuernas",
+  "zona": "Pecho",
+  "para_que": "Press de pecho tumbado en el suelo: el suelo limita el recorrido y protege el hombro.",
+  "patron": "empuje_horizontal",
+  "musculos": {
+   "principales": [
+    "pectoral",
+    "triceps"
+   ],
+   "secundarios": [
+    "deltoides_anterior"
+   ]
+  },
+  "posicion": "boca_arriba",
+  "tipo": "reps",
+  "lados": "bilateral",
+  "material": [
+   "mancuernas"
+  ],
+  "nivel": 1,
+  "regresion": null,
+  "progresion": null,
+  "sustitutos": [
+   "press_goma",
+   "flex"
+  ],
+  "carga": {
+   "lumbar": 0,
+   "rodilla": 0,
+   "hombro": 0,
+   "muneca": 0,
+   "cuello": 0
+  },
+  "evitar_si": "",
+  "usos": [
+   "fuerza"
+  ],
+  "dosis": {
+   "reps": 10,
+   "rango": [
+    8,
+    15
+   ],
+   "tempo_s": 4,
+   "kg": [
+    8,
+    10
+   ]
+  },
+  "apuntes": []
+ },
+ "press_goma": {
+  "nombre": "Press de suelo con banda",
+  "zona": "Pecho",
+  "para_que": "Press de pecho tumbado con la banda por la espalda.",
+  "patron": "empuje_horizontal",
+  "musculos": {
+   "principales": [
+    "pectoral",
+    "triceps"
+   ],
+   "secundarios": [
+    "deltoides_anterior"
+   ]
+  },
+  "posicion": "boca_arriba",
+  "tipo": "reps",
+  "lados": "bilateral",
+  "material": [
+   "gomas"
+  ],
+  "nivel": 1,
+  "regresion": null,
+  "progresion": null,
+  "sustitutos": [
+   "press_db",
+   "flex"
+  ],
+  "carga": {
+   "lumbar": 0,
+   "rodilla": 0,
+   "hombro": 0,
+   "muneca": 0,
+   "cuello": 0
+  },
+  "evitar_si": "",
+  "usos": [
+   "fuerza"
+  ],
+  "dosis": {
+   "reps": 12,
+   "rango": [
+    10,
+    20
+   ],
+   "tempo_s": 4
+  },
+  "apuntes": [
+   "Las fases dicen «Empuja las mancuernas»: copiadas del press con mancuernas",
+   "La banda va por la espalda: comprobar en la figura que pasa por debajo de los omóplatos"
+  ]
+ },
+ "angel": {
+  "nombre": "Ángel en pared",
+  "zona": "Espalda",
+  "para_que": "Movilidad de hombros y escápulas con la espalda pegada a la pared; corrige la postura encorvada.",
+  "patron": "movilidad_hombro",
+  "musculos": {
+   "principales": [
+    "escapulares",
+    "deltoides_posterior"
+   ],
+   "secundarios": [
+    "manguito_rotador",
+    "transverso"
+   ]
+  },
+  "posicion": "de_pie_pared",
+  "tipo": "reps",
+  "lados": "bilateral",
+  "material": [
+   "pared"
+  ],
+  "nivel": 1,
+  "regresion": null,
+  "progresion": null,
+  "sustitutos": [],
+  "carga": {
+   "lumbar": 0,
+   "rodilla": 0,
+   "hombro": 1,
+   "muneca": 0,
+   "cuello": 0
+  },
+  "evitar_si": "Si pellizca el hombro arriba, sube menos.",
+  "usos": [
+   "movilidad",
+   "calentar"
+  ],
+  "dosis": {
+   "reps": 10,
+   "rango": [
+    8,
+    15
+   ],
+   "tempo_s": 4
+  },
+  "apuntes": [
+   "La flecha y la etiqueta están en la esquina del dibujo y no dejan agrandar la figura (D3)"
+  ]
+ },
+ "remo_db": {
+  "nombre": "Remo a una mano con mancuerna",
+  "zona": "Espalda",
+  "para_que": "Tirón a una mano con apoyo: espalda media y dorsal sin cargar la lumbar.",
+  "patron": "tiron_horizontal",
+  "musculos": {
+   "principales": [
+    "dorsal",
+    "escapulares"
+   ],
+   "secundarios": [
+    "biceps",
+    "deltoides_posterior",
+    "erectores"
+   ]
+  },
+  "posicion": "de_pie_inclinado",
+  "tipo": "reps",
+  "lados": "por_lado",
+  "material": [
+   "mancuernas",
+   "silla"
+  ],
+  "nivel": 1,
+  "regresion": null,
+  "progresion": null,
+  "sustitutos": [
+   "remo_goma",
+   "remo_incl_banda"
+  ],
+  "carga": {
+   "lumbar": 1,
+   "rodilla": 0,
+   "hombro": 0,
+   "muneca": 0,
+   "cuello": 0
+  },
+  "evitar_si": "Si notas la lumbar, apoya más peso en la mano libre.",
+  "usos": [
+   "fuerza"
+  ],
+  "dosis": {
+   "reps": 10,
+   "rango": [
+    8,
+    15
+   ],
+   "tempo_s": 4,
+   "kg": [
+    8,
+    12
+   ]
+  },
+  "apuntes": []
+ },
+ "remo_goma": {
+  "nombre": "Remo sentado con banda",
+  "zona": "Espalda",
+  "para_que": "Tirón sentado con banda: junta las escápulas con la espalda alta.",
+  "patron": "tiron_horizontal",
+  "musculos": {
+   "principales": [
+    "dorsal",
+    "escapulares"
+   ],
+   "secundarios": [
+    "biceps",
+    "deltoides_posterior"
+   ]
+  },
+  "posicion": "sentado_suelo",
+  "tipo": "reps",
+  "lados": "bilateral",
+  "material": [
+   "gomas"
+  ],
+  "nivel": 1,
+  "regresion": null,
+  "progresion": null,
+  "sustitutos": [
+   "remo_incl_banda",
+   "remo_db"
+  ],
+  "carga": {
+   "lumbar": 1,
+   "rodilla": 0,
+   "hombro": 0,
+   "muneca": 0,
+   "cuello": 0
+  },
+  "evitar_si": "Si no puedes sentarte recto, dobla más las rodillas o siéntate en un cojín.",
+  "usos": [
+   "fuerza"
+  ],
+  "dosis": {
+   "reps": 15,
+   "rango": [
+    10,
+    20
+   ],
+   "tempo_s": 4
+  },
+  "apuntes": []
+ },
+ "remo_incl_banda": {
+  "nombre": "Remo inclinado con banda",
+  "zona": "Espalda",
+  "para_que": "Tirón de pie inclinado con banda: espalda media, dorsal y postura.",
+  "patron": "tiron_horizontal",
+  "musculos": {
+   "principales": [
+    "dorsal",
+    "escapulares"
+   ],
+   "secundarios": [
+    "biceps",
+    "deltoides_posterior",
+    "erectores"
+   ]
+  },
+  "posicion": "de_pie_inclinado",
+  "tipo": "reps",
+  "lados": "bilateral",
+  "material": [
+   "gomas"
+  ],
+  "nivel": 2,
+  "regresion": null,
+  "progresion": null,
+  "sustitutos": [
+   "remo_goma",
+   "remo_db"
+  ],
+  "carga": {
+   "lumbar": 1,
+   "rodilla": 0,
+   "hombro": 0,
+   "muneca": 0,
+   "cuello": 0
+  },
+  "evitar_si": "Con dolor lumbar, mejor el remo sentado.",
+  "usos": [
+   "fuerza"
+  ],
+  "dosis": {
+   "reps": 12,
+   "rango": [
+    10,
+    20
+   ],
+   "tempo_s": 4
+  },
+  "apuntes": [
+   "No está en ningún módulo de la rutina de core: solo en sesiones sueltas",
+   "Las etiquetas están en la esquina y no dejan agrandar la figura (D3)"
+  ]
+ },
+ "curl_db": {
+  "nombre": "Curl de bíceps con mancuernas",
+  "zona": "Brazos",
+  "para_que": "Curl de bíceps con mancuernas.",
+  "patron": "flexion_codo",
+  "musculos": {
+   "principales": [
+    "biceps"
+   ],
+   "secundarios": [
+    "antebrazo"
+   ]
+  },
+  "posicion": "de_pie",
+  "tipo": "reps",
+  "lados": "bilateral",
+  "material": [
+   "mancuernas"
+  ],
+  "nivel": 1,
+  "regresion": null,
+  "progresion": null,
+  "sustitutos": [
+   "curl_goma",
+   "curl_toalla"
+  ],
+  "carga": {
+   "lumbar": 0,
+   "rodilla": 0,
+   "hombro": 0,
+   "muneca": 0,
+   "cuello": 0
+  },
+  "evitar_si": "",
+  "usos": [
+   "fuerza"
+  ],
+  "dosis": {
+   "reps": 12,
+   "rango": [
+    8,
+    15
+   ],
+   "tempo_s": 4,
+   "kg": [
+    6,
+    8
+   ]
+  },
+  "apuntes": []
+ },
+ "curl_goma": {
+  "nombre": "Curl de bíceps con banda",
+  "zona": "Brazos",
+  "para_que": "Curl de bíceps pisando la banda.",
+  "patron": "flexion_codo",
+  "musculos": {
+   "principales": [
+    "biceps"
+   ],
+   "secundarios": [
+    "antebrazo"
+   ]
+  },
+  "posicion": "de_pie",
+  "tipo": "reps",
+  "lados": "bilateral",
+  "material": [
+   "gomas"
+  ],
+  "nivel": 1,
+  "regresion": null,
+  "progresion": null,
+  "sustitutos": [
+   "curl_db",
+   "curl_toalla"
+  ],
+  "carga": {
+   "lumbar": 0,
+   "rodilla": 0,
+   "hombro": 0,
+   "muneca": 0,
+   "cuello": 0
+  },
+  "evitar_si": "",
+  "usos": [
+   "fuerza"
+  ],
+  "dosis": {
+   "reps": 12,
+   "rango": [
+    10,
+    20
+   ],
+   "tempo_s": 4
+  },
+  "apuntes": []
+ },
+ "curl_toalla": {
+  "nombre": "Curl isométrico con toalla",
+  "zona": "Brazos",
+  "para_que": "Bíceps sin material: tirar de una toalla pisada, sin moverse.",
+  "patron": "flexion_codo",
+  "musculos": {
+   "principales": [
+    "biceps"
+   ],
+   "secundarios": [
+    "antebrazo"
+   ]
+  },
+  "posicion": "de_pie",
+  "tipo": "isometrico",
+  "lados": "bilateral",
+  "material": [
+   "toalla"
+  ],
+  "nivel": 1,
+  "regresion": null,
+  "progresion": null,
+  "sustitutos": [
+   "curl_goma"
+  ],
+  "carga": {
+   "lumbar": 0,
+   "rodilla": 0,
+   "hombro": 0,
+   "muneca": 0,
+   "cuello": 0
+  },
+  "evitar_si": "",
+  "usos": [
+   "fuerza"
+  ],
+  "dosis": {
+   "secs": 25,
+   "rango": [
+    15,
+    40
+   ],
+   "tempo_s": null
+  },
+  "apuntes": []
+ },
+ "ext_db": {
+  "nombre": "Extensión de tríceps tumbado",
+  "zona": "Brazos",
+  "para_que": "Tríceps tumbado con mancuernas (codos al techo).",
+  "patron": "extension_codo",
+  "musculos": {
+   "principales": [
+    "triceps"
+   ],
+   "secundarios": []
+  },
+  "posicion": "boca_arriba",
+  "tipo": "reps",
+  "lados": "bilateral",
+  "material": [
+   "mancuernas"
+  ],
+  "nivel": 1,
+  "regresion": null,
+  "progresion": null,
+  "sustitutos": [
+   "fondos",
+   "flex_cerr"
+  ],
+  "carga": {
+   "lumbar": 0,
+   "rodilla": 0,
+   "hombro": 0,
+   "muneca": 0,
+   "cuello": 0
+  },
+  "evitar_si": "",
+  "usos": [
+   "fuerza"
+  ],
+  "dosis": {
+   "reps": 12,
+   "rango": [
+    8,
+    15
+   ],
+   "tempo_s": 4,
+   "kg": [
+    6,
+    8
+   ]
+  },
+  "apuntes": []
+ },
+ "fondos": {
+  "nombre": "Fondos en silla",
+  "zona": "Brazos",
+  "para_que": "Tríceps con el peso del cuerpo en una silla, con recorrido corto.",
+  "patron": "extension_codo",
+  "musculos": {
+   "principales": [
+    "triceps"
+   ],
+   "secundarios": [
+    "deltoides_anterior",
+    "pectoral"
+   ]
+  },
+  "posicion": "apoyado_silla",
+  "tipo": "reps",
+  "lados": "bilateral",
+  "material": [
+   "silla"
+  ],
+  "nivel": 2,
+  "regresion": null,
+  "progresion": null,
+  "sustitutos": [
+   "ext_db",
+   "flex_cerr"
+  ],
+  "carga": {
+   "lumbar": 0,
+   "rodilla": 0,
+   "hombro": 2,
+   "muneca": 1,
+   "cuello": 0
+  },
+  "evitar_si": "Si molesta la parte delantera del hombro, cambia a la extensión tumbado.",
+  "usos": [
+   "fuerza"
+  ],
+  "dosis": {
+   "reps": 8,
+   "rango": [
+    5,
+    15
+   ],
+   "tempo_s": 4
+  },
+  "apuntes": []
+ },
+ "puente_banda": {
+  "nombre": "Puente de glúteo con banda",
+  "zona": "Glúteo",
+  "para_que": "Puente con mini banda: glúteo mayor y también el medio (empujar las rodillas hacia fuera).",
+  "patron": "puente_cadera",
+  "musculos": {
+   "principales": [
+    "gluteo_mayor",
+    "gluteo_medio"
+   ],
+   "secundarios": [
+    "isquios",
+    "transverso"
+   ]
+  },
+  "posicion": "boca_arriba",
+  "tipo": "reps",
+  "lados": "bilateral",
+  "material": [
+   "banda"
+  ],
+  "nivel": 1,
+  "regresion": "puente",
+  "progresion": "puente_abd",
+  "sustitutos": [
+   "puente"
+  ],
+  "carga": {
+   "lumbar": 1,
+   "rodilla": 0,
+   "hombro": 0,
+   "muneca": 0,
+   "cuello": 0
+  },
+  "evitar_si": "Si notas la lumbar más que el culo, sube menos.",
+  "usos": [
+   "core",
+   "fuerza",
+   "calentar"
+  ],
+  "dosis": {
+   "reps": 15,
+   "rango": [
+    10,
+    20
+   ],
+   "tempo_s": 4
+  },
+  "apuntes": []
+ },
+ "puente_abd": {
+  "nombre": "Puente con apertura de rodillas",
+  "zona": "Glúteo",
+  "para_que": "Puente mantenido abriendo las rodillas contra la banda: glúteo medio.",
+  "patron": "abduccion_cadera",
+  "musculos": {
+   "principales": [
+    "gluteo_medio",
+    "gluteo_mayor"
+   ],
+   "secundarios": [
+    "isquios"
+   ]
+  },
+  "posicion": "boca_arriba",
+  "tipo": "reps",
+  "lados": "bilateral",
+  "material": [
+   "banda"
+  ],
+  "nivel": 2,
+  "regresion": "puente_banda",
+  "progresion": null,
+  "sustitutos": [
+   "almeja"
+  ],
+  "carga": {
+   "lumbar": 1,
+   "rodilla": 0,
+   "hombro": 0,
+   "muneca": 0,
+   "cuello": 0
+  },
+  "evitar_si": "Si notas la lumbar, baja un poco la cadera.",
+  "usos": [
+   "fuerza"
+  ],
+  "dosis": {
+   "reps": 15,
+   "rango": [
+    10,
+    20
+   ],
+   "tempo_s": 3
+  },
+  "apuntes": []
+ },
+ "paso_lateral": {
+  "nombre": "Paso lateral con banda",
+  "zona": "Glúteo",
+  "para_que": "Pasos de lado con la banda: glúteo medio y estabilidad de rodilla.",
+  "patron": "desplazamiento_lateral",
+  "musculos": {
+   "principales": [
+    "gluteo_medio"
+   ],
+   "secundarios": [
+    "gluteo_mayor",
+    "cuadriceps"
+   ]
+  },
+  "posicion": "de_pie",
+  "tipo": "reps",
+  "lados": "por_lado",
+  "material": [
+   "banda"
+  ],
+  "nivel": 2,
+  "regresion": null,
+  "progresion": null,
+  "sustitutos": [
+   "almeja",
+   "puente_abd"
+  ],
+  "carga": {
+   "lumbar": 0,
+   "rodilla": 1,
+   "hombro": 0,
+   "muneca": 0,
+   "cuello": 0
+  },
+  "evitar_si": "Si se te van las rodillas hacia dentro, pasos más cortos.",
+  "usos": [
+   "fuerza",
+   "calentar"
+  ],
+  "dosis": {
+   "reps": 10,
+   "rango": [
+    8,
+    15
+   ],
+   "tempo_s": 2
+  },
+  "apuntes": []
+ },
+ "almeja": {
+  "nombre": "Almeja",
+  "zona": "Glúteo",
+  "para_que": "Glúteo medio tumbado de lado: abrir la rodilla con los pies juntos.",
+  "patron": "abduccion_cadera",
+  "musculos": {
+   "principales": [
+    "gluteo_medio"
+   ],
+   "secundarios": [
+    "gluteo_mayor"
+   ]
+  },
+  "posicion": "de_lado",
+  "tipo": "reps",
+  "lados": "por_lado",
+  "material": [],
+  "nivel": 1,
+  "regresion": null,
+  "progresion": null,
+  "sustitutos": [
+   "puente_abd",
+   "paso_lateral"
+  ],
+  "carga": {
+   "lumbar": 0,
+   "rodilla": 0,
+   "hombro": 0,
+   "muneca": 0,
+   "cuello": 0
+  },
+  "evitar_si": "",
+  "usos": [
+   "fuerza",
+   "calentar"
+  ],
+  "dosis": {
+   "reps": 15,
+   "rango": [
+    10,
+    20
+   ],
+   "tempo_s": 3
+  },
+  "apuntes": [
+   "Figura 3D mal: piernas casi rectas en vez de cadera y rodillas dobladas",
+   "Figura 3D mal: al abrir, el pie de arriba se separa (la clave dice pies juntos)",
+   "Figura 3D mal: la cabeza no apoya en el brazo y el tronco flota (solo toca el brazo)",
+   "Causa: la apertura es un giro fuera del plano del dibujo 2D; necesita postura 3D",
+   "Con mini banda sería la variante natural: no existe"
+  ]
+ }
+}

@@ -1,0 +1,2288 @@
+{
+ "psoas": {
+  "inicio": "De rodillas con una pierna adelantada: la rodilla de atrás y el empeine en el suelo, el pie de delante apoyado y esa rodilla a unos 90°. Tronco recto.",
+  "fases": [
+   {
+    "texto": "Postura: rodilla de atrás en el suelo, tronco recto",
+    "segundos": 2.4,
+    "tono": null,
+    "apoyos": [
+     "rodilla",
+     "pies"
+    ]
+   },
+   {
+    "texto": "Paso 1 · Aprieta fuerte el culo y mete el coxis hacia abajo",
+    "segundos": 2.4,
+    "tono": null,
+    "apoyos": [
+     "rodilla",
+     "pies"
+    ]
+   },
+   {
+    "texto": "Paso 2 · Sin soltar el culo, lleva la cadera adelante unos cm",
+    "segundos": 4.4,
+    "tono": null,
+    "apoyos": [
+     "rodilla",
+     "pies"
+    ]
+   }
+  ],
+  "claves": [
+   "Las piernas no se mueven: rodilla de atrás y pie de delante quietos",
+   "Primero aprieta el culo de la pierna de atrás y mete el coxis",
+   "Después lleva la cadera unos centímetros adelante, con el tronco recto"
+  ],
+  "errores": [
+   "Arquear la zona lumbar para avanzar: el estiramiento se va a la espalda",
+   "Llevar la rodilla de delante más allá del pie",
+   "Soltar el culo al llevar la cadera adelante"
+  ],
+  "respiracion": "Respira lento y suelta el aire al llevar la cadera adelante.",
+  "lo_notas_en": "En la parte delantera de la cadera de la pierna de atrás; no en la zona lumbar ni en la rodilla.",
+  "condiciones": [
+   {
+    "angulo": {
+     "articulacion": "rodilla",
+     "lado": "alguno",
+     "entre": [
+      55,
+      115
+     ]
+    }
+   },
+   {
+    "inclinacion": {
+     "parte": "tronco",
+     "entre": [
+      0,
+      15
+     ]
+    }
+   },
+   {
+    "angulo": {
+     "articulacion": "cadera",
+     "lado": "alguno",
+     "entre": [
+      -45,
+      10
+     ]
+    },
+    "fase": [
+     1,
+     2
+    ]
+   },
+   {
+    "quieto": {
+     "parte": "tobillo",
+     "cm": 5
+    }
+   }
+  ],
+  "no_medible": []
+ },
+ "puente": {
+  "inicio": "Boca arriba, rodillas dobladas, pies apoyados a la anchura de la cadera y brazos en el suelo junto al cuerpo.",
+  "fases": [
+   {
+    "texto": "Sube en 1 s apretando el culo y aguanta 1 s arriba",
+    "segundos": 2,
+    "tono": "up",
+    "apoyos": [
+     "cabeza",
+     "espalda_alta",
+     "pies",
+     "brazos"
+    ]
+   },
+   {
+    "texto": "Baja despacio (2 s) con el ombligo dentro",
+    "segundos": 2,
+    "tono": "down",
+    "apoyos": [
+     "cabeza",
+     "espalda_alta",
+     "espalda_baja",
+     "cadera",
+     "pies",
+     "brazos"
+    ]
+   }
+  ],
+  "claves": [
+   "Boca arriba, rodillas dobladas y pies apoyados",
+   "Antes de subir, aplana la zona lumbar contra el suelo",
+   "Sube la cadera apretando el culo, empujando con los talones",
+   "Arriba: hombros, cadera y rodillas en línea, sin arquear"
+  ],
+  "errores": [
+   "Subir arqueando la zona lumbar: se nota en la espalda y no en el culo",
+   "Empujar con las puntas: se carga el cuádriceps",
+   "Abrir o cerrar las rodillas al subir"
+  ],
+  "respiracion": "Suelta el aire al subir y cógelo al bajar.",
+  "lo_notas_en": "En el culo y algo en la parte de atrás del muslo; no en la zona lumbar.",
+  "condiciones": [
+   {
+    "angulo": {
+     "articulacion": "rodilla",
+     "entre": [
+      45,
+      125
+     ]
+    }
+   },
+   {
+    "recto": {
+     "puntos": [
+      "hombro",
+      "cadera",
+      "rodilla"
+     ],
+     "tol": 12
+    },
+    "fase": 0
+   },
+   {
+    "separados": {
+     "partes": [
+      "pie_izq",
+      "pie_der"
+     ],
+     "cm": 5
+    }
+   }
+  ],
+  "no_medible": []
+ },
+ "deadbug": {
+  "inicio": "Boca arriba con la zona lumbar pegada al suelo, brazos estirados hacia el techo y rodillas dobladas a 90° en el aire, encima de la cadera.",
+  "fases": [
+   {
+    "texto": "Estira un brazo atrás y la pierna contraria adelante (2 s)",
+    "segundos": 2,
+    "tono": "up",
+    "apoyos": [
+     "cabeza",
+     "espalda_alta",
+     "espalda_baja",
+     "cadera"
+    ]
+   },
+   {
+    "texto": "Vuelve al centro (2 s), lumbar pegada al suelo",
+    "segundos": 2,
+    "tono": "down",
+    "apoyos": [
+     "cabeza",
+     "espalda_alta",
+     "espalda_baja",
+     "cadera"
+    ]
+   },
+   {
+    "texto": "Ahora el otro brazo y la otra pierna (2 s)",
+    "segundos": 2,
+    "tono": "up",
+    "apoyos": [
+     "cabeza",
+     "espalda_alta",
+     "espalda_baja",
+     "cadera"
+    ]
+   },
+   {
+    "texto": "Vuelve al centro (2 s)",
+    "segundos": 2,
+    "tono": "down",
+    "apoyos": [
+     "cabeza",
+     "espalda_alta",
+     "espalda_baja",
+     "cadera"
+    ]
+   }
+  ],
+  "claves": [
+   "Brazos al techo y rodillas dobladas a 90° encima de la cadera",
+   "Estira a la vez un brazo atrás y la pierna contraria adelante",
+   "La zona lumbar no se despega del suelo en ningún momento",
+   "Si se despega la espalda, estira menos"
+  ],
+  "errores": [
+   "La zona lumbar se arquea al estirar: se nota en la espalda",
+   "Estirar el brazo y la pierna del mismo lado",
+   "Ir deprisa y dejar caer la pierna"
+  ],
+  "respiracion": "Suelta el aire al estirar y cógelo al volver al centro.",
+  "lo_notas_en": "En la barriga, sobre todo abajo; no en la zona lumbar ni en el cuello.",
+  "condiciones": [
+   {
+    "angulo": {
+     "articulacion": "rodilla",
+     "entre": [
+      70,
+      110
+     ]
+    },
+    "fase": [
+     1,
+     3
+    ]
+   },
+   {
+    "angulo": {
+     "articulacion": "cadera",
+     "entre": [
+      70,
+      110
+     ]
+    },
+    "fase": [
+     1,
+     3
+    ]
+   },
+   {
+    "angulo": {
+     "articulacion": "hombro",
+     "entre": [
+      70,
+      110
+     ]
+    },
+    "fase": [
+     1,
+     3
+    ]
+   },
+   {
+    "angulo": {
+     "articulacion": "rodilla",
+     "lado": "alguno",
+     "entre": [
+      0,
+      30
+     ]
+    },
+    "fase": [
+     0,
+     2
+    ]
+   }
+  ],
+  "no_medible": []
+ },
+ "plancha": {
+  "inicio": "Boca abajo, apoyado en los antebrazos, con los codos debajo de los hombros, y en las puntas de los pies.",
+  "fases": [
+   {
+    "texto": "Apoya antebrazos y puntas: codos debajo de los hombros",
+    "segundos": 2.4,
+    "tono": null,
+    "apoyos": [
+     "antebrazos",
+     "puntas_pies"
+    ]
+   },
+   {
+    "texto": "Aprieta el culo y mete el ombligo: el cuerpo queda recto",
+    "segundos": 3.6,
+    "tono": null,
+    "apoyos": [
+     "antebrazos",
+     "puntas_pies"
+    ]
+   }
+  ],
+  "claves": [
+   "Apoyado en antebrazos y puntas de los pies, codos debajo de los hombros",
+   "Aprieta el culo y mete el ombligo: la cadera se alinea",
+   "Mantén el cuerpo recto como una tabla",
+   "Mirada al suelo, cuello largo"
+  ],
+  "errores": [
+   "La zona lumbar se hunde: se nota en la espalda (es el error más típico)",
+   "Subir mucho el culo: el ejercicio deja de trabajar la barriga",
+   "Aguantar el aire"
+  ],
+  "respiracion": "Respira corto y normal, sin aguantar el aire.",
+  "lo_notas_en": "En la barriga y el culo; no en la zona lumbar.",
+  "condiciones": [
+   {
+    "angulo": {
+     "articulacion": "hombro",
+     "entre": [
+      65,
+      110
+     ]
+    }
+   },
+   {
+    "angulo": {
+     "articulacion": "codo",
+     "entre": [
+      65,
+      115
+     ]
+    }
+   },
+   {
+    "recto": {
+     "puntos": [
+      "hombro",
+      "cadera",
+      "tobillo"
+     ],
+     "tol": 12
+    },
+    "fase": 1
+   }
+  ],
+  "no_medible": []
+ },
+ "gato": {
+  "inicio": "A cuatro patas: manos debajo de los hombros y rodillas debajo de la cadera, con los empeines en el suelo.",
+  "fases": [
+   {
+    "texto": "Coge aire: deja caer la barriga y mira al frente",
+    "segundos": 3.5,
+    "tono": "down",
+    "apoyos": [
+     "manos",
+     "rodillas",
+     "espinillas"
+    ]
+   },
+   {
+    "texto": "Suelta el aire: redondea la espalda y mete el ombligo",
+    "segundos": 3.5,
+    "tono": "up",
+    "apoyos": [
+     "manos",
+     "rodillas",
+     "espinillas"
+    ]
+   }
+  ],
+  "claves": [
+   "Manos debajo de los hombros, rodillas debajo de la cadera",
+   "Coge aire: deja caer la barriga y mira al frente",
+   "Suelta el aire: redondea la espalda hacia arriba y mira al ombligo",
+   "Movimiento lento, que empiece en la pelvis"
+  ],
+  "errores": [
+   "Mover solo el cuello y no la espalda",
+   "Doblar los codos o echar el peso atrás",
+   "Ir rápido, sin respirar"
+  ],
+  "respiracion": "Coge aire al dejar caer la barriga y suéltalo al redondear la espalda.",
+  "lo_notas_en": "A lo largo de toda la espalda, como un estiramiento suave; no debe doler.",
+  "condiciones": [
+   {
+    "angulo": {
+     "articulacion": "hombro",
+     "entre": [
+      40,
+      110
+     ]
+    }
+   },
+   {
+    "angulo": {
+     "articulacion": "cadera",
+     "entre": [
+      65,
+      110
+     ]
+    }
+   },
+   {
+    "angulo": {
+     "articulacion": "codo",
+     "entre": [
+      0,
+      25
+     ]
+    }
+   }
+  ],
+  "no_medible": []
+ },
+ "crunch_inv": {
+  "inicio": "Boca arriba, brazos en el suelo junto al cuerpo y rodillas dobladas a 90° en el aire, encima de la cadera.",
+  "fases": [
+   {
+    "texto": "Sube: rodillas al pecho, despega el coxis y aprieta 1 s",
+    "segundos": 2,
+    "tono": "up",
+    "apoyos": [
+     "cabeza",
+     "espalda_alta",
+     "espalda_baja",
+     "brazos"
+    ]
+   },
+   {
+    "texto": "Baja muy despacio (3 s) sin arquear la lumbar",
+    "segundos": 3,
+    "tono": "down",
+    "apoyos": [
+     "cabeza",
+     "espalda_alta",
+     "espalda_baja",
+     "cadera",
+     "brazos"
+    ]
+   }
+  ],
+  "claves": [
+   "Rodillas dobladas a 90° en el aire, brazos en el suelo",
+   "Lleva las rodillas al pecho despegando solo el coxis",
+   "Sin impulso: sube con el abdomen, no con las piernas",
+   "Al bajar, la zona lumbar no se arquea"
+  ],
+  "errores": [
+   "Balancear las piernas para subir",
+   "Despegar toda la espalda y cargar el cuello",
+   "Bajar de golpe arqueando la zona lumbar"
+  ],
+  "respiracion": "Suelta el aire al subir y cógelo al bajar despacio.",
+  "lo_notas_en": "En la parte baja de la barriga; no en el cuello ni en la zona lumbar.",
+  "condiciones": [
+   {
+    "angulo": {
+     "articulacion": "rodilla",
+     "entre": [
+      60,
+      120
+     ]
+    }
+   },
+   {
+    "angulo": {
+     "articulacion": "cadera",
+     "entre": [
+      105,
+      150
+     ]
+    },
+    "fase": 0
+   },
+   {
+    "angulo": {
+     "articulacion": "cadera",
+     "entre": [
+      60,
+      110
+     ]
+    },
+    "fase": 1
+   }
+  ],
+  "no_medible": []
+ },
+ "hollow_k": {
+  "inicio": "Boca arriba con las rodillas dobladas, los pies apoyados y los brazos junto al cuerpo. La zona lumbar pegada al suelo.",
+  "fases": [
+   {
+    "texto": "Boca arriba: pega la lumbar al suelo",
+    "segundos": 2,
+    "tono": null,
+    "apoyos": [
+     "cabeza",
+     "espalda_alta",
+     "espalda_baja",
+     "cadera",
+     "pies",
+     "brazos"
+    ]
+   },
+   {
+    "texto": "Despega hombros y rodillas; la lumbar NO se despega",
+    "segundos": 4.2,
+    "tono": null,
+    "apoyos": [
+     "espalda_baja",
+     "cadera"
+    ]
+   }
+  ],
+  "claves": [
+   "Pega la lumbar al suelo antes de nada",
+   "Despega los hombros y lleva las rodillas dobladas encima de la cadera",
+   "Brazos estirados hacia las rodillas, ombligo dentro",
+   "Si la lumbar se despega, acerca más las rodillas"
+  ],
+  "errores": [
+   "La zona lumbar se despega del suelo",
+   "Tirar del cuello en vez de despegar los hombros",
+   "Aguantar el aire"
+  ],
+  "respiracion": "Respira corto sin soltar la barriga.",
+  "lo_notas_en": "En toda la barriga; no en la zona lumbar ni en el cuello.",
+  "condiciones": [
+   {
+    "angulo": {
+     "articulacion": "cadera",
+     "entre": [
+      70,
+      115
+     ]
+    },
+    "fase": 1
+   },
+   {
+    "angulo": {
+     "articulacion": "rodilla",
+     "entre": [
+      60,
+      120
+     ]
+    }
+   },
+   {
+    "angulo": {
+     "articulacion": "codo",
+     "entre": [
+      0,
+      25
+     ]
+    },
+    "fase": 1
+   }
+  ],
+  "no_medible": []
+ },
+ "plancha_lat": {
+  "inicio": "Tumbado de lado, con el codo de abajo justo debajo del hombro y las piernas estiradas, un pie encima del otro.",
+  "fases": [
+   {
+    "texto": "De lado: codo justo debajo del hombro",
+    "segundos": 2,
+    "tono": null,
+    "apoyos": [
+     "antebrazo",
+     "lado_cuerpo",
+     "pierna_abajo"
+    ]
+   },
+   {
+    "texto": "Sube la cadera y estira el brazo de arriba al techo",
+    "segundos": 4.2,
+    "tono": null,
+    "apoyos": [
+     "antebrazo",
+     "pie"
+    ]
+   }
+  ],
+  "claves": [
+   "Codo justo debajo del hombro",
+   "Cuerpo recto de la cabeza a los pies",
+   "Aprieta el culo: la cadera no se va hacia atrás",
+   "Arriba, el brazo de arriba estirado hacia el techo"
+  ],
+  "errores": [
+   "La cadera se cae hacia el suelo",
+   "La cadera se va hacia atrás y el cuerpo se dobla",
+   "El hombro de abajo se hunde hacia la oreja"
+  ],
+  "respiracion": "Respira normal, sin aguantar el aire.",
+  "lo_notas_en": "En el costado que queda abajo (oblicuos) y en el hombro de apoyo, sin dolor.",
+  "condiciones": [
+   {
+    "angulo": {
+     "articulacion": "rodilla",
+     "entre": [
+      -5,
+      20
+     ]
+    }
+   },
+   {
+    "recto": {
+     "puntos": [
+      "hombro",
+      "cadera",
+      "tobillo"
+     ],
+     "tol": 12
+    },
+    "fase": 1
+   },
+   {
+    "angulo": {
+     "articulacion": "hombro",
+     "entre": [
+      60,
+      115
+     ],
+     "lado": "alguno"
+    },
+    "fase": 1
+   },
+   {
+    "juntos": [
+     "pie_izq",
+     "pie_der"
+    ]
+   }
+  ],
+  "no_medible": []
+ },
+ "flex": {
+  "inicio": "Boca abajo con las manos en el suelo debajo de los hombros, los brazos estirados y el cuerpo recto sobre las puntas de los pies.",
+  "fases": [
+   {
+    "texto": "Baja en bloque (2 s): costillas abajo, culo apretado",
+    "segundos": 2,
+    "tono": "down",
+    "apoyos": [
+     "manos",
+     "puntas_pies"
+    ]
+   },
+   {
+    "texto": "Empuja el suelo y sube con el cuerpo recto",
+    "segundos": 2,
+    "tono": "up",
+    "apoyos": [
+     "manos",
+     "puntas_pies"
+    ]
+   }
+  ],
+  "claves": [
+   "Manos debajo de los hombros",
+   "Aprieta el culo y mete las costillas: el cuerpo es una tabla",
+   "Codos a unos 45° del cuerpo, no abiertos en cruz",
+   "Baja en bloque y sube empujando el suelo"
+  ],
+  "errores": [
+   "Se hunde la cadera o sube el culo",
+   "Abrir los codos en cruz: carga el hombro",
+   "Bajar solo la cabeza"
+  ],
+  "respiracion": "Coge aire al bajar y suéltalo al empujar.",
+  "lo_notas_en": "En el pecho, la parte de delante del hombro y los tríceps; no en la zona lumbar.",
+  "condiciones": [
+   {
+    "recto": {
+     "puntos": [
+      "hombro",
+      "cadera",
+      "tobillo"
+     ],
+     "tol": 12
+    }
+   },
+   {
+    "angulo": {
+     "articulacion": "codo",
+     "entre": [
+      0,
+      25
+     ]
+    },
+    "fase": 1
+   },
+   {
+    "angulo": {
+     "articulacion": "codo",
+     "entre": [
+      60,
+      130
+     ]
+    },
+    "fase": 0
+   },
+   {
+    "angulo": {
+     "articulacion": "hombro",
+     "entre": [
+      55,
+      100
+     ]
+    },
+    "fase": 1
+   }
+  ],
+  "no_medible": [
+   "Codos a unos 45° del cuerpo: es la apertura del codo hacia fuera, que la figura de perfil no muestra"
+  ]
+ },
+ "press_db": {
+  "inicio": "Tumbado boca arriba en el suelo, rodillas dobladas y pies apoyados, con una mancuerna en cada mano a la altura del pecho y los codos en el suelo.",
+  "fases": [
+   {
+    "texto": "Empuja las mancuernas hacia el techo",
+    "segundos": 2,
+    "tono": "up",
+    "apoyos": [
+     "cabeza",
+     "espalda_alta",
+     "espalda_baja",
+     "cadera",
+     "pies"
+    ]
+   },
+   {
+    "texto": "Baja (2 s) hasta apoyar los codos en el suelo",
+    "segundos": 2,
+    "tono": "down",
+    "apoyos": [
+     "cabeza",
+     "espalda_alta",
+     "espalda_baja",
+     "cadera",
+     "pies",
+     "codos"
+    ]
+   }
+  ],
+  "claves": [
+   "Rodillas dobladas y pies apoyados",
+   "Mancuernas sobre el pecho, palmas hacia los pies",
+   "Baja hasta que los codos toquen el suelo",
+   "La lumbar se queda apoyada todo el rato"
+  ],
+  "errores": [
+   "Dejar caer los codos de golpe contra el suelo",
+   "Arquear la zona lumbar al empujar",
+   "Abrir los codos en cruz"
+  ],
+  "respiracion": "Suelta el aire al empujar y cógelo al bajar.",
+  "lo_notas_en": "En el pecho y los tríceps; no en el hombro.",
+  "condiciones": [
+   {
+    "angulo": {
+     "articulacion": "rodilla",
+     "entre": [
+      45,
+      125
+     ]
+    }
+   },
+   {
+    "angulo": {
+     "articulacion": "codo",
+     "entre": [
+      0,
+      25
+     ]
+    },
+    "fase": 0
+   },
+   {
+    "angulo": {
+     "articulacion": "codo",
+     "entre": [
+      60,
+      130
+     ]
+    },
+    "fase": 1
+   }
+  ],
+  "no_medible": [
+   "palmas hacia los pies: el giro de la mano no se comprueba"
+  ]
+ },
+ "angel": {
+  "inicio": "De pie, de espaldas a la pared y con los pies a un palmo de ella, rodillas sueltas. Lumbar, espalda y cabeza pegadas a la pared y brazos en W.",
+  "fases": [
+   {
+    "texto": "Sube los brazos rozando la pared, lumbar pegada",
+    "segundos": 2,
+    "tono": "up",
+    "apoyos": [
+     "pies",
+     "espalda_alta@pared",
+     "cadera@pared",
+     "cabeza@pared"
+    ]
+   },
+   {
+    "texto": "Baja en W juntando las escápulas",
+    "segundos": 2,
+    "tono": "down",
+    "apoyos": [
+     "pies",
+     "espalda_alta@pared",
+     "cadera@pared",
+     "cabeza@pared"
+    ]
+   }
+  ],
+  "claves": [
+   "Lumbar, espalda y cabeza pegadas a la pared",
+   "Brazos en W pegados a la pared",
+   "Súbelos a Y sin despegarlos",
+   "Si la lumbar se despega, sube menos los brazos"
+  ],
+  "errores": [
+   "Despegar la zona lumbar al subir los brazos",
+   "Despegar los codos o las manos de la pared",
+   "Subir los hombros hacia las orejas"
+  ],
+  "respiracion": "Suelta el aire al subir los brazos y cógelo al bajar.",
+  "lo_notas_en": "Entre los omóplatos y en la parte de atrás del hombro; no en la zona lumbar.",
+  "condiciones": [
+   {
+    "angulo": {
+     "articulacion": "hombro",
+     "entre": [
+      130,
+      185
+     ]
+    },
+    "fase": 0
+   },
+   {
+    "angulo": {
+     "articulacion": "hombro",
+     "entre": [
+      55,
+      115
+     ]
+    },
+    "fase": 1
+   },
+   {
+    "angulo": {
+     "articulacion": "codo",
+     "entre": [
+      60,
+      120
+     ]
+    },
+    "fase": 1
+   },
+   {
+    "angulo": {
+     "articulacion": "rodilla",
+     "entre": [
+      0,
+      25
+     ]
+    }
+   }
+  ],
+  "no_medible": [
+   "pies a un palmo de ella: la distancia a la pared no se comprueba",
+   "Brazos en W pegados a la pared: la pared de la figura es de fondo y los brazos van de frente"
+  ]
+ },
+ "remo_db": {
+  "inicio": "De pie e inclinado hacia delante con la espalda recta, casi horizontal, la mano libre apoyada en una silla y una mancuerna en la otra, con el brazo estirado.",
+  "fases": [
+   {
+    "texto": "Tira del codo hacia la cadera, espalda recta",
+    "segundos": 2,
+    "tono": "up",
+    "apoyos": [
+     "mano@silla",
+     "pies"
+    ]
+   },
+   {
+    "texto": "Baja estirando el brazo (2 s), sin girar el tronco",
+    "segundos": 2,
+    "tono": "down",
+    "apoyos": [
+     "mano@silla",
+     "pies"
+    ]
+   }
+  ],
+  "claves": [
+   "Apoya la mano libre en una silla o en el sofá",
+   "Espalda recta, casi horizontal, rodillas un poco dobladas",
+   "Tira del codo hacia la cadera, sin girar el tronco",
+   "Baja estirando del todo el brazo"
+  ],
+  "errores": [
+   "Girar el tronco para subir la mancuerna",
+   "Redondear la espalda",
+   "Tirar con la mano en vez de con el codo"
+  ],
+  "respiracion": "Suelta el aire al tirar y cógelo al bajar.",
+  "lo_notas_en": "En la espalda, bajo el omóplato, y algo en el bíceps; no en la zona lumbar.",
+  "condiciones": [
+   {
+    "inclinacion": {
+     "parte": "tronco",
+     "entre": [
+      55,
+      100
+     ]
+    }
+   },
+   {
+    "angulo": {
+     "articulacion": "rodilla",
+     "entre": [
+      5,
+      50
+     ]
+    }
+   },
+   {
+    "angulo": {
+     "articulacion": "codo",
+     "lado": "alguno",
+     "entre": [
+      60,
+      140
+     ]
+    },
+    "fase": 0
+   },
+   {
+    "angulo": {
+     "articulacion": "codo",
+     "entre": [
+      0,
+      30
+     ],
+     "lado": "alguno"
+    },
+    "fase": 1
+   }
+  ],
+  "no_medible": []
+ },
+ "curl_db": {
+  "inicio": "De pie, con una mancuerna en cada mano, los brazos estirados junto al cuerpo y las palmas hacia delante.",
+  "fases": [
+   {
+    "texto": "Sube doblando el codo; el codo no se mueve",
+    "segundos": 2,
+    "tono": "up",
+    "apoyos": [
+     "pies"
+    ]
+   },
+   {
+    "texto": "Baja despacio (2 s), culo apretado, sin balancear",
+    "segundos": 2,
+    "tono": "down",
+    "apoyos": [
+     "pies"
+    ]
+   }
+  ],
+  "claves": [
+   "Rodillas sueltas y culo apretado",
+   "Codos pegados al cuerpo: no se mueven",
+   "Sube y baja sin balancear",
+   "Si te echas atrás para subir, pesa demasiado"
+  ],
+  "errores": [
+   "Balancear el cuerpo para subir",
+   "Adelantar los codos al subir",
+   "Bajar de golpe"
+  ],
+  "respiracion": "Suelta el aire al subir y cógelo al bajar.",
+  "lo_notas_en": "En el bíceps; no en la zona lumbar ni en el hombro.",
+  "condiciones": [
+   {
+    "inclinacion": {
+     "parte": "tronco",
+     "entre": [
+      0,
+      12
+     ]
+    }
+   },
+   {
+    "quieto": "codo"
+   },
+   {
+    "angulo": {
+     "articulacion": "codo",
+     "entre": [
+      100,
+      155
+     ]
+    },
+    "fase": 0
+   },
+   {
+    "angulo": {
+     "articulacion": "codo",
+     "entre": [
+      0,
+      30
+     ]
+    },
+    "fase": 1
+   },
+   {
+    "angulo": {
+     "articulacion": "rodilla",
+     "entre": [
+      0,
+      25
+     ]
+    }
+   }
+  ],
+  "no_medible": []
+ },
+ "curl_toalla": {
+  "inicio": "De pie, pisando el centro de una toalla con los dos pies y con un extremo en cada mano.",
+  "fases": [
+   {
+    "texto": "Pisa la toalla y agarra un extremo con cada mano",
+    "segundos": 2,
+    "tono": null,
+    "apoyos": [
+     "pies"
+    ]
+   },
+   {
+    "texto": "Codos a 90° pegados al cuerpo: tira hacia arriba",
+    "segundos": 4,
+    "tono": null,
+    "apoyos": [
+     "pies"
+    ]
+   }
+  ],
+  "claves": [
+   "Pisa el centro de una toalla con los dos pies",
+   "Codos a 90° pegados al cuerpo",
+   "Tira hacia arriba con fuerza sin moverte",
+   "Culo apretado y costillas abajo: sin echarte atrás"
+  ],
+  "errores": [
+   "Echarse hacia atrás al tirar",
+   "Separar los codos del cuerpo",
+   "Aguantar el aire"
+  ],
+  "respiracion": "Respira corto y normal mientras tiras.",
+  "lo_notas_en": "En el bíceps; no en la zona lumbar.",
+  "condiciones": [
+   {
+    "inclinacion": {
+     "parte": "tronco",
+     "entre": [
+      0,
+      12
+     ]
+    }
+   },
+   {
+    "angulo": {
+     "articulacion": "codo",
+     "entre": [
+      70,
+      110
+     ]
+    },
+    "fase": 1
+   },
+   {
+    "angulo": {
+     "articulacion": "rodilla",
+     "entre": [
+      0,
+      25
+     ]
+    }
+   }
+  ],
+  "no_medible": [
+   "Pisa el centro de una toalla: el material no se comprueba",
+   "pegados al cuerpo: es la distancia del codo al costado, que no se mide"
+  ]
+ },
+ "ext_db": {
+  "inicio": "Tumbado boca arriba en el suelo, rodillas dobladas y pies apoyados, con los brazos estirados hacia el techo y una mancuerna en cada mano.",
+  "fases": [
+   {
+    "texto": "Dobla los codos: mancuernas junto a la cabeza (2 s)",
+    "segundos": 2,
+    "tono": "down",
+    "apoyos": [
+     "cabeza",
+     "espalda_alta",
+     "espalda_baja",
+     "cadera",
+     "pies"
+    ]
+   },
+   {
+    "texto": "Estira los brazos; los codos apuntan al techo",
+    "segundos": 2,
+    "tono": "up",
+    "apoyos": [
+     "cabeza",
+     "espalda_alta",
+     "espalda_baja",
+     "cadera",
+     "pies"
+    ]
+   }
+  ],
+  "claves": [
+   "Rodillas dobladas, lumbar apoyada",
+   "Brazos estirados hacia el techo con las mancuernas",
+   "Dobla solo los codos: las mancuernas bajan junto a la cabeza",
+   "Los codos apuntan al techo y no se abren"
+  ],
+  "errores": [
+   "Mover los hombros y bajar los codos",
+   "Abrir los codos hacia fuera",
+   "Bajar deprisa hacia la cabeza"
+  ],
+  "respiracion": "Coge aire al bajar y suéltalo al estirar.",
+  "lo_notas_en": "En la parte de atrás del brazo (tríceps); no en el codo.",
+  "condiciones": [
+   {
+    "angulo": {
+     "articulacion": "rodilla",
+     "entre": [
+      45,
+      125
+     ]
+    }
+   },
+   {
+    "angulo": {
+     "articulacion": "codo",
+     "entre": [
+      80,
+      155
+     ]
+    },
+    "fase": 0
+   },
+   {
+    "angulo": {
+     "articulacion": "codo",
+     "entre": [
+      0,
+      25
+     ]
+    },
+    "fase": 1
+   },
+   {
+    "angulo": {
+     "articulacion": "hombro",
+     "entre": [
+      60,
+      135
+     ]
+    }
+   },
+   {
+    "quieto": {
+     "parte": "codo",
+     "cm": 8
+    }
+   }
+  ],
+  "no_medible": []
+ },
+ "fondos": {
+  "inicio": "Sentado en el borde de una silla firme apoyada en la pared, con las manos en el borde junto a la cadera; adelanta el cuerpo para que la cadera quede fuera, rodillas dobladas y pies apoyados.",
+  "fases": [
+   {
+    "texto": "Baja solo un poco (2 s), hombros lejos de las orejas",
+    "segundos": 2,
+    "tono": "down",
+    "apoyos": [
+     "manos@silla",
+     "pies"
+    ]
+   },
+   {
+    "texto": "Empuja la silla y estira los brazos",
+    "segundos": 2,
+    "tono": "up",
+    "apoyos": [
+     "manos@silla",
+     "pies"
+    ]
+   }
+  ],
+  "claves": [
+   "Manos en el borde de una silla firme, apoyada en la pared",
+   "Rodillas dobladas y pies apoyados",
+   "Baja solo unos centímetros: rango corto",
+   "Hombros lejos de las orejas, codos hacia atrás"
+  ],
+  "errores": [
+   "Bajar demasiado: carga la parte delantera del hombro",
+   "Abrir los codos hacia fuera",
+   "Empujar con las piernas"
+  ],
+  "respiracion": "Coge aire al bajar y suéltalo al empujar.",
+  "lo_notas_en": "En la parte de atrás del brazo (tríceps); no en la parte delantera del hombro.",
+  "condiciones": [
+   {
+    "angulo": {
+     "articulacion": "rodilla",
+     "entre": [
+      45,
+      125
+     ]
+    }
+   },
+   {
+    "angulo": {
+     "articulacion": "codo",
+     "entre": [
+      0,
+      25
+     ]
+    },
+    "fase": 1
+   },
+   {
+    "angulo": {
+     "articulacion": "codo",
+     "entre": [
+      20,
+      110
+     ]
+    },
+    "fase": 0
+   }
+  ],
+  "no_medible": [
+   "silla firme, apoyada en la pared: la pared no se dibuja"
+  ]
+ },
+ "hollow_kb": {
+  "inicio": "Boca arriba con las rodillas dobladas, los pies apoyados y los brazos junto al cuerpo. La zona lumbar pegada al suelo.",
+  "fases": [
+   {
+    "texto": "Boca arriba: pega la lumbar al suelo",
+    "segundos": 2,
+    "tono": null,
+    "apoyos": [
+     "cabeza",
+     "espalda_alta",
+     "espalda_baja",
+     "cadera",
+     "pies",
+     "brazos"
+    ]
+   },
+   {
+    "texto": "Despega hombros y rodillas; la lumbar NO se despega",
+    "segundos": 4.2,
+    "tono": null,
+    "apoyos": [
+     "espalda_baja",
+     "cadera"
+    ]
+   }
+  ],
+  "claves": [
+   "Pega la lumbar al suelo antes de nada",
+   "Rodillas dobladas encima de la cadera",
+   "Brazos estirados por encima de la cabeza, a ras del suelo",
+   "Si la lumbar se despega, baja los brazos hacia las rodillas"
+  ],
+  "errores": [
+   "La zona lumbar se despega del suelo",
+   "Doblar los codos",
+   "Tirar del cuello"
+  ],
+  "respiracion": "Respira corto sin soltar la barriga.",
+  "lo_notas_en": "En toda la barriga; no en la zona lumbar ni en el cuello.",
+  "condiciones": [
+   {
+    "angulo": {
+     "articulacion": "cadera",
+     "entre": [
+      70,
+      115
+     ]
+    },
+    "fase": 1
+   },
+   {
+    "angulo": {
+     "articulacion": "hombro",
+     "entre": [
+      140,
+      185
+     ]
+    },
+    "fase": 1
+   },
+   {
+    "angulo": {
+     "articulacion": "codo",
+     "entre": [
+      0,
+      25
+     ]
+    },
+    "fase": 1
+   }
+  ],
+  "no_medible": []
+ },
+ "hollow_l": {
+  "inicio": "Boca arriba con las rodillas dobladas, los pies apoyados y los brazos junto al cuerpo. La zona lumbar pegada al suelo.",
+  "fases": [
+   {
+    "texto": "Boca arriba: pega la lumbar al suelo",
+    "segundos": 2,
+    "tono": null,
+    "apoyos": [
+     "cabeza",
+     "espalda_alta",
+     "espalda_baja",
+     "cadera",
+     "pies",
+     "brazos"
+    ]
+   },
+   {
+    "texto": "Despega hombros y piernas; la lumbar NO se despega",
+    "segundos": 4.2,
+    "tono": null,
+    "apoyos": [
+     "espalda_baja",
+     "cadera"
+    ]
+   }
+  ],
+  "claves": [
+   "Pega la lumbar al suelo antes de nada",
+   "Piernas estiradas y juntas, a la altura que puedas",
+   "Brazos estirados por encima de la cabeza",
+   "Si la lumbar se despega, sube las piernas o dobla las rodillas"
+  ],
+  "errores": [
+   "La zona lumbar se despega del suelo",
+   "Bajar tanto las piernas que se arquea la espalda",
+   "Tirar del cuello"
+  ],
+  "respiracion": "Respira corto sin soltar la barriga.",
+  "lo_notas_en": "En toda la barriga; no en la zona lumbar ni en el cuello.",
+  "condiciones": [
+   {
+    "angulo": {
+     "articulacion": "rodilla",
+     "entre": [
+      -5,
+      20
+     ]
+    },
+    "fase": 1
+   },
+   {
+    "juntos": [
+     "pie_izq",
+     "pie_der"
+    ],
+    "fase": 1
+   },
+   {
+    "angulo": {
+     "articulacion": "hombro",
+     "entre": [
+      140,
+      185
+     ]
+    },
+    "fase": 1
+   },
+   {
+    "angulo": {
+     "articulacion": "codo",
+     "entre": [
+      0,
+      25
+     ]
+    },
+    "fase": 1
+   }
+  ],
+  "no_medible": []
+ },
+ "plancha_lat_k": {
+  "inicio": "Tumbado de lado, con el codo de abajo justo debajo del hombro y las rodillas dobladas hacia atrás, apoyadas en el suelo.",
+  "fases": [
+   {
+    "texto": "De lado: codo justo debajo del hombro",
+    "segundos": 2,
+    "tono": null,
+    "apoyos": [
+     "antebrazo",
+     "lado_cuerpo",
+     "pierna_abajo"
+    ]
+   },
+   {
+    "texto": "Sube la cadera y estira el brazo de arriba al techo",
+    "segundos": 4.2,
+    "tono": null,
+    "apoyos": [
+     "antebrazo",
+     "pierna_abajo"
+    ]
+   }
+  ],
+  "claves": [
+   "Codo justo debajo del hombro",
+   "Rodillas dobladas y apoyadas en el suelo",
+   "Sube la cadera hasta alinear hombro, cadera y rodilla",
+   "Aprieta el culo: la cadera no se va hacia atrás"
+  ],
+  "errores": [
+   "La cadera se queda abajo",
+   "La cadera se va hacia atrás",
+   "El hombro de abajo se hunde hacia la oreja"
+  ],
+  "respiracion": "Respira normal, sin aguantar el aire.",
+  "lo_notas_en": "En el costado que queda abajo (oblicuos); no en el cuello.",
+  "condiciones": [
+   {
+    "angulo": {
+     "articulacion": "rodilla",
+     "entre": [
+      50,
+      120
+     ]
+    }
+   },
+   {
+    "recto": {
+     "puntos": [
+      "hombro",
+      "cadera",
+      "rodilla"
+     ],
+     "tol": 12
+    },
+    "fase": 1
+   },
+   {
+    "angulo": {
+     "articulacion": "hombro",
+     "entre": [
+      60,
+      115
+     ],
+     "lado": "alguno"
+    },
+    "fase": 1
+   }
+  ],
+  "no_medible": []
+ },
+ "flex_incl": {
+  "inicio": "De pie frente al sofá, con las manos en el borde a la anchura de los hombros y los pies atrás, el cuerpo recto e inclinado.",
+  "fases": [
+   {
+    "texto": "Baja el pecho al borde (2 s), culo apretado",
+    "segundos": 2,
+    "tono": "down",
+    "apoyos": [
+     "manos@sofa",
+     "puntas_pies"
+    ]
+   },
+   {
+    "texto": "Empuja y sube con el cuerpo recto",
+    "segundos": 2,
+    "tono": "up",
+    "apoyos": [
+     "manos@sofa",
+     "puntas_pies"
+    ]
+   }
+  ],
+  "claves": [
+   "Manos en el borde del sofá o de una mesa firme",
+   "Cuerpo recto de la cabeza a los pies, culo apretado",
+   "Baja el pecho hacia el borde",
+   "Codos a unos 45° del cuerpo"
+  ],
+  "errores": [
+   "Se hunde la cadera",
+   "Bajar solo la cabeza",
+   "El sofá se mueve: tiene que estar contra la pared"
+  ],
+  "respiracion": "Coge aire al bajar y suéltalo al empujar.",
+  "lo_notas_en": "En el pecho y los tríceps; no en la zona lumbar.",
+  "condiciones": [
+   {
+    "recto": {
+     "puntos": [
+      "hombro",
+      "cadera",
+      "tobillo"
+     ],
+     "tol": 12
+    }
+   },
+   {
+    "angulo": {
+     "articulacion": "codo",
+     "entre": [
+      0,
+      25
+     ]
+    },
+    "fase": 1
+   },
+   {
+    "angulo": {
+     "articulacion": "codo",
+     "entre": [
+      50,
+      130
+     ]
+    },
+    "fase": 0
+   }
+  ],
+  "no_medible": [
+   "Codos a unos 45° del cuerpo: es la apertura del codo hacia fuera, que la figura de perfil no muestra"
+  ]
+ },
+ "flex_pies": {
+  "inicio": "Boca abajo con las manos en el suelo debajo de los hombros y las puntas de los pies sobre una silla, el cuerpo recto.",
+  "fases": [
+   {
+    "texto": "Baja en bloque (2 s): costillas abajo, culo apretado",
+    "segundos": 2,
+    "tono": "down",
+    "apoyos": [
+     "manos",
+     "puntas_pies@silla"
+    ]
+   },
+   {
+    "texto": "Empuja el suelo y sube con el cuerpo recto",
+    "segundos": 2,
+    "tono": "up",
+    "apoyos": [
+     "manos",
+     "puntas_pies@silla"
+    ]
+   }
+  ],
+  "claves": [
+   "Pies en una silla, manos en el suelo bajo los hombros",
+   "Culo apretado y costillas abajo: que no se hunda la cadera",
+   "Baja hasta casi tocar el suelo",
+   "Si se arquea la lumbar, vuelve a las normales"
+  ],
+  "errores": [
+   "Se hunde la cadera",
+   "Abrir los codos en cruz",
+   "La silla se mueve: apóyala en la pared"
+  ],
+  "respiracion": "Coge aire al bajar y suéltalo al empujar.",
+  "lo_notas_en": "En la parte alta del pecho, el hombro y los tríceps; no en la zona lumbar.",
+  "condiciones": [
+   {
+    "recto": {
+     "puntos": [
+      "hombro",
+      "cadera",
+      "tobillo"
+     ],
+     "tol": 12
+    }
+   },
+   {
+    "angulo": {
+     "articulacion": "codo",
+     "entre": [
+      0,
+      25
+     ]
+    },
+    "fase": 1
+   },
+   {
+    "angulo": {
+     "articulacion": "codo",
+     "entre": [
+      60,
+      140
+     ]
+    },
+    "fase": 0
+   }
+  ],
+  "no_medible": []
+ },
+ "flex_cerr": {
+  "inicio": "Boca abajo con las manos juntas en el suelo debajo del pecho, los brazos estirados y el cuerpo recto sobre las puntas de los pies.",
+  "fases": [
+   {
+    "texto": "Baja con los codos pegados (2 s)",
+    "segundos": 2,
+    "tono": "down",
+    "apoyos": [
+     "manos",
+     "puntas_pies"
+    ]
+   },
+   {
+    "texto": "Empuja con los tríceps y sube recto",
+    "segundos": 2,
+    "tono": "up",
+    "apoyos": [
+     "manos",
+     "puntas_pies"
+    ]
+   }
+  ],
+  "claves": [
+   "Manos juntas debajo del pecho",
+   "Codos pegados al cuerpo al bajar",
+   "Cuerpo recto: culo apretado y costillas abajo",
+   "Cuello largo, mirando al suelo"
+  ],
+  "errores": [
+   "Abrir los codos al bajar",
+   "Se hunde la cadera",
+   "Manos demasiado adelantadas"
+  ],
+  "respiracion": "Coge aire al bajar y suéltalo al empujar.",
+  "lo_notas_en": "En los tríceps y el centro del pecho; no en la muñeca ni en la zona lumbar.",
+  "condiciones": [
+   {
+    "recto": {
+     "puntos": [
+      "hombro",
+      "cadera",
+      "tobillo"
+     ],
+     "tol": 12
+    }
+   },
+   {
+    "juntos": {
+     "partes": [
+      "mano_izq",
+      "mano_der"
+     ],
+     "cm": 12
+    }
+   },
+   {
+    "angulo": {
+     "articulacion": "codo",
+     "entre": [
+      0,
+      25
+     ]
+    },
+    "fase": 1
+   },
+   {
+    "angulo": {
+     "articulacion": "codo",
+     "entre": [
+      60,
+      140
+     ]
+    },
+    "fase": 0
+   }
+  ],
+  "no_medible": [
+   "Codos pegados al cuerpo: es la distancia del codo al costado, que la figura de perfil no muestra"
+  ]
+ },
+ "puente_banda": {
+  "inicio": "Boca arriba, rodillas dobladas, pies apoyados a la anchura de la cadera, mini banda por encima de las rodillas y brazos en el suelo.",
+  "fases": [
+   {
+    "texto": "Sube en 1 s apretando el culo y aguanta 1 s arriba",
+    "segundos": 2,
+    "tono": "up",
+    "apoyos": [
+     "cabeza",
+     "espalda_alta",
+     "pies",
+     "brazos"
+    ]
+   },
+   {
+    "texto": "Baja despacio (2 s) con el ombligo dentro",
+    "segundos": 2,
+    "tono": "down",
+    "apoyos": [
+     "cabeza",
+     "espalda_alta",
+     "espalda_baja",
+     "cadera",
+     "pies",
+     "brazos"
+    ]
+   }
+  ],
+  "claves": [
+   "Banda por encima de las rodillas, pies a la anchura de la cadera",
+   "Antes de subir, aplana la zona lumbar contra el suelo",
+   "Sube apretando el culo y empujando las rodillas hacia fuera contra la banda",
+   "Arriba: hombros, cadera y rodillas en línea, sin arquear"
+  ],
+  "errores": [
+   "Las rodillas se cierran hacia dentro",
+   "Subir arqueando la zona lumbar",
+   "Empujar con las puntas de los pies"
+  ],
+  "respiracion": "Suelta el aire al subir y cógelo al bajar.",
+  "lo_notas_en": "En el culo, también en su parte de fuera; no en la zona lumbar.",
+  "condiciones": [
+   {
+    "angulo": {
+     "articulacion": "rodilla",
+     "entre": [
+      45,
+      125
+     ]
+    }
+   },
+   {
+    "recto": {
+     "puntos": [
+      "hombro",
+      "cadera",
+      "rodilla"
+     ],
+     "tol": 12
+    },
+    "fase": 0
+   },
+   {
+    "separados": {
+     "partes": [
+      "pie_izq",
+      "pie_der"
+     ],
+     "cm": 5
+    }
+   }
+  ],
+  "no_medible": []
+ },
+ "press_goma": {
+  "inicio": "Tumbado boca arriba, rodillas dobladas y pies apoyados, con la banda por debajo de la espalda a la altura de los omóplatos y una punta del bucle en cada mano.",
+  "fases": [
+   {
+    "texto": "Empuja las manos hacia el techo",
+    "segundos": 2,
+    "tono": "up",
+    "apoyos": [
+     "cabeza",
+     "espalda_alta",
+     "espalda_baja",
+     "cadera",
+     "pies"
+    ]
+   },
+   {
+    "texto": "Baja (2 s) hasta apoyar los codos en el suelo",
+    "segundos": 2,
+    "tono": "down",
+    "apoyos": [
+     "cabeza",
+     "espalda_alta",
+     "espalda_baja",
+     "cadera",
+     "pies",
+     "codos"
+    ]
+   }
+  ],
+  "claves": [
+   "Banda por debajo de la espalda, a la altura de los omóplatos",
+   "Una punta del bucle en cada mano, codos a 45° del cuerpo",
+   "Empuja hacia el techo y baja despacio",
+   "La lumbar se queda apoyada todo el rato"
+  ],
+  "errores": [
+   "Dejar que la banda tire de golpe al bajar",
+   "Arquear la zona lumbar al empujar",
+   "Abrir los codos en cruz"
+  ],
+  "respiracion": "Suelta el aire al empujar y cógelo al bajar.",
+  "lo_notas_en": "En el pecho y los tríceps; no en el hombro.",
+  "condiciones": [
+   {
+    "angulo": {
+     "articulacion": "rodilla",
+     "entre": [
+      45,
+      125
+     ]
+    }
+   },
+   {
+    "angulo": {
+     "articulacion": "codo",
+     "entre": [
+      0,
+      25
+     ]
+    },
+    "fase": 0
+   },
+   {
+    "angulo": {
+     "articulacion": "codo",
+     "entre": [
+      60,
+      130
+     ]
+    },
+    "fase": 1
+   }
+  ],
+  "no_medible": [
+   "codos a 45° del cuerpo: es la apertura del codo hacia fuera, que la figura de perfil no muestra"
+  ]
+ },
+ "curl_goma": {
+  "inicio": "De pie, pisando la banda con los dos pies, con la otra punta del bucle en las manos y los brazos estirados.",
+  "fases": [
+   {
+    "texto": "Sube las manos a los hombros; los codos no se mueven",
+    "segundos": 2,
+    "tono": "up",
+    "apoyos": [
+     "pies"
+    ]
+   },
+   {
+    "texto": "Baja despacio (2 s), sin balancear",
+    "segundos": 2,
+    "tono": "down",
+    "apoyos": [
+     "pies"
+    ]
+   }
+  ],
+  "claves": [
+   "Pisa la banda con los dos pies y coge la otra punta del bucle",
+   "Palmas hacia delante, codos quietos y pegados al cuerpo",
+   "Sube las manos a los hombros, sin balanceo",
+   "Culo apretado y costillas abajo: sin echarte atrás"
+  ],
+  "errores": [
+   "Balancear el cuerpo para subir",
+   "Adelantar los codos",
+   "Soltar la banda de golpe al bajar"
+  ],
+  "respiracion": "Suelta el aire al subir y cógelo al bajar.",
+  "lo_notas_en": "En el bíceps; no en la zona lumbar ni en el hombro.",
+  "condiciones": [
+   {
+    "inclinacion": {
+     "parte": "tronco",
+     "entre": [
+      0,
+      12
+     ]
+    }
+   },
+   {
+    "quieto": "codo"
+   },
+   {
+    "angulo": {
+     "articulacion": "codo",
+     "entre": [
+      100,
+      155
+     ]
+    },
+    "fase": 0
+   },
+   {
+    "angulo": {
+     "articulacion": "codo",
+     "entre": [
+      0,
+      30
+     ]
+    },
+    "fase": 1
+   },
+   {
+    "angulo": {
+     "articulacion": "rodilla",
+     "entre": [
+      0,
+      25
+     ]
+    }
+   }
+  ],
+  "no_medible": [
+   "Palmas hacia delante: el giro de la mano no se comprueba"
+  ]
+ },
+ "remo_goma": {
+  "inicio": "Sentado en el suelo con las piernas delante y las rodillas algo dobladas, la banda por la planta de los pies y la otra punta en las manos, con los brazos estirados.",
+  "fases": [
+   {
+    "texto": "Tira hacia el ombligo y junta las escápulas",
+    "segundos": 2,
+    "tono": "up",
+    "apoyos": [
+     "cadera",
+     "talones"
+    ]
+   },
+   {
+    "texto": "Vuelve despacio (2 s), espalda recta",
+    "segundos": 2,
+    "tono": "down",
+    "apoyos": [
+     "cadera",
+     "talones"
+    ]
+   }
+  ],
+  "claves": [
+   "Banda por la planta de los pies, rodillas algo dobladas",
+   "Espalda recta y alta, sin echarte atrás",
+   "Tira hacia el ombligo juntando las escápulas",
+   "Vuelve despacio con los brazos estirados"
+  ],
+  "errores": [
+   "Echarse atrás para tirar",
+   "Encoger los hombros hacia las orejas",
+   "Redondear la espalda al volver"
+  ],
+  "respiracion": "Suelta el aire al tirar y cógelo al volver.",
+  "lo_notas_en": "Entre los omóplatos y en la espalda; no en la zona lumbar.",
+  "condiciones": [
+   {
+    "inclinacion": {
+     "parte": "tronco",
+     "entre": [
+      0,
+      25
+     ]
+    }
+   },
+   {
+    "angulo": {
+     "articulacion": "rodilla",
+     "entre": [
+      5,
+      50
+     ]
+    }
+   },
+   {
+    "angulo": {
+     "articulacion": "codo",
+     "entre": [
+      60,
+      150
+     ]
+    },
+    "fase": 0
+   },
+   {
+    "angulo": {
+     "articulacion": "codo",
+     "entre": [
+      0,
+      30
+     ]
+    },
+    "fase": 1
+   }
+  ],
+  "no_medible": []
+ },
+ "puente_abd": {
+  "inicio": "Boca arriba con la mini banda por encima de las rodillas, pies apoyados y la cadera arriba en puente, con los brazos en el suelo.",
+  "fases": [
+   {
+    "texto": "Abre las rodillas contra la banda",
+    "segundos": 1.5,
+    "tono": "up",
+    "apoyos": [
+     "cabeza",
+     "espalda_alta",
+     "pies",
+     "brazos"
+    ]
+   },
+   {
+    "texto": "Cierra despacio sin bajar la cadera",
+    "segundos": 1.5,
+    "tono": "down",
+    "apoyos": [
+     "cabeza",
+     "espalda_alta",
+     "pies",
+     "brazos"
+    ]
+   }
+  ],
+  "claves": [
+   "Banda por encima de las rodillas y cadera arriba en puente",
+   "Quédate arriba todo el rato, culo apretado",
+   "Abre las rodillas contra la banda y vuelve despacio",
+   "Si notas la lumbar, baja un poco la cadera"
+  ],
+  "errores": [
+   "Bajar la cadera al abrir",
+   "Abrir con impulso",
+   "Arquear la zona lumbar"
+  ],
+  "respiracion": "Suelta el aire al abrir y cógelo al cerrar.",
+  "lo_notas_en": "En la parte de fuera del culo; no en la zona lumbar.",
+  "condiciones": [
+   {
+    "angulo": {
+     "articulacion": "rodilla",
+     "entre": [
+      45,
+      125
+     ]
+    }
+   },
+   {
+    "recto": {
+     "puntos": [
+      "hombro",
+      "cadera",
+      "rodilla"
+     ],
+     "tol": 15
+    }
+   },
+   {
+    "separados": {
+     "partes": [
+      "rodilla_izq",
+      "rodilla_der"
+     ],
+     "cm": 15
+    },
+    "fase": 0
+   }
+  ],
+  "no_medible": []
+ },
+ "paso_lateral": {
+  "inicio": "De pie, medio agachado, con la mini banda por encima de las rodillas y los pies separados.",
+  "fases": [
+   {
+    "texto": "Paso de lado, rodillas hacia fuera",
+    "segundos": 1,
+    "tono": "up",
+    "apoyos": [
+     "pie"
+    ]
+   },
+   {
+    "texto": "Acerca el otro pie sin juntarlos del todo",
+    "segundos": 1,
+    "tono": "down",
+    "apoyos": [
+     "pie"
+    ]
+   }
+  ],
+  "claves": [
+   "Banda por encima de las rodillas, medio agachado",
+   "Pecho alto y culo atrás, sin arquear la lumbar",
+   "Da un paso de lado sin juntar del todo los pies",
+   "Las rodillas empujan hacia fuera todo el rato"
+  ],
+  "errores": [
+   "Las rodillas se van hacia dentro",
+   "Ponerse de pie entre pasos",
+   "Balancear el tronco de lado a lado"
+  ],
+  "respiracion": "Respira normal, un paso por respiración o dos.",
+  "lo_notas_en": "En la parte de fuera del culo; no en la rodilla.",
+  "condiciones": [
+   {
+    "angulo": {
+     "articulacion": "rodilla",
+     "entre": [
+      15,
+      80
+     ]
+    }
+   },
+   {
+    "separados": {
+     "partes": [
+      "pie_izq",
+      "pie_der"
+     ],
+     "cm": 8
+    }
+   }
+  ],
+  "no_medible": []
+ },
+ "almeja": {
+  "inicio": "Tumbado de lado, con el brazo de abajo estirado por encima de la cabeza y la cabeza apoyada en él. Cadera doblada unos 45° y rodillas a 90°, una pierna encima de la otra y los pies juntos, en línea con la espalda.",
+  "fases": [
+   {
+    "texto": "Abre la rodilla de arriba hacia el techo, pies juntos",
+    "segundos": 1.5,
+    "tono": "up",
+    "apoyos": [
+     "lado_cuerpo",
+     "brazo_abajo",
+     "pierna_abajo",
+     "cabeza@brazo_abajo"
+    ]
+   },
+   {
+    "texto": "Cierra despacio sin girar la cadera",
+    "segundos": 1.5,
+    "tono": "down",
+    "apoyos": [
+     "lado_cuerpo",
+     "brazo_abajo",
+     "pierna_abajo",
+     "cabeza@brazo_abajo"
+    ]
+   }
+  ],
+  "claves": [
+   "Cabeza apoyada en el brazo de abajo y la otra mano en la cadera",
+   "Cadera y rodillas dobladas, pies juntos",
+   "Abre la rodilla de arriba hacia el techo sin separar los pies",
+   "La cadera de arriba no se va hacia atrás"
+  ],
+  "errores": [
+   "Girar el tronco hacia atrás al abrir: la cadera de arriba se va atrás y el glúteo trabaja menos",
+   "Separar los pies al abrir",
+   "Abrir con impulso y dejar caer la rodilla al cerrar"
+  ],
+  "respiracion": "Suelta el aire al abrir la rodilla y cógelo al cerrar.",
+  "lo_notas_en": "En el lateral del glúteo de la pierna de arriba; no en la zona lumbar ni en la ingle.",
+  "condiciones": [
+   {
+    "juntos": [
+     "pie_izq",
+     "pie_der"
+    ]
+   },
+   {
+    "angulo": {
+     "articulacion": "rodilla",
+     "entre": [
+      70,
+      110
+     ]
+    }
+   },
+   {
+    "angulo": {
+     "articulacion": "cadera",
+     "entre": [
+      30,
+      70
+     ]
+    }
+   }
+  ],
+  "no_medible": []
+ },
+ "remo_incl_banda": {
+  "inicio": "De pie pisando la banda con los dos pies, con la otra punta del bucle en las manos, el tronco inclinado unos 45° y la espalda recta.",
+  "fases": [
+   {
+    "texto": "Tira de los codos hasta el ombligo y junta los omóplatos",
+    "segundos": 2,
+    "tono": "up",
+    "apoyos": [
+     "pies"
+    ]
+   },
+   {
+    "texto": "Baja despacio (2 s) con la espalda recta",
+    "segundos": 2,
+    "tono": "down",
+    "apoyos": [
+     "pies"
+    ]
+   }
+  ],
+  "claves": [
+   "Pisa la banda con los dos pies y coge la otra punta del bucle",
+   "Tronco inclinado unos 45°, espalda recta y rodillas algo dobladas",
+   "Tira de los codos hacia atrás, pegados al cuerpo, hasta el ombligo",
+   "Junta los omóplatos arriba"
+  ],
+  "errores": [
+   "Levantar el tronco para tirar",
+   "Redondear la espalda",
+   "Encoger los hombros"
+  ],
+  "respiracion": "Suelta el aire al tirar y cógelo al bajar.",
+  "lo_notas_en": "En la espalda, entre los omóplatos; no en la zona lumbar.",
+  "condiciones": [
+   {
+    "inclinacion": {
+     "parte": "tronco",
+     "entre": [
+      25,
+      65
+     ]
+    }
+   },
+   {
+    "angulo": {
+     "articulacion": "rodilla",
+     "entre": [
+      5,
+      50
+     ]
+    }
+   },
+   {
+    "angulo": {
+     "articulacion": "codo",
+     "entre": [
+      60,
+      150
+     ]
+    },
+    "fase": 0
+   },
+   {
+    "angulo": {
+     "articulacion": "codo",
+     "entre": [
+      0,
+      30
+     ]
+    },
+    "fase": 1
+   }
+  ],
+  "no_medible": [
+   "pegados al cuerpo: es la distancia del codo al costado, que no se mide"
+  ]
+ }
+}

@@ -152,7 +152,8 @@ class Rutina(
         private fun parseExercise(key: String, o: JSONObject): Exercise {
             val poses = objs(o.getJSONArray("poses")).map { p ->
                 val m = LinkedHashMap<String, FloatArray>()
-                for (j in p.keys()) m[j] = floats(p.getJSONArray(j))
+                // solo los puntos ([x, y] o [x, y, z]); otras claves ("apoya", de la figura 3D) no son puntos
+                for (j in p.keys()) p.optJSONArray(j)?.let { m[j] = floats(it) }
                 m as Map<String, FloatArray>
             }
             val phases = objs(o.getJSONArray("phases")).map { p ->

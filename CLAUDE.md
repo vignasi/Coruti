@@ -36,10 +36,15 @@ La usan Ignasi y su mujer, cada uno con su cuenta. Todo en **español** (código
   (`docs/strava.md`). Proyecto `jlyqtxihsorqczlxvbly`.
 - `docs/supabase.md` (cuentas y nube), `docs/strava.md` (Strava y Polar), `docs/diseno/` (funcionalidades, sistema de
   diseño, validación, prototipo y figura 3D; la figura se copia al APK al compilar).
+- `ejercicios/`: cómo se hace cada ejercicio (bloque E, `docs/diseno/4-ejercicios.md`): `fichas.json` (paso 1),
+  `tecnicas.json` (paso 2; `a_rutina.js` pasa claves y textos de fase a `rutina.json`), `comprobar.js` (pasos 1 y 2) y
+  `comprobar3d.js` + `reglas3d.js` (paso 3, figura 3D con Playwright): los dos tienen que dar 0 fallos.
+  `a_sql.js` genera el SQL del catálogo `exercise_catalog`; `pose.js` y `ver.js` ayudan a ajustar posturas.
 - `.github/workflows/build.yml`: en `main` (al fusionar cambios del APK) publica el APK en Releases; en una rama, solo a mano, lo deja como artefacto.
 
 ## Comandos
 - Compilar y probar: `gradle assembleRelease testReleaseUnitTest` (necesita el SDK de Android 34 en `local.properties`).
+- Ejercicios: `node ejercicios/comprobar.js`, `node ejercicios/comprobar3d.js` y `node --test ejercicios/reglas3d.test.js`.
 - Pruebas del servidor: `node --experimental-strip-types --test supabase/functions/_shared/logica.test.ts`.
 - Desplegar funciones: `npx supabase functions deploy conexiones polar-aviso --use-api --project-ref jlyqtxihsorqczlxvbly`.
 
@@ -48,5 +53,7 @@ La usan Ignasi y su mujer, cada uno con su cuenta. Todo en **español** (código
   los tokens, en `connection_secrets`. En la app solo va la clave pública de Supabase.
 - Sin cuenta, la app funciona igual, solo en el móvil.
 - Polar Flow tiene que seguir recibiendo todas las sesiones del reloj.
+- Un ejercicio nuevo o cambiado pasa por los tres pasos de `docs/diseno/4-ejercicios.md` (ficha, técnica, figura) y sus
+  comprobaciones; sin el visto bueno del usuario no se publica.
 - Si se añade un ejercicio a `rutina.json`, añadirlo también en `EJERCICIO_STRAVA` (`supabase/functions/_shared/logica.ts`).
 - Las sesiones las escriben igual la página y el widget (misma forma de `history.json`).

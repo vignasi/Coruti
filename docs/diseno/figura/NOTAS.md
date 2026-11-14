@@ -142,3 +142,22 @@ Se podrían cambiar la complexión, lo marcado del músculo y del abdomen, el co
 - **Riesgo técnico:** la ropa tiene que deformarse igual que el cuerpo, si no lo atraviesa.
 - **Widget:** se haría guardando imágenes de la figura personalizada al cambiarla.
 - **Textos:** neutros y sin juicio («complexión», no «gordito»). Es opcional y no está ligado al peso real salvo que la persona lo pida.
+
+## Figura 3D revisada ejercicio a ejercicio (E3, noviembre de 2026)
+La figura 3D pasa un comprobador (`ejercicios/comprobar3d.js`, ver `docs/diseno/4-ejercicios.md`, paso 3) que mide sobre la
+piel deformada: qué toca el suelo, qué atraviesa, ángulos y distancias. Para que lo pasen los 30, hombre y mujer:
+- **Puntos con z** (`[x, y, z]`, z hacia la cámara): giros fuera del plano del dibujo. `figura.js` interpola z y la ignora al dibujar.
+- **`"apoya"`** (ejercicio o postura): `tronco`, `lado`, `rodillas` o `pies`. El cuerpo baja hasta que esa piel toca el suelo
+  (antes, el hueso más bajo quedaba a 7 cm y la piel flotaba o se hundía según el sexo). Entre dos posturas con apoyos
+  distintos, el que menos baja (nada atraviesa el suelo).
+- Tumbado con el tronco en el suelo: el cuerpo se inclina para apoyar espalda alta y pelvis, y el cuello gira (hasta 20°) para
+  apoyar la cabeza. **`"retro"`**: retroversión de la pelvis en grados (lumbar pegada).
+- Manos y pies apoyados: el objetivo se afina hasta que la palma o la suela (todos sus vértices) tocan. Brazo o pierna rectos
+  en el dibujo siguen rectos (sube el cuerpo, o gira sobre las rodillas a cuatro patas). Con las dos manos apoyadas y sin
+  otro apoyo, el codo toma el ángulo del dibujo. Antebrazo apoyado: si el hombro queda bajo, el codo se abre por el suelo.
+- Muebles: con las dos manos encima (fondos) la silla se centra en el cuerpo y es más ancha; la pared de frente va justo
+  detrás de la espalda.
+- Arreglos: la base de giro de un hueso que apunta a la cámara salía degenerada (la espinilla se torcía);
+  `rotateOnWorldAxis` de three.js no vale con el padre girado (`rotW`); el encuadre de la dibujada ignora las claves que no
+  son puntos (`"apoya"` lo rompía).
+- Las imágenes del widget (`widget/`) están rehechas con estas posturas.

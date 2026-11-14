@@ -23,7 +23,10 @@ function state(ex,t,clamp){
   const cur=ph[i],prev=ph[(i-1+ph.length)%ph.length];
   const a=withC(ex.poses[prev.pose]),b=withC(ex.poses[cur.pose]);
   const f=tt<cur.move?ease(tt/cur.move):1,pose={};
-  for(const k in b)pose[k]=[a[k][0]+(b[k][0]-a[k][0])*f,a[k][1]+(b[k][1]-a[k][1])*f];
+  for(const k in b){if(!Array.isArray(b[k]))continue;   // claves que no son puntos ("apoya" de la figura 3D)
+    pose[k]=[a[k][0]+(b[k][0]-a[k][0])*f,a[k][1]+(b[k][1]-a[k][1])*f];
+    // tercera coordenada (E3): hacia delante del dibujo (hacia la cámara); la usa solo la figura 3D, la dibujada la ignora
+    if(a[k].length>2||b[k].length>2)pose[k].push((a[k][2]||0)+((b[k][2]||0)-(a[k][2]||0))*f);}
   return {pose,phase:cur,idx:i,n:ph.length,f,tt};
 }
 /* Instante al final del movimiento de la fase i, y el de la postura que trabaja (para las miniaturas) */
@@ -129,7 +132,7 @@ function boxOf(ex,big){
   const m=BOXC.get(ex)||{};BOXC.set(ex,m);if(m[big])return m[big];
   let x0=1e9,y0=1e9,x1=-1e9,y1=GROUND+1;
   const take=(x,y,r)=>{x0=Math.min(x0,x-r);x1=Math.max(x1,x+r);y0=Math.min(y0,y-r);y1=Math.max(y1,y+r);};
-  ex.poses.map(withC).forEach(p=>{for(const k in p)take(p[k][0],p[k][1],k==="h"?8:k[0]==="a"?10:6);});
+  ex.poses.map(withC).forEach(p=>{for(const k in p)if(Array.isArray(p[k]))take(p[k][0],p[k][1],k==="h"?8:k[0]==="a"?10:6);});
   (ex.equip||[]).forEach(q=>{if(q.t==="box"){const [x,y,w,h]=q.r;if(h<90){take(x,y,0);take(x+w,y,0);}else{x0=Math.min(x0,Math.max(x,x0-8));x1=Math.max(x1,Math.min(x+w,x1+8));}}});
   if(big)ex.phases.forEach(ph=>{if(ph.arrow){take(ph.arrow[0],ph.arrow[1],4);take(ph.arrow[2],ph.arrow[3],4);}});
   const pad=big?8:5,max=big?2.1:2.7,sc=Math.min(max,(180-2*pad)/(x1-x0),(112-2*pad)/(y1-y0));

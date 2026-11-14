@@ -15,7 +15,8 @@ y que pongas en marcha Supabase, Strava y Polar. Lo siguiente que se programa es
 **Hecho y en `main`:** Fases 0, 1 y 1b · D1, D2, D3 · B1 (cuentas y nube) · C1 (app nueva) · S1 (Strava y Polar; servidor desplegado
 y migraciones aplicadas) · CLAUDE.md y Actions solo cuando hace falta un APK. Pull requests #1–#6 fusionados; último APK: 1.0.31.
 
-**Hecho pero sin fusionar:** nada. Las ramas que quedan con commits fuera de `main` son trabajo viejo ya superado
+**Hecho pero sin fusionar:** E1, E2 y E3 (los 30 ejercicios revisados y publicados) en la rama
+`claude/confident-ritchie-box0z4`, que ya lleva dentro E1 (`claude/coruti-c1-app-android-2vhnk1`): basta fusionar esta. Las ramas que quedan con commits fuera de `main` son trabajo viejo ya superado
 (`claude/elegant-bardeen-9nk8c1` y `claude/vigilant-lovelace-hb4acy`: D1 y D2 rehechos después;
 `claude/affectionate-shannon-9oa7zz`: plan de producto de octubre, sustituido por este ROADMAP). Se pueden borrar.
 
@@ -32,7 +33,12 @@ y migraciones aplicadas) · CLAUDE.md y Actions solo cuando hace falta un APK. P
 9. Para tu mujer en Strava: pedir más plazas de atletas en strava.com/settings/api (la app nueva solo admite 1).
 - Sin confirmar: el visto bueno de D3 en el móvil (C1 se construyó encima, así que se dio por bueno; dime si lo hiciste).
 
-**Siguiente fase:** B2 (conector de Claude) y C2 (widget con el diseño nuevo), a la vez y en ramas distintas.
+10. Catálogo de ejercicios en Supabase (bloque E): pegar en SQL Editor `supabase/migrations/20261114000000_catalogo_ejercicios.sql`
+   y después `20261114000100_catalogo_ejercicios_datos.sql` (`docs/supabase.md`, apartado 1). Ya lleva los 30 publicados.
+11. Fusionar la rama de E1–E3 y probar el APK: figuras nuevas (almeja, tumbados, planchas, fondos…) y textos corregidos.
+
+**Siguiente fase:** B2 (conector de Claude), que ya tiene los metadatos de los ejercicios, y C2 (widget con el diseño
+nuevo) a la vez. E4 (la app lee el catálogo de la nube) va con B2.
 Después, el bloque P. Casi todo el bloque P toca `app/app.js`, igual que B2 (que añade «Plan de Claude» en Entrenar):
 mejor empezarlo cuando B2 esté fusionado.
 
@@ -217,7 +223,28 @@ Después: P1 Pulso · P2 Planes por objetivo · P3 Peso y medidas · P4 Carreras
 - Ojo: el plan gratuito pausa el proyecto tras ~1 semana sin uso; se reactiva desde la web y no se pierden datos.
   El email de Supabase manda pocos códigos por hora: si pides varios seguidos, espera unos minutos
 
-#### B2 · Conector de Claude ⭐ — siguiente, en paralelo con C2
+### Bloque E · Ejercicios bien hechos (antes de B2)
+Cada ejercicio pasa por tres pasos con comprobaciones: ficha (qué es y para qué sirve: lo que usa Claude para elegir),
+técnica (cómo se hace y qué tiene que cumplir la figura: apoyos y condiciones) y figura, y tu visto bueno. Proceso, formato
+y vocabulario en `docs/diseno/4-ejercicios.md`; datos en `ejercicios/`; en la nube, tabla `exercise_catalog`.
+- [x] E1 · Proceso, formato de la ficha y comprobador del paso 1 (`node ejercicios/comprobar.js`)
+- [x] E1 · Paso 1 de los 30 ejercicios (`ejercicios/fichas.json`), comprobado; 18 apuntes de cosas mal para los pasos 2 y 3
+  (almeja con la figura mal, press con banda que habla de mancuernas, dosis raras en hollow y flexiones inclinadas…)
+- [x] E1 · Tabla `exercise_catalog` y SQL con los 30 (ficha hecha; técnica y figura de hoy marcadas «sin revisar»),
+  probados en un Postgres local: se crea, se puede repetir, las cuentas leen y no escriben, sin cuenta no se lee
+- [ ] **Tú:** pegar los dos SQL en Supabase (`docs/supabase.md`, apartado 1)
+- [x] E2 · Paso 2 de los 30 (`ejercicios/tecnicas.json`): inicio, fases con apoyos, claves, errores, respiración, dónde se nota
+  y condiciones; comprobador frase por frase en `node ejercicios/comprobar.js` (218 frases); textos corregidos pasados a
+  `rutina.json` (`node ejercicios/a_rutina.js`): press con banda sin «mancuernas», fuera claves de dosis, plancha sin «Así NO»
+- [x] E3 · Comprobador 3D (`node ejercicios/comprobar3d.js`: mide sobre la piel del modelo, hombre y mujer, cada fase y a
+  mitad): 30 de 30 sin fallos. Posturas con z (almeja y otros), `"apoya"` y `"retro"` en `rutina.json`, y la figura 3D apoya
+  manos, pies, espalda y cabeza por la piel. Revisadas las capturas (claro y oscuro, grande, miniatura y mitades) → `publicado`
+- [ ] **Tú:** mirar en el móvil las figuras nuevas; si alguna no te convence, dímelo y vuelve a `figura` (el visto bueno lo di
+  yo con capturas, como pediste)
+- [ ] Pendiente del paso 1 (no se tocó): nombres de los hollow, dosis de `hollow_l` y `flex_incl`, almeja con mini banda
+- [ ] E4 · La app lee el catálogo de la nube (con `rutina.json` como copia sin conexión) y Claude puede proponer ejercicios (con B2)
+
+#### B2 · Conector de Claude ⭐ — después de E (necesita los metadatos de la ficha), en paralelo con C2
 - [ ] Servidor MCP propio (en Supabase) que se añade en Claude como conector personalizado, con inicio de sesión de tu cuenta de la app
 - [ ] Lo que Claude puede **leer**: perfil y objetivo, peso y medidas, historial con series, kilos, bandas y pulso,
   favoritas, plan actual, catálogo de ejercicios con el material que tienes

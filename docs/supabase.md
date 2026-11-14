@@ -9,7 +9,10 @@ es la seguridad por persona (RLS) de las tablas. La clave secreta (`sb_secret_�
 1. En supabase.com, abre el proyecto → **SQL Editor** → **New query**.
 2. Pega entero `supabase/migrations/20261112000000_b1_cuentas_y_datos.sql` y pulsa **Run**.
    Se puede volver a ejecutar sin romper nada. Los avisos «does not exist, skipping» son normales.
-3. Comprueba en **Table Editor** que están `profiles`, `app_state`, `workout_sessions`, `workout_sets`, `favorites`,
+3. Después, igual, cada archivo nuevo de `supabase/migrations/` en orden de nombre. Para el catálogo de ejercicios (bloque E):
+   `20261114000000_catalogo_ejercicios.sql` y luego `20261114000100_catalogo_ejercicios_datos.sql` (los 30 ejercicios).
+   En **Table Editor** → `exercise_catalog` tienen que salir 30 filas con estado `ficha`.
+4. Comprueba en **Table Editor** que están `profiles`, `app_state`, `workout_sessions`, `workout_sets`, `favorites`,
    `body_measurements`, `exercises`, `plans`, `plan_days`, `connections` y `connection_secrets`, y que ninguna pone
    «RLS disabled» ni «Unrestricted».
 
