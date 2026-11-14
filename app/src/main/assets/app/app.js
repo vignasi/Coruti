@@ -301,7 +301,7 @@ function botonConn(p, st) {
     : `<button class="btn btn-principal btn-grande" data-act="conectar" data-v="${p}">${ico('conexion')}Conectar con ${nombre}</button>`;
 }
 P.conexiones = { render: () => { const st = nube();
-  if (!st || !st.signedIn) return `${cab('Conexiones')}<div class="pantalla"><p>Para conectar Strava y Polar hace falta entrar con tu cuenta: las claves se guardan en tu cuenta, no en el móvil.</p>${st ? item({ t: 'Entrar', m: 'Con tu email, sin contraseña', go: 'entrar', icono: 'correo' }) : ''}</div>`;
+  if (!st || !st.signedIn) return `${cab('Conexiones')}<div class="pantalla"><p>Para conectar Strava y Polar hace falta entrar con tu cuenta: las claves se guardan en tu cuenta, no en el móvil.</p>${st ? item({ t: 'Entrar', m: 'Con tu email y tu contraseña', go: 'entrar', icono: 'correo' }) : ''}</div>`;
   const pend = historyList().filter(o => ['waiting', 'error'].includes(stravaDe(o))).length;
   return `${cab('Conexiones')}
   <div class="pantalla"><div class="lista">
@@ -335,6 +335,7 @@ P.tu = { render: () => { const st = nube(), wf = widgetFav();
       ${!st ? '<p class="meta">La cuenta solo funciona en la app del móvil.</p>'
         : st.signedIn ? `<div class="lista"><div class="item" style="cursor:default"><span class="item-icono">${ico('correo')}</span><span class="crece"><span class="nombre" style="overflow-wrap:anywhere">${esc(st.email)}</span><span class="meta">Tus datos se guardan en la nube y se sincronizan al terminar cada sesión y al abrir la app</span></span></div>
           <button class="item" data-act="sincronizar" ${st.busy ? 'disabled' : ''}><span class="item-icono">${ico('reintentar')}</span><span class="crece"><span class="nombre">Sincronizar ahora</span><span class="meta" aria-live="polite">${esc(nubeTxt(st))}</span></span></button>
+          ${item({ t: 'Cambiar la contraseña', m: 'La de tu cuenta', go: 'clave', icono: 'correo' })}
           <button class="item" data-act="hoja" data-v="salir"><span class="item-icono">${ico('salir')}</span><span class="crece"><span class="nombre">Salir</span><span class="meta">Tus datos se quedan en este móvil</span></span></button></div>`
         : `<div class="lista">${item({ t: 'Entrar', m: 'Para no perder nada y tenerlo también en otro móvil', go: 'entrar', icono: 'correo' })}</div>`}
     </section>
@@ -351,19 +352,26 @@ P.tu = { render: () => { const st = nube(), wf = widgetFav();
 
 P.entrar = { sinPestanas: true, render: () => `${cab('Entrar')}
   <div class="pantalla">
-    <div class="pila" style="gap:var(--e3)"><h1 class="titulo-pantalla">Rutina core</h1><p>Entra con tu email para guardar tus sesiones en la nube y tenerlas en otro móvil. Te llega un código, sin contraseña.</p></div>
-    ${S.codigo ? `<form class="pila" style="gap:var(--e4)" data-form="codigo">
-      <p>Código enviado a <strong style="overflow-wrap:anywhere">${esc(S.email)}</strong>. Si no llega en 2 minutos, mira en spam.</p>
-      <div class="campo"><label for="codigo">Código del email</label><input id="codigo" inputmode="numeric" autocomplete="one-time-code" maxlength="10" required style="font-size:var(--t4);letter-spacing:.3em;text-align:center"></div>
+    <div class="pila" style="gap:var(--e3)"><h1 class="titulo-pantalla">Rutina core</h1><p>Entra con tu cuenta para guardar tus sesiones en la nube y tenerlas en otro móvil.</p></div>
+    <form class="pila" style="gap:var(--e4)" data-form="entrar">
+      <div class="campo"><label for="email">Email</label><input id="email" type="email" autocomplete="username" inputmode="email" value="${esc(S.email || '')}" required></div>
+      <div class="campo"><label for="clave">Contraseña</label><input id="clave" type="password" autocomplete="current-password" required></div>
       <button class="btn btn-principal btn-grande" type="submit" ${S.enviando ? 'disabled' : ''}>Entrar</button>
-      <button class="btn btn-texto" type="button" data-act="otrocodigo">Enviar otro código o cambiar el email</button>
-    </form>` : `<form class="pila" style="gap:var(--e4)" data-form="email">
-      <div class="campo"><label for="email">Email</label><input id="email" type="email" autocomplete="email" inputmode="email" value="${esc(S.email || '')}" required></div>
-      <button class="btn btn-principal btn-grande" type="submit" ${S.enviando ? 'disabled' : ''}>Enviarme un código</button>
-    </form>`}
+    </form>
     <p class="mensaje ${S.nubeOk === false ? 'error' : ''}" role="status" aria-live="polite">${esc(S.nubeMsg || '')}</p>
     <button class="btn btn-texto" data-act="atras">Seguir sin cuenta</button>
-    <p class="meta">Sin cuenta, todo se queda solo en este móvil. Puedes entrar más tarde desde Tú.</p>
+    <p class="meta">Las cuentas las crea quien lleva la app. Sin cuenta, todo se queda solo en este móvil y puedes entrar más tarde desde Tú.</p>
+  </div>` };
+
+P.clave = { render: () => `${cab('Cambiar la contraseña')}
+  <div class="pantalla">
+    <form class="pila" style="gap:var(--e4)" data-form="clave">
+      <div class="campo"><label for="clave-n">Contraseña nueva</label><input id="clave-n" type="password" autocomplete="new-password" minlength="8" required></div>
+      <div class="campo"><label for="clave-r">Repite la contraseña</label><input id="clave-r" type="password" autocomplete="new-password" minlength="8" required></div>
+      <button class="btn btn-principal btn-grande" type="submit" ${S.enviando ? 'disabled' : ''}>Cambiar</button>
+    </form>
+    <p class="mensaje ${S.nubeOk === false ? 'error' : ''}" role="status" aria-live="polite">${esc(S.nubeMsg || '')}</p>
+    <p class="meta">Mínimo 8 caracteres. Sigues dentro de la cuenta en este móvil.</p>
   </div>` };
 
 P.material = { render: () => `${cab('Material')}
@@ -703,7 +711,6 @@ const ACC = {
   hoja: b => { S.hoja = b.dataset.v; },
   sincronizar: () => { try { A.cloudSync(); } catch (e) {} setTimeout(() => pintar(false), 300); },
   salirya: () => { S.hoja = null; try { A.cloudSignOut(); } catch (e) {} },
-  otrocodigo: () => { S.codigo = false; S.nubeMsg = ''; },
   quitabanda: b => { const a = BANDS.slice(); a.splice(+b.dataset.v, 1); setBands(a); },
   nuevabanda: () => { setBands([...BANDS, 'Banda ' + (BANDS.length + 1)]); setTimeout(() => { const e = document.getElementById('banda-' + (BANDS.length - 1)); if (e) { e.focus(); e.select(); } }, 30); },
   figsexo: b => { cfg.app.fig = b.dataset.v; saveCfg(); if (window.FIG) window.FIG.precargar(cfg.app.fig); },
@@ -736,19 +743,21 @@ window.atras = atras;
 document.addEventListener('click', ev => {
   const t = ev.target.closest('[data-go],[data-act]'); if (!t || t.disabled) return;
   if (t.dataset.act === 'tap' && ev.target.closest('button,a,input') && ev.target.closest('button,a,input') !== t) return;
-  if (t.dataset.go) { ir(t.dataset.go); return; }
+  if (t.dataset.go) { if (t.dataset.go === 'entrar' || t.dataset.go === 'clave') { S.nubeMsg = ''; S.nubeOk = true; S.enviando = false; } ir(t.dataset.go); return; }
   const f = ACC[t.dataset.act]; if (!f || t.dataset.act === 'sw') return;
   const r = f(t, ev); if (r !== 'nav' && r !== 'nada') pintar(false);
 });
 document.addEventListener('change', ev => { const t = ev.target; if (t.dataset && t.dataset.act === 'sw') { ACC.sw(t); pintar(false); }
   if (t.dataset && t.dataset.banda != null) { const a = BANDS.slice(); a[+t.dataset.banda] = t.value; setBands(a); pintar(false); } });
 document.addEventListener('submit', ev => { ev.preventDefault();
-  if (ev.target.dataset.form === 'email') { const em = document.getElementById('email').value.trim();
+  if (ev.target.dataset.form === 'entrar') { const em = document.getElementById('email').value.trim(), cl = document.getElementById('clave').value;
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)) { S.nubeMsg = 'Escribe un email válido.'; S.nubeOk = false; return pintar(false); }
-    S.email = em; S.enviando = true; S.nubeMsg = 'Enviando el código…'; S.nubeOk = true; pintar(false); try { A.cloudSendCode(em); } catch (e) { S.enviando = false; S.nubeMsg = 'La cuenta solo funciona en la app del móvil.'; S.nubeOk = false; pintar(false); } return; }
-  if (ev.target.dataset.form === 'codigo') { const c = document.getElementById('codigo').value.replace(/\s/g, '');
-    if (!/^\d{6,10}$/.test(c)) { S.nubeMsg = 'El código son las cifras que te han llegado por email.'; S.nubeOk = false; return pintar(false); }
-    S.enviando = true; S.nubeMsg = 'Comprobando…'; S.nubeOk = true; pintar(false); try { A.cloudVerify(S.email, c); } catch (e) {} return; }
+    if (!cl) { S.nubeMsg = 'Escribe tu contraseña.'; S.nubeOk = false; return pintar(false); }
+    S.email = em; S.enviando = true; S.nubeMsg = 'Entrando…'; S.nubeOk = true; pintar(false); try { A.cloudSignIn(em, cl); } catch (e) { S.enviando = false; S.nubeMsg = 'La cuenta solo funciona en la app del móvil.'; S.nubeOk = false; pintar(false); } return; }
+  if (ev.target.dataset.form === 'clave') { const n = document.getElementById('clave-n').value, r = document.getElementById('clave-r').value;
+    if (n.length < 8) { S.nubeMsg = 'La contraseña tiene que tener al menos 8 caracteres.'; S.nubeOk = false; return pintar(false); }
+    if (n !== r) { S.nubeMsg = 'Las dos contraseñas no coinciden.'; S.nubeOk = false; return pintar(false); }
+    S.enviando = true; S.nubeMsg = 'Cambiando…'; S.nubeOk = true; pintar(false); try { A.cloudChangePassword(n); } catch (e) { S.enviando = false; S.nubeMsg = 'Solo funciona en la app del móvil.'; S.nubeOk = false; pintar(false); } return; }
   if (ev.target.dataset.form === 'fav') { const n = saveFav(fr, document.getElementById('fav-n').value); S.favEdit = n; S.hoja = null; toast(`Guardada en favoritas: «${n}»`); }
 });
 document.addEventListener('keydown', ev => {
@@ -775,11 +784,11 @@ window.onCloud = (st, changed) => { if (changed) reloadAll(); else if (!R && ['t
 window.onConnMsg = (msg, ok) => { S.connMsg = msg; S.connOk = ok; S.fwd = null; if (!R) pintar(false); };
 window.irConexiones = () => { if (R || !D) return; S.hoja = null; S.pila = ['tu']; S.ruta = 'conexiones'; pintar(true); };
 window.onStravaSent = (id, msg, ok) => { S.envStr = null; S.strMsg = { ...(S.strMsg || {}), [id]: msg }; if (!R) pintar(false); };
-/* Respuesta de la nube al pedir el código o al comprobarlo */
+/* Respuesta de la nube al entrar o al cambiar la contraseña */
 window.onCloudMsg = (msg, ok, kind) => { S.enviando = false; S.nubeMsg = msg; S.nubeOk = ok;
-  if (kind === 'code' && ok) S.codigo = true;
-  if (kind === 'verify' && ok) { S.codigo = false; S.nubeMsg = ''; S.pila = []; S.ruta = 'tu'; pintar(true); toast(msg || 'Has entrado'); return; }
-  if (S.ruta === 'entrar') pintar(false); };
+  if (kind === 'clave' && ok) { S.nubeMsg = ''; atras(); toast(msg); return; }
+  if (kind === 'verify' && ok) { S.nubeMsg = ''; S.pila = []; S.ruta = 'tu'; pintar(true); toast(msg || 'Has entrado'); return; }
+  if (S.ruta === 'entrar' || S.ruta === 'clave') pintar(false); };
 function exportarNavegador() {
   const free = {}; [['last', 'free.last'], ['favs', 'free.favs'], ['bands', 'free.bands'], ['bandUse', 'free.bandUse']].forEach(([k, f]) => { try { const v = JSON.parse(store.free(f)); if (v != null) free[k] = v; } catch (e) {} });
   free.widgetFav = widgetFav();
