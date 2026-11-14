@@ -41,6 +41,9 @@ Tu cuenta ya está creada, con una contraseña provisional que se cambia en Tú 
 ## Plan por olas
 
 Página con cada ola y sus prompts para copiar: https://claude.ai/artifact/LtU45Cz1hmWwYEux1kRRix (se actualiza en el mismo enlace).
+Cada fase tiene ahí los botones **Lanzado** y **Terminado**: es donde se lleva qué está en marcha (lo leen y lo marcan
+las conversaciones de Claude, ver `CLAUDE.md`). A 14 nov: ola 0 terminada; ola 1 (C2, B2a, B3, E5, S2) lanzada.
+Nueva en la ola 2: **C3** · carga, entrar y perfil (diseño para validar: https://claude.ai/artifact/4hzvRiBPPzs36L3QaJ8o2v).
 Una ola es un grupo de prompts que se lanzan **a la vez**, cada uno en su conversación y su rama. Al acabar todos: fusionar
 sus pull requests, instalar el APK de `main`, probar y pasar a la siguiente.
 **Regla:** en una misma ola, cada prompt toca una **zona** distinta (tabla de abajo). Una idea nueva que cae en una zona ocupada
@@ -50,7 +53,7 @@ va a la ola siguiente. Las conversaciones de Coruti se abren en el **entorno «C
 |---|---|---|
 | 0 ✅ | O0: fusionar E y este plan (hecho el 14 nov) | — |
 | 1 | C2 widget · B2a servidor del conector de Claude · B3 partir `app.js` · E5 pendientes del paso 1 · S2 dirección nueva de la API de Strava | Ya |
-| 2 | B2b «Plan de Claude» en la app (con E4) · P1 pulso en directo · P4a servidor de carreras de Strava | B2a y B3 fusionados |
+| 2 | B2b «Plan de Claude» en la app (con E4) · P1 pulso en directo · C3 carga, entrar y perfil · P4a servidor de carreras de Strava | B2a y B3 fusionados |
 | 3 | C2b el widget muestra el plan de Claude · P3 peso y medidas · P5 EMOM, Tabata y AMRAP | B2b fusionado |
 | 4 | P2 planes por objetivo · P4b carreras en el historial · P6 coach por voz | Ola 3 fusionada y P4a desplegado |
 | 5 | P7 Freeletics: decidir si hace falta | Tras usar B2 unas semanas |
