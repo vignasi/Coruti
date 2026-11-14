@@ -38,6 +38,8 @@ La usan Ignasi y su mujer, cada uno con su cuenta. Todo en **español** (código
 - `app/src/test/`: pruebas de Kotlin (`gradle testReleaseUnitTest`).
 - `supabase/migrations/`: esquema con RLS por persona. `supabase/functions/`: Edge Functions de Strava y Polar
   (`docs/strava.md`). Proyecto `jlyqtxihsorqczlxvbly`.
+- `supabase/functions/claude/` + `_shared/claude.ts`: servidor MCP del conector de Claude (B2a, `docs/claude.md`); su página
+  de inicio de sesión es `web/claude/` (GitHub Pages, `.github/workflows/pagina.yml`).
 - `docs/supabase.md` (cuentas y nube), `docs/strava.md` (Strava y Polar), `docs/diseno/` (funcionalidades, sistema de
   diseño, validación, prototipo y figura 3D; la figura se copia al APK al compilar).
 - `ejercicios/`: cómo se hace cada ejercicio (bloque E, `docs/diseno/4-ejercicios.md`): `fichas.json` (paso 1),
@@ -49,7 +51,8 @@ La usan Ignasi y su mujer, cada uno con su cuenta. Todo en **español** (código
 ## Comandos
 - Compilar y probar: `gradle assembleRelease testReleaseUnitTest` (necesita el SDK de Android 34 en `local.properties`).
 - Ejercicios: `node ejercicios/comprobar.js`, `node ejercicios/comprobar3d.js` y `node --test ejercicios/reglas3d.test.js`.
-- Pruebas del servidor: `node --experimental-strip-types --test supabase/functions/_shared/logica.test.ts`.
+- Pruebas del servidor: `node --experimental-strip-types --test supabase/functions/_shared/logica.test.ts` y `…/_shared/claude.test.ts`.
+- Desplegar el conector de Claude: `npx supabase functions deploy claude --use-api --project-ref jlyqtxihsorqczlxvbly`.
 - Desplegar funciones: `npx supabase functions deploy conexiones polar-aviso --use-api --project-ref jlyqtxihsorqczlxvbly`.
 
 ## Reglas que no se rompen
