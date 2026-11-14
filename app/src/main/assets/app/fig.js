@@ -1,16 +1,16 @@
 /* Rutina core · la figura en la app (C1). La 3D de D1 (figura/figura3d.js con three.js y los modelos, todo dentro del APK)
    y, si el móvil no tiene WebGL o falla la carga, la dibujada (figura/figura.js), que es el respaldo decidido en D1.
-   app.js pinta <canvas data-fig="ejercicio" data-modo="…"> y llama a FIG.pintar(raíz) después de cada repintado:
+   la interfaz (comun.js y las zonas) pinta <canvas data-fig="ejercicio" data-modo="…"> y llama a FIG.pintar(raíz) después de cada repintado:
    - mini    → postura clave, quieta, sin etiquetas (cuadrícula, listas). Se guarda en caché: no se vuelve a dibujar.
    - grande  → movimiento en bucle con las etiquetas de zona (ficha, vista previa de la figura).
    - libre   → el reproductor, a toda pantalla, con encuadre por ejercicio (D3) y densidad del lienzo como máximo 2.
-               El instante lo da app.js (window.FIG_T) para que la figura vaya con los tonos de cada repetición.
+               El instante lo da reproductor.js (window.FIG_T) para que la figura vaya con los tonos de cada repetición.
    - sig     → movimiento sin etiquetas (el siguiente ejercicio, durante el descanso).
    data-g="m|f" fuerza hombre o mujer; si no, el elegido en Tú → Figura (window.FIG_GENERO). */
 const BASE = new URL('figura/', location.href).href;
 const DPR_REPRO = 2;                                   // reproductor: como mucho 2 píxeles por dp (D3: la GPU es el cuello de botella)
 const lento = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
-await window.D_LISTA;                                  // rutina.json leído (app.js)
+await window.D_LISTA;                                  // rutina.json leído (inicio.js)
 const D = window.D;
 await new Promise(ok => { if (window.Figura) return ok(); const s = document.createElement('script'); s.src = BASE + 'figura.js'; s.onload = ok; s.onerror = ok; document.head.appendChild(s); });
 
@@ -109,7 +109,7 @@ async function trabajar() {
   ocupado = false;
 }
 
-/* Animadas: un bucle para todas. En el reproductor el instante lo marca app.js (FIG_T); el resto, en bucle libre */
+/* Animadas: un bucle para todas. En el reproductor el instante lo marca reproductor.js (FIG_T); el resto, en bucle libre */
 const inicio = new Map();
 let raf = 0;
 function bucle(now) {

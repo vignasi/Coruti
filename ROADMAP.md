@@ -57,10 +57,11 @@ va a la ola siguiente. Las conversaciones de Coruti se abren en el **entorno «C
 
 | Zona | Archivos |
 |---|---|
-| Interfaz entera | `assets/app/app.js` (hasta que B3 lo parta) |
-| Entrenar y planes | pantalla Entrenar, `motor.js`, `Plan.kt` |
-| Reproductor | pantalla del reproductor |
-| Historial · Tú | sus pantallas |
+| Interfaz común | `assets/app/comun.js`, `inicio.js`, `estilos.css`, `index.html` (iconos, piezas, pintar, acciones compartidas, puente con Android): solo una conversación por ola |
+| Entrenar y planes | `assets/app/entrenar.js` (Entrenar, rutina de core, Sesión nueva, Elegir), `motor.js`, `Plan.kt` |
+| Reproductor | `assets/app/reproductor.js` (reproductor, final, grabación de series) |
+| Ejercicios (pantallas) | `assets/app/ejercicios.js` (pestaña y ficha) |
+| Historial · Tú | `assets/app/historial.js` · `assets/app/tu.js` |
 | Sincronización | `Cloud.kt`, `SyncLogic.kt` |
 | Widget | `Widgets.kt`, `Free.kt`, `res/` |
 | Servidor de Claude · de Strava | `supabase/functions/` (función nueva) · `_shared/servidor.ts` y función de carreras |
@@ -68,8 +69,12 @@ va a la ola siguiente. Las conversaciones de Coruti se abren en el **entorno «C
 
 Fases nuevas del plan por olas (las demás siguen abajo, en su bloque):
 - **B2a** · servidor MCP del conector de Claude (sin tocar la app). **B2b** · «Plan de Claude» en la app, con E4.
-- **B3** · partir `app.js` (unas 800 líneas, todas las pantallas) en un archivo por pantalla, sin cambiar nada visible,
-  para que varias conversaciones toquen la app a la vez sin pisarse.
+- **B3** ✅ · `app.js` partido en un archivo por zona (`comun.js`, `entrenar.js`, `reproductor.js`, `ejercicios.js`,
+  `historial.js`, `tu.js`, `inicio.js`), sin cambiar nada visible: 62 pantallas × claro y oscuro con el mismo HTML y los mismos
+  píxeles que antes (Chromium, 360 × 740). Cada zona añade lo suyo a `P` (pantallas), `ACC` (acciones), `HOJAS` y `FORM`.
+  Lo que sigue compartido en `comun.js`: los controles −/+ (`cambiar`), segmentos y interruptores reparten por clave para
+  todas las zonas; añadir uno nuevo toca `comun.js`. **Tú:** instalar el APK de la rama (o el de `main` al fusionar) y
+  comprobar que todo va igual.
 - **C2b** · el widget muestra y empieza la sesión del día del plan de Claude.
 - **E5** · lo pendiente del paso 1 de los ejercicios (nombres de los hollow, dosis de `hollow_l` y `flex_incl`, almeja con mini banda).
 - **S2** · dirección nueva de la API de Strava antes del 4 de enero de 2027.

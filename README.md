@@ -19,8 +19,8 @@ App Android personal con la rutina diaria de core y pelvis neutra y un widget pa
 
 ## Datos
 
-La app (C1) es una página dentro del APK: `assets/index.html` con `assets/app/` (pantallas en `app.js`, lógica en `motor.js`,
-figura en `fig.js`). La figura 3D y la dibujada viven en `docs/diseno/figura/` y se copian al APK al compilar.
+La app (C1) es una página dentro del APK: `assets/index.html` con `assets/app/` (pantallas en un archivo por zona: `comun.js`,
+`entrenar.js`, `reproductor.js`, `ejercicios.js`, `historial.js`, `tu.js` e `inicio.js`; lógica en `motor.js`; figura en `fig.js`). La figura 3D y la dibujada viven en `docs/diseno/figura/` y se copian al APK al compilar.
 
 Todos los ejercicios (dibujo por fases, textos, tiempos, variantes y módulos) están en
 [`app/src/main/assets/rutina.json`](app/src/main/assets/rutina.json). Lo leen la página (`assets/app/`) y el código Kotlin
