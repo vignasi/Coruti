@@ -52,7 +52,30 @@ val copiarFigura by tasks.registering(Copy::class) {
     into(figuraAssets.map { it.dir("figura") })
 }
 android.sourceSets.getByName("main").assets.srcDir(figuraAssets)
-tasks.named("preBuild") { dependsOn(copiarFigura) }
+
+// Imágenes del widget (C2): las WebP de la figura 3D (docs/diseno/figura/widget/, D1) entran como recursos,
+// fig_<m|f>_<ejercicio>_<fase>.webp: las de claro en drawable-nodpi y las de oscuro en drawable-night-nodpi, así el
+// widget sigue al tema del móvil sin hacer nada. Solo los ejercicios de rutina.json (las sobrantes no entran).
+val figuraRes = layout.buildDirectory.dir("generated/figura-res")
+val imagenesWidget by tasks.registering(Copy::class) {
+    val rutina = file("src/main/assets/rutina.json")
+    inputs.file(rutina)
+    @Suppress("UNCHECKED_CAST")
+    val ejercicios = (groovy.json.JsonSlurper().parse(rutina) as Map<String, Any>)["exercises"] as Map<String, Map<String, Any>>
+    val nombres = ejercicios.flatMap { (k, ex) -> (ex["phases"] as List<*>).indices.map { "${k}_$it.webp" } }
+    for ((tema, carpeta) in listOf("claro" to "drawable-nodpi", "oscuro" to "drawable-night-nodpi")) {
+        for (g in listOf("m", "f")) {
+            from(rootProject.file("docs/diseno/figura/widget/$g/$tema")) {
+                include(nombres)
+                rename { "fig_${g}_$it" }
+                into(carpeta)
+            }
+        }
+    }
+    into(figuraRes)
+}
+android.sourceSets.getByName("main").res.srcDir(figuraRes)
+tasks.named("preBuild") { dependsOn(copiarFigura, imagenesWidget) }
 
 dependencies {
     // Solo para las pruebas en el ordenador (gradle testReleaseUnitTest); no entran en el APK
