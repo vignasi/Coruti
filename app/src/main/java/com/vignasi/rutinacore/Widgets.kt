@@ -6,10 +6,15 @@ import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.provider.Settings
 import android.view.View
 import android.widget.RemoteViews
 
-/** Widget grande: el reproductor completo de la rutina y los ajustes de la sesión. */
+/* Widgets con el diseño de D2 (C2, docs/diseno/2-sistema-de-diseno.md → Widget). Fondo A: `capa` de la app, claro u
+   oscuro según el tema del móvil; los colores salen de res/values(-night)/widget.xml y las imágenes de la figura 3D de
+   drawable(-night)-nodpi, así Android cambia de tema solo. Muestran la rutina de core o la favorita elegida. */
+
+/** Widget grande: elige favorita o core, rondas y Empezar; durante la sesión, figura, cantidad, Pausa y Hecho. */
 class RutinaWidget : AppWidgetProvider() {
     override fun onUpdate(context: Context, manager: AppWidgetManager, ids: IntArray) {
         WidgetUpdater.refresh(context, force = true)
@@ -18,45 +23,28 @@ class RutinaWidget : AppWidgetProvider() {
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
         if (Workout.active) return // durante la sesión no se cambia la configuración
-        val fav = Store.widgetSource(context) == Store.SRC_FAV
         when (intent.action) {
-            ACTION_SRC -> { Store.setWidgetSource(context, intent.getStringExtra(EXTRA_SRC) ?: return); WidgetUpdater.refresh(context, force = true); return }
-            ACTION_PLUS, ACTION_MINUS -> if (fav) {
-                Store.addWidgetFavRounds(context, if (intent.action == ACTION_PLUS) 1 else -1)
-                WidgetUpdater.refresh(context, force = true)
-                return
-            }
-        }
-        val cfg = Store.config(context)
-        when (intent.action) {
-            ACTION_PLUS -> cfg.rounds = (cfg.rounds + 1).coerceAtMost(6)
-            ACTION_MINUS -> cfg.rounds = (cfg.rounds - 1).coerceAtLeast(1)
-            ACTION_INT -> cfg.setAll(INTENSITIES[(INTENSITIES.indexOf(cfg.intensity) + 1) % INTENSITIES.size])
-            ACTION_AUTO -> cfg.auto = !cfg.auto
-            ACTION_MOD -> {
-                val m = intent.getStringExtra(EXTRA_MOD) ?: return
-                if (cfg.auto) cfg.auto = false
-                cfg.mods[m] = cfg.mods[m] != true
+            ACTION_SRC -> Store.setWidgetSource(context, intent.getStringExtra(EXTRA_SRC) ?: return)
+            ACTION_PLUS, ACTION_MINUS -> {
+                val d = if (intent.action == ACTION_PLUS) 1 else -1
+                if (Store.widgetSource(context) == Store.SRC_FAV) Store.addWidgetFavRounds(context, d)
+                else Store.config(context).let { it.rounds = (it.rounds + d).coerceIn(1, 6); Store.setConfig(context, it) }
             }
             else -> return
         }
-        Store.setConfig(context, cfg)
+        Workout.done = false
         WidgetUpdater.refresh(context, force = true)
     }
 
     companion object {
         const val ACTION_PLUS = "com.vignasi.rutinacore.PLUS"
         const val ACTION_MINUS = "com.vignasi.rutinacore.MINUS"
-        const val ACTION_INT = "com.vignasi.rutinacore.INTENSITY"
-        const val ACTION_AUTO = "com.vignasi.rutinacore.AUTO"
-        const val ACTION_MOD = "com.vignasi.rutinacore.MODULE"
-        const val EXTRA_MOD = "m"
         const val ACTION_SRC = "com.vignasi.rutinacore.SOURCE"
         const val EXTRA_SRC = "src"
     }
 }
 
-/** Widget pequeño: ejercicio en curso, tiempo y botón de empezar. */
+/** Widget pequeño: figura, sesión y Empezar; durante la sesión, ejercicio, cantidad, Pausa y Hecho. */
 class RutinaMini : AppWidgetProvider() {
     override fun onUpdate(context: Context, manager: AppWidgetManager, ids: IntArray) {
         WidgetUpdater.refresh(context, force = true)
@@ -64,21 +52,17 @@ class RutinaMini : AppWidgetProvider() {
 }
 
 object WidgetUpdater {
-    private var lastFrame: String? = null
+    private var lastFig: String? = null
     private var lastSig: String? = null
-
-    private val CHIPS = listOf(
-        "abdomen" to R.id.chip_abd, "pecho" to R.id.chip_pec, "espalda" to R.id.chip_esp, "brazos" to R.id.chip_bra, "gluteo" to R.id.chip_glu
-    )
+    private val recursos = HashMap<String, Int>()
 
     private fun pi(ctx: Context, req: Int, action: String): PendingIntent {
         val i = Intent(ctx, WorkoutService::class.java).setAction(action)
         return PendingIntent.getForegroundService(ctx, req, i, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
     }
 
-    private fun bc(ctx: Context, req: Int, action: String, mod: String? = null, src: String? = null): PendingIntent {
+    private fun bc(ctx: Context, req: Int, action: String, src: String? = null): PendingIntent {
         val i = Intent(ctx, RutinaWidget::class.java).setAction(action)
-        if (mod != null) i.putExtra(RutinaWidget.EXTRA_MOD, mod)
         if (src != null) i.putExtra(RutinaWidget.EXTRA_SRC, src)
         return PendingIntent.getBroadcast(ctx, req, i, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
     }
@@ -88,217 +72,201 @@ object WidgetUpdater {
         return PendingIntent.getActivity(ctx, 20, i, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
     }
 
-    private class Frame(val key: String, val ex: Exercise, val phase: Int)
+    /** Lo que se puede empezar (parado): la favorita elegida o la rutina de core, con sus pasos. */
+    private class Sesion(val fav: FreeSession?, val steps: List<Step>, val titulo: String, val origen: String)
 
-    private fun frame(data: Rutina): Frame {
+    private fun sesion(ctx: Context, data: Rutina): Sesion {
+        val f = if (Store.widgetSource(ctx) == Store.SRC_FAV) Store.widgetFav(ctx) else null
+        if (f != null) return Sesion(f, buildFree(data, f) { Store.bandOf(ctx, it) }, f.name, "Favorita")
+        val cfg = Store.config(ctx)
+        val mods = activeModules(data, cfg, Store.lastDay(ctx))
+        val origen = if (cfg.auto) "Hoy toca el día ${if (Store.lastDay(ctx) == "A") "B" else "A"}" else modsLabel(mods)
+        return Sesion(null, Store.plan(ctx, cfg), "Rutina de core", origen)
+    }
+
+    /** Qué figura se ve: ejercicio y fase (null = todas las fases, alternando; parado). */
+    private class Fig(val k: String?, val fase: Int?) { val key = "$k-$fase" }
+
+    private fun fig(data: Rutina, s: Sesion?): Fig {
         val st = Workout.current()
-        if (!Workout.active || st == null) {
-            val ex = data.ex(if (Workout.done) "gato" else "psoas")
-            val ph = if (Workout.done) 0 else ex.phases.size - 1
-            return Frame("idle-${ex.key}-$ph", ex, ph)
+        if (!Workout.active || st == null) return Fig(s?.let { ejercicioFigura(it.steps, -1) }, null)
+        val k = ejercicioFigura(Workout.steps, Workout.idx) ?: return Fig(null, null)
+        if (st.rest || st.prep) return Fig(k, 0)
+        val ex = data.ex(k)
+        return Fig(k, ex.phaseAt(Workout.elapsedInStep(), clamp = ex.hold))
+    }
+
+    private fun genero(ctx: Context): String = if (Store.config(ctx).app.optString("fig") == "f") "f" else "m"
+
+    private fun recurso(ctx: Context, nombre: String): Int =
+        recursos.getOrPut(nombre) { ctx.resources.getIdentifier(nombre, "drawable", ctx.packageName) }
+
+    /** Con «Quitar animaciones» del móvil, la figura no alterna: queda en la primera fase. */
+    private fun sinMovimiento(ctx: Context): Boolean =
+        try { Settings.Global.getFloat(ctx.contentResolver, Settings.Global.ANIMATOR_DURATION_SCALE, 1f) == 0f } catch (e: Exception) { false }
+
+    /** Pone las fases de la figura en el ViewFlipper (alternan solas cada 1,4 s si hay más de una). */
+    private fun ponerFigura(ctx: Context, data: Rutina, rv: RemoteViews, f: Fig) {
+        rv.removeAllViews(R.id.fig)
+        val k = f.k
+        val ex = k?.let { data.exercises[it] }
+        if (k == null || ex == null) { rv.setViewVisibility(R.id.fig, View.GONE); return }
+        val g = genero(ctx)
+        val fases = when {
+            f.fase != null -> listOf(f.fase)
+            sinMovimiento(ctx) -> listOf(0)
+            else -> ex.phases.indices.toList()
         }
-        val ex = data.ex(st.k)
-        val live = !st.prep && !st.rest
-        val ph = ex.phaseAt(Workout.elapsedInStep(), clamp = live && ex.hold)
-        return Frame("${Workout.idx}-$ph", ex, ph)
+        var n = 0
+        for (i in fases) {
+            val id = recurso(ctx, recursoFigura(g, k, i))
+            if (id == 0) continue // ejercicio nuevo sin imágenes todavía (docs/diseno/figura/NOTAS.md): sin figura
+            val hijo = RemoteViews(ctx.packageName, R.layout.w_fig)
+            hijo.setImageViewResource(R.id.fig_img, id)
+            rv.addView(R.id.fig, hijo)
+            n++
+        }
+        rv.setViewVisibility(R.id.fig, if (n > 0) View.VISIBLE else View.GONE)
+        rv.setContentDescription(R.id.fig, "Figura: ${ex.name}")
     }
-
-    private fun statusLine(ctx: Context): String {
-        val streak = Store.streak(ctx)
-        val today = if (Store.doneToday(ctx)) "Hoy ✓" else "Hoy pendiente"
-        return if (streak > 0) "$today · racha $streak" else today
-    }
-
-    private fun repNow(data: Rutina, st: Step): Int =
-        minOf(st.reps, (Workout.elapsedInStep() / data.ex(st.k).rep).toInt() + 1)
 
     fun refresh(ctx: Context, force: Boolean = false) {
         val data = Rutina.get(ctx)
-        val f = frame(data)
+        val s = if (Workout.active) null else sesion(ctx, data)
+        val f = fig(data, s)
         val st = Workout.current()
         // El servicio llama muy a menudo (para los tonos): solo se redibuja si cambia algo visible
-        val sig = "${f.key}|${Workout.leftSec()}|${Workout.running}|${if (st != null && st.reps > 0 && Workout.active) repNow(data, st) else 0}"
+        val sig = "${f.key}|${Workout.idx}|${Workout.leftSec()}|${Workout.running}|${Workout.active}|" +
+            if (st != null && st.reps > 0 && Workout.active) cantidadTxt(st, Workout.elapsedInStep(), 0, data.ex(st.k).rep).second else ""
         if (!force && sig == lastSig) return
         lastSig = sig
+        // La figura solo se manda al cambiar (si no, el ViewFlipper volvería a empezar en cada segundo)
+        val conFig = force || f.key != lastFig
+        lastFig = f.key
 
         val mgr = AppWidgetManager.getInstance(ctx)
-        val bigIds = mgr.getAppWidgetIds(ComponentName(ctx, RutinaWidget::class.java))
-        val miniIds = mgr.getAppWidgetIds(ComponentName(ctx, RutinaMini::class.java))
-        val withImage = force || f.key != lastFrame
-        lastFrame = f.key
-
-        if (bigIds.isNotEmpty()) {
-            val img = if (withImage) PoseRenderer.render(data, f.ex, f.phase, 400) else null
-            for (id in bigIds) {
-                val rv = big(ctx, data, f, img)
-                if (img != null) mgr.updateAppWidget(id, rv) else mgr.partiallyUpdateAppWidget(id, rv)
-            }
+        for (id in mgr.getAppWidgetIds(ComponentName(ctx, RutinaWidget::class.java))) {
+            val rv = grande(ctx, data, s, f, conFig)
+            if (conFig) mgr.updateAppWidget(id, rv) else mgr.partiallyUpdateAppWidget(id, rv)
         }
-        for (id in miniIds) mgr.updateAppWidget(id, mini(ctx, data))
+        for (id in mgr.getAppWidgetIds(ComponentName(ctx, RutinaMini::class.java))) {
+            val rv = pequeno(ctx, data, s, f, conFig)
+            if (conFig) mgr.updateAppWidget(id, rv) else mgr.partiallyUpdateAppWidget(id, rv)
+        }
     }
 
-    private fun big(ctx: Context, data: Rutina, f: Frame, img: android.graphics.Bitmap?): RemoteViews {
+    /** Botón principal (icono + texto) y el de al lado (Pausa / Parar), según el estado de la sesión. */
+    private fun botones(ctx: Context, rv: RemoteViews, main: Int, mainIc: Int, mainTxt: Int, alt: Int, st: Step?) {
+        if (Workout.active && st != null) {
+            val (ic, txt, desc) = when {
+                !Workout.running -> Triple(R.drawable.w_ic_play, "Seguir", "Seguir")
+                st.rest -> Triple(R.drawable.w_ic_check, "Saltar", "Terminar el descanso")
+                st.prep -> Triple(R.drawable.w_ic_check, "Ya", "Empezar ya")
+                else -> Triple(R.drawable.w_ic_check, "Hecho", "Hecho: pasar al siguiente")
+            }
+            rv.setImageViewResource(mainIc, ic)
+            rv.setTextViewText(mainTxt, txt)
+            rv.setContentDescription(main, desc)
+            rv.setOnClickPendingIntent(main, if (Workout.running) pi(ctx, 11, WorkoutService.ACTION_SKIP) else pi(ctx, 10, WorkoutService.ACTION_TOGGLE))
+            rv.setViewVisibility(alt, View.VISIBLE)
+            // Parar está detrás de Pausa, como en la app: la sesión se guarda como incompleta
+            rv.setImageViewResource(alt, if (Workout.running) R.drawable.w_ic_pausa else R.drawable.w_ic_parar)
+            rv.setContentDescription(alt, if (Workout.running) "Pausa" else "Parar. Se guarda como incompleta")
+            rv.setOnClickPendingIntent(alt, if (Workout.running) pi(ctx, 10, WorkoutService.ACTION_TOGGLE) else pi(ctx, 12, WorkoutService.ACTION_STOP))
+        } else {
+            rv.setImageViewResource(mainIc, R.drawable.w_ic_play)
+            val otra = Workout.done || Store.doneToday(ctx)
+            rv.setTextViewText(mainTxt, if (otra) "Hacer otra" else "Empezar")
+            rv.setContentDescription(main, null)
+            rv.setOnClickPendingIntent(main, pi(ctx, 10, WorkoutService.ACTION_TOGGLE))
+            rv.setViewVisibility(alt, View.GONE)
+        }
+    }
+
+    private fun grande(ctx: Context, data: Rutina, s: Sesion?, f: Fig, conFig: Boolean): RemoteViews {
         val rv = RemoteViews(ctx.packageName, R.layout.widget_player)
         val st = Workout.current()
-
-        rv.setTextViewText(R.id.status, statusLine(ctx))
-        if (img != null) {
-            rv.setImageViewBitmap(R.id.pose, img)
-            rv.setContentDescription(R.id.pose, "Dibujo: " + f.ex.name + ". " + f.ex.phases[f.phase].cap)
-        }
+        if (conFig) ponerFigura(ctx, data, rv, f)
+        rv.setOnClickPendingIntent(R.id.textos, openApp(ctx))
+        botones(ctx, rv, R.id.btn_main, R.id.btn_main_ic, R.id.btn_main_txt, R.id.btn_alt, st)
 
         if (Workout.active && st != null) {
-            val ex = f.ex
-            val live = !st.prep && !st.rest
-            rv.setTextViewText(R.id.ex_name, if (st.prep) "Prepárate: ${ex.name}" else st.name)
-            var cap = when {
-                st.rest -> "Respira y bebe agua"
-                st.prep -> st.sub.substringAfter(" · ", "")
-                else -> ex.phases[f.phase].cap
-            }
-            st.kg?.let { kg ->
-                val last = Store.weight(ctx, st.k)
-                cap = kgRange(kg) + (if (last != null) " · último ${fmtKg(last)} kg" else "") + (if (cap.isNotEmpty()) " · $cap" else "")
-            }
-            rv.setTextViewText(R.id.ex_cap, cap)
-            rv.setTextViewText(R.id.time, fmt(Workout.leftSec()))
-            var info = "${Workout.roundWord} ${st.r}/${Workout.rounds}"
-            if (live && st.reps > 0) info += " · ${ex.unit} ${repNow(data, st)}/${st.reps}"
-            else if (live && st.hold) info += " · quieto"
-            rv.setTextViewText(R.id.info, info)
-            rv.setProgressBar(R.id.progress, st.s * 10, (st.s * 10 - Workout.leftMs / 100).toInt(), false)
-            rv.setTextViewText(R.id.btn_play, if (Workout.running) "⏸  Pausa" else "▶  Seguir")
-            rv.setViewVisibility(R.id.rounds_box, View.GONE)
-            rv.setViewVisibility(R.id.config_box, View.GONE)
-            rv.setViewVisibility(R.id.src_box, View.GONE)
-            rv.setViewVisibility(R.id.btn_skip, View.VISIBLE)
-            rv.setViewVisibility(R.id.btn_stop, View.VISIBLE)
-        } else if (Store.widgetSource(ctx) == Store.SRC_FAV && Store.widgetFav(ctx) != null) {
-            idleFav(ctx, data, rv, Store.widgetFav(ctx)!!)
-        } else {
-            srcRow(ctx, rv, fav = false)
-            rv.setViewVisibility(R.id.chip_auto, View.VISIBLE)
-            rv.setViewVisibility(R.id.chip_int, View.VISIBLE)
-            val cfg = Store.config(ctx)
-            val mods = activeModules(data, cfg, Store.lastDay(ctx))
-            val steps = Store.plan(ctx, cfg)
-            if (Workout.done) {
-                rv.setTextViewText(R.id.ex_name, "¡Rutina terminada!")
-                rv.setTextViewText(R.id.ex_cap, "Apúntala en Polar como «Entrenamiento en circuito»")
-            } else {
-                rv.setTextViewText(R.id.ex_name, modsLabel(mods))
-                rv.setTextViewText(R.id.ex_cap, if (cfg.auto) "Alterna sola: hoy toca el día ${if (Store.lastDay(ctx) == "A") "B" else "A"}" else "Toca los módulos para añadirlos o quitarlos")
-            }
-            rv.setTextViewText(R.id.time, fmt(totalSeconds(steps)))
-            val lvl = cfg.commonLevel((if (mods.isEmpty()) data.modules else mods).map { it.key })
-            val lvlName = lvl?.let { INT_NAME[it] } ?: "Mixto"
-            rv.setTextViewText(R.id.info, "${cfg.rounds} ${if (cfg.rounds == 1) "ronda" else "rondas"}" + if (mods.isNotEmpty()) " · $lvlName" else "")
-            rv.setProgressBar(R.id.progress, 100, if (Workout.done) 100 else 0, false)
-            rv.setTextViewText(R.id.btn_play, if (Workout.done) "▶  Otra vez" else "▶  Empezar")
-            rv.setTextViewText(R.id.rounds_lbl, "${cfg.rounds}")
-            rv.setContentDescription(R.id.rounds_lbl, "${cfg.rounds} rondas")
-            rv.setViewVisibility(R.id.rounds_box, View.VISIBLE)
-            rv.setViewVisibility(R.id.config_box, View.VISIBLE)
-            rv.setViewVisibility(R.id.btn_skip, View.GONE)
-            rv.setViewVisibility(R.id.btn_stop, View.GONE)
-
-            CHIPS.forEachIndexed { i, (key, id) ->
-                val on = mods.any { it.key == key }
-                val name = data.modules.firstOrNull { it.key == key }?.name ?: key
-                chip(rv, id, name, on)
-                rv.setContentDescription(id, "$name: ${if (on) "activado" else "desactivado"}")
-                rv.setOnClickPendingIntent(id, bc(ctx, 50 + i, RutinaWidget.ACTION_MOD, key))
-            }
-            chip(rv, R.id.chip_auto, "A/B", cfg.auto)
-            rv.setContentDescription(R.id.chip_auto, "Alternar automáticamente: ${if (cfg.auto) "activado" else "desactivado"}")
-            chip(rv, R.id.chip_int, lvlName, false)
-            rv.setContentDescription(R.id.chip_int, "Intensidad $lvlName. Toca para cambiarla en todos los módulos")
-            rv.setOnClickPendingIntent(R.id.chip_auto, bc(ctx, 55, RutinaWidget.ACTION_AUTO))
-            rv.setOnClickPendingIntent(R.id.chip_int, bc(ctx, 56, RutinaWidget.ACTION_INT))
+            val ex = data.ex(st.k)
+            rv.setViewVisibility(R.id.seg_box, View.GONE)
+            rv.setViewVisibility(R.id.rondas_box, View.GONE)
+            rv.setViewVisibility(R.id.top_box, View.VISIBLE)
+            rv.setViewVisibility(R.id.progreso, View.VISIBLE)
+            rv.setViewVisibility(R.id.cantidad, View.VISIBLE)
+            rv.setTextViewText(R.id.pos, posTxt(Workout.steps, Workout.idx, Workout.roundWord))
+            rv.setTextViewText(R.id.quedan, "Quedan ${fmt(Workout.remainingSec())}")
+            rv.setTextViewText(R.id.nombre, if (st.rest) "Respira" else ex.name)
+            val (cant, abajo) = cantidadTxt(st, Workout.elapsedInStep(), Workout.leftSec(), ex.rep)
+            rv.setTextViewText(R.id.cantidad, cant)
+            // Debajo: ritmo o tiempo, y la banda o los kilos de este ejercicio
+            val sigue = if (st.prep) Workout.steps.getOrNull(Workout.idx + 1) else st
+            val extra = if (st.rest || sigue == null) null else Store.bandOf(ctx, sigue.k)?.let { "Banda: $it" }
+                ?: sigue.kg?.let { kg -> Store.weight(ctx, sigue.k)?.let { "${fmtKg(it)} kg" } ?: kgRange(kg) }
+            rv.setTextViewText(R.id.linea1, listOfNotNull(abajo, extra).joinToString(" · "))
+            rv.setTextViewText(R.id.linea2, luegoTxt(Workout.steps, Workout.idx))
+            rv.setProgressBar(R.id.progreso, st.s * 10, (st.s * 10 - Workout.leftMs / 100).toInt().coerceAtLeast(0), false)
+            return rv
         }
 
-        rv.setOnClickPendingIntent(R.id.btn_play, pi(ctx, 10, WorkoutService.ACTION_TOGGLE))
-        rv.setOnClickPendingIntent(R.id.btn_skip, pi(ctx, 11, WorkoutService.ACTION_SKIP))
-        rv.setOnClickPendingIntent(R.id.btn_stop, pi(ctx, 12, WorkoutService.ACTION_STOP))
-        rv.setOnClickPendingIntent(R.id.btn_minus, bc(ctx, 13, RutinaWidget.ACTION_MINUS))
-        rv.setOnClickPendingIntent(R.id.btn_plus, bc(ctx, 14, RutinaWidget.ACTION_PLUS))
-        rv.setOnClickPendingIntent(R.id.header, openApp(ctx))
+        s ?: return rv
+        rv.setViewVisibility(R.id.top_box, View.GONE)
+        rv.setViewVisibility(R.id.progreso, View.GONE)
+        rv.setViewVisibility(R.id.cantidad, View.GONE)
+        rv.setViewVisibility(R.id.rondas_box, View.VISIBLE)
+        // Segmentos ★ Favorita · Core: solo si hay una favorita marcada en la app (C2b añadirá «Hoy», el plan de Claude)
+        val fav = Store.widgetFav(ctx)
+        if (fav == null) rv.setViewVisibility(R.id.seg_box, View.GONE) else {
+            val enFav = s.fav != null
+            rv.setViewVisibility(R.id.seg_box, View.VISIBLE)
+            rv.setInt(R.id.seg_fav, "setBackgroundResource", if (enFav) R.drawable.w_seg_on else 0)
+            rv.setInt(R.id.seg_core, "setBackgroundResource", if (enFav) 0 else R.drawable.w_seg_on)
+            rv.setContentDescription(R.id.seg_fav, "Favorita: ${fav.name}" + if (enFav) ". Elegida" else "")
+            rv.setContentDescription(R.id.seg_core, "Rutina de core" + if (!enFav) ". Elegida" else "")
+            rv.setOnClickPendingIntent(R.id.seg_fav, bc(ctx, 57, RutinaWidget.ACTION_SRC, Store.SRC_FAV))
+            rv.setOnClickPendingIntent(R.id.seg_core, bc(ctx, 58, RutinaWidget.ACTION_SRC, Store.SRC_RUTINA))
+        }
+        if (Workout.done) {
+            rv.setTextViewText(R.id.nombre, if (s.fav != null) "¡Terminada!" else "¡Rutina terminada!")
+            rv.setTextViewText(R.id.linea1, "Buen trabajo")
+        } else {
+            rv.setTextViewText(R.id.nombre, s.titulo)
+            rv.setTextViewText(R.id.linea1, s.origen)
+        }
+        val racha = Store.streak(ctx)
+        rv.setTextViewText(R.id.linea2, "${ejerciciosTxt(s.steps)} · ${minTxt(totalSeconds(s.steps))}" +
+            if (racha > 1) " · racha de $racha días" else "")
+        val n = s.fav?.rounds ?: Store.config(ctx).rounds
+        val palabra = if (s.fav != null && !s.fav.isAlt) "Series" else "Rondas"
+        rv.setTextViewText(R.id.rondas_txt, palabra)
+        rv.setTextViewText(R.id.rondas_n, "$n")
+        rv.setContentDescription(R.id.rondas_n, "$n ${palabra.lowercase()}")
+        rv.setContentDescription(R.id.btn_menos, "Una ${if (palabra == "Series") "serie" else "ronda"} menos")
+        rv.setContentDescription(R.id.btn_mas, "Una ${if (palabra == "Series") "serie" else "ronda"} más")
+        rv.setOnClickPendingIntent(R.id.btn_menos, bc(ctx, 13, RutinaWidget.ACTION_MINUS))
+        rv.setOnClickPendingIntent(R.id.btn_mas, bc(ctx, 14, RutinaWidget.ACTION_PLUS))
         return rv
     }
 
-    /** Fila «Rutina / ★ favorita»: solo si hay una favorita marcada en la app. */
-    private fun srcRow(ctx: Context, rv: RemoteViews, fav: Boolean) {
-        val f = Store.widgetFav(ctx)
-        if (f == null) { rv.setViewVisibility(R.id.src_box, View.GONE); return }
-        rv.setViewVisibility(R.id.src_box, View.VISIBLE)
-        chip(rv, R.id.chip_src_rut, "Rutina", !fav)
-        chip(rv, R.id.chip_src_fav, "★ " + f.name, fav)
-        rv.setContentDescription(R.id.chip_src_rut, "Rutina completa" + if (!fav) ": elegida" else "")
-        rv.setContentDescription(R.id.chip_src_fav, "Favorita ${f.name}" + if (fav) ": elegida" else "")
-        rv.setOnClickPendingIntent(R.id.chip_src_rut, bc(ctx, 57, RutinaWidget.ACTION_SRC, src = Store.SRC_RUTINA))
-        rv.setOnClickPendingIntent(R.id.chip_src_fav, bc(ctx, 58, RutinaWidget.ACTION_SRC, src = Store.SRC_FAV))
-    }
-
-    /** Widget parado con la favorita elegida: sus ejercicios, duración y rondas (− / + cambian las de la favorita). */
-    private fun idleFav(ctx: Context, data: Rutina, rv: RemoteViews, f: FreeSession) {
-        srcRow(ctx, rv, fav = true)
-        val steps = buildFree(data, f) { Store.bandOf(ctx, it) }
-        if (Workout.done) {
-            rv.setTextViewText(R.id.ex_name, "¡Terminado!")
-            rv.setTextViewText(R.id.ex_cap, "Apúntala en Polar como «Entrenamiento en circuito»")
-        } else {
-            rv.setTextViewText(R.id.ex_name, f.sel.joinToString(" + ") { data.ex(it.k).name })
-            rv.setTextViewText(R.id.ex_cap, f.sel.joinToString(" / ") { if (FreeSession.isHold(data, it.k)) "${it.n} s" else "${it.n} reps" } + " · descanso ${f.rest} s")
-        }
-        rv.setTextViewText(R.id.time, fmt(totalSeconds(steps)))
-        val kind = if (f.isAlt) (if (f.rounds == 1) "ronda alternada" else "rondas alternadas") else (if (f.rounds == 1) "serie" else "series")
-        rv.setTextViewText(R.id.info, "${f.rounds} $kind")
-        rv.setProgressBar(R.id.progress, 100, if (Workout.done) 100 else 0, false)
-        rv.setTextViewText(R.id.btn_play, if (Workout.done) "▶  Otra vez" else "▶  Empezar")
-        rv.setTextViewText(R.id.rounds_lbl, "${f.rounds}")
-        rv.setContentDescription(R.id.rounds_lbl, "${f.rounds} ${if (f.isAlt) "rondas" else "series"}")
-        rv.setViewVisibility(R.id.rounds_box, View.VISIBLE)
-        rv.setViewVisibility(R.id.chip_auto, View.GONE)
-        rv.setViewVisibility(R.id.chip_int, View.GONE)
-        rv.setViewVisibility(R.id.config_box, View.GONE)
-        rv.setViewVisibility(R.id.btn_skip, View.GONE)
-        rv.setViewVisibility(R.id.btn_stop, View.GONE)
-    }
-
-    private fun chip(rv: RemoteViews, id: Int, text: String, on: Boolean) {
-        rv.setTextViewText(id, text)
-        rv.setInt(id, "setBackgroundResource", if (on) R.drawable.widget_btn else R.drawable.widget_btn_ghost)
-        rv.setTextColor(id, if (on) 0xFF1E6B74.toInt() else 0xFFFFFFFF.toInt())
-    }
-
-    private fun mini(ctx: Context, data: Rutina): RemoteViews {
+    private fun pequeno(ctx: Context, data: Rutina, s: Sesion?, f: Fig, conFig: Boolean): RemoteViews {
         val rv = RemoteViews(ctx.packageName, R.layout.widget_mini)
         val st = Workout.current()
+        if (conFig) ponerFigura(ctx, data, rv, f)
+        rv.setOnClickPendingIntent(R.id.mini_textos, openApp(ctx))
+        botones(ctx, rv, R.id.mini_main, R.id.mini_main_ic, R.id.mini_main_txt, R.id.mini_alt, st)
         if (Workout.active && st != null) {
-            val name = if (st.prep) "Prepárate: " + data.ex(st.k).name else st.name
-            rv.setTextViewText(R.id.mini_title, name)
-            var sub = "${fmt(Workout.leftSec())} · ${Workout.roundWord.lowercase()} ${st.r}/${Workout.rounds}"
-            if (!st.prep && !st.rest && st.reps > 0) sub += " · ${repNow(data, st)}/${st.reps}"
-            rv.setTextViewText(R.id.mini_sub, sub)
-            rv.setTextViewText(R.id.mini_play, if (Workout.running) "⏸" else "▶")
-            rv.setContentDescription(R.id.mini_play, if (Workout.running) "Pausa" else "Seguir")
-        } else if (Store.widgetSource(ctx) == Store.SRC_FAV && Store.widgetFav(ctx) != null) {
-            val f = Store.widgetFav(ctx)!!
-            val total = totalSeconds(buildFree(data, f) { Store.bandOf(ctx, it) })
-            rv.setTextViewText(R.id.mini_title, if (Workout.done) "¡Terminado!" else "★ ${f.name} · ${fmt(total)}")
-            rv.setTextViewText(R.id.mini_sub, "${f.rounds} ${if (f.isAlt) "rondas" else "series"} · ${statusLine(ctx)}")
-            rv.setTextViewText(R.id.mini_play, "▶")
-            rv.setContentDescription(R.id.mini_play, "Empezar ${f.name}")
-        } else {
-            val cfg = Store.config(ctx)
-            val total = totalSeconds(Store.plan(ctx, cfg))
-            rv.setTextViewText(R.id.mini_title, if (Workout.done) "¡Rutina terminada!" else "Rutina core · ${fmt(total)}")
-            rv.setTextViewText(R.id.mini_sub, "${cfg.rounds} ${if (cfg.rounds == 1) "ronda" else "rondas"} · ${statusLine(ctx)}")
-            rv.setTextViewText(R.id.mini_play, "▶")
-            rv.setContentDescription(R.id.mini_play, "Empezar la rutina")
+            val ex = data.ex(st.k)
+            rv.setTextViewText(R.id.mini_nombre, if (st.rest) "Descanso" else ex.name)
+            rv.setTextViewText(R.id.mini_cant, cantidadTxt(st, Workout.elapsedInStep(), Workout.leftSec(), ex.rep, corta = true).first)
+            rv.setViewVisibility(R.id.mini_cant, View.VISIBLE)
+        } else if (s != null) {
+            val nombre = if (s.fav != null) "★ ${s.fav.name}" else "Core"
+            rv.setTextViewText(R.id.mini_nombre, if (Workout.done) "¡Terminada!" else "$nombre · ${minTxt(totalSeconds(s.steps))}")
+            rv.setViewVisibility(R.id.mini_cant, View.GONE)
         }
-        rv.setOnClickPendingIntent(R.id.mini_play, pi(ctx, 30, WorkoutService.ACTION_TOGGLE))
-        rv.setOnClickPendingIntent(R.id.mini_root, openApp(ctx))
         return rv
     }
 }

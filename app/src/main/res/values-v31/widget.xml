@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Android 12+: radio del sistema y letra Atkinson (antes, la del sistema: es lo único que cambia) -->
+<resources>
+    <dimen name="w_radio">@android:dimen/system_app_widget_background_radius</dimen>
+    <style name="WTexto">
+        <item name="android:textColor">@color/w_tinta</item>
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:fontFamily">@font/atkinson</item>
+    </style>
+</resources>
